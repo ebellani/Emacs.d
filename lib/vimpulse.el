@@ -1885,6 +1885,7 @@ In XEmacs, change the `end-glyph' property."
   (define-key viper-vi-basic-map "\C-wk" 'windmove-up)
   (define-key viper-vi-basic-map "\C-wl" 'windmove-right))
 
+
 ;;; Insert mode keys
 
 ;; Vim-like completion keys

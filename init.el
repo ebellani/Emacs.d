@@ -2,15 +2,22 @@
 
 (add-to-list 'load-path my-default-lib)
 
-;; vimpulse, because I really like vim's keybindings
+;; vimpulse, because I really like vim's key-bindings
 (require 'vimpulse)
 (require 'redo)
 
 ;; automatically sets the global mode for all buffers
 (global-linum-mode 1)
 
-;; fonts
-(set-face-attribute 'default nil :font "Liberation Mono 10")
+;; styling. Check if not in terminal to set the nice colors and fonts.
+(unless (string= 'nil window-system) 
+    (progn
+      (set-face-attribute 'default nil :font "Liberation Mono 11")
+      (require 'color-theme)
+      (color-theme-initialize)
+      (load-file "~/.emacs.d/lib/color-theme-twilight.el")
+      ;; (color-theme-billw)
+      (color-theme-twilight)))
 
 ;;Setting up tabbar
 (require 'tabbar)
@@ -19,6 +26,16 @@
 ;; define C-u and C-d to be like vim (equal pgup pgdown)
 ;; for some reason C-u was not working
 (define-key viper-vi-basic-map "\C-u" 'scroll-down)
+
+(setq-default viper-electric-mode 1)
+
+;; set the viper >> and << keys to represent increase and decrease left margins
+;;(define-key viper-vi-basic-map ">" 'increase-left-margin)
+
+;; set the default spacing for ruby editing
+(setq viper-shift-width 2)
+
+;; sets C-[ to also mean C-g 
 
 ;; page-up and page-down scroll bars for the tabs
 ;; basically modify the keys of tabbar
@@ -30,12 +47,14 @@
 (global-set-key [C-prior] 'tabbar-backward)
 (global-set-key [C-next] 'tabbar-forward)
 
+;; newline also indents
+(global-set-key "\r" 'newline-and-indent)
 
 ;; hide menus
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
-;; most of the information below was lifted from 
+;; some of the information below was lifted from 
 ;; http://pintucoperu.wordpress.com/2010/03/04/utilizando-emacs-como-editor-de-texto-para-cc-python-y-vhdl-y-conociendo-el-modo-cua/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -44,23 +63,26 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'reverse)
 (setq uniquify-separator "|")
-(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-after-kill-buffer-p 1)
 (setq uniquify-ignore-buffers-re "^\\*")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Keep session
-;; (desktop-save-mode 1)
+(desktop-save-mode 1)
+
+;; disable the save mode
+(global-set-key [f5] 'desktop-save-mode)
 
 ;; Inhibit startup window, very annoying
-(setq inhibit-startup-message t)
+(setq inhibit-startup-message 1)
 
 ;; Makes final line always be a return
-(setq require-final-newline t)
+(setq require-final-newline 1)
 
 ;; Avoid to make a separate frame
 (setq display-buffer nil)
-(setq display-buffer-reuse-frames t)
+(setq display-buffer-reuse-frames 1)
 (setq pop-up-frames nil)
 
 ;; Put scrollbar on the right
@@ -70,7 +92,7 @@
 ;; (tooltip-mode nil)
 
 ;; Make copy and paste to work with other programs
-(setq x-select-enable-clipboard t)
+(setq x-select-enable-clipboard 1)
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; we want fontification in all modes
@@ -103,14 +125,18 @@
 ;; highlighted
 (global-hl-line-mode 1)
 
-;;   ;; Set indent to 4 instead of 2
-;;   (setq standard-indent 4)
-;;    
+;; Highlight search object
+(setq search-highlight           t)
+;; Highlight query object 
+(setq query-replace-highlight    t)
+
+(setq standard-indent 2)
+
 ;; Use spaces instead of tab
 (setq-default indent-tabs-mode nil)
 
 ;;   ;; Set tab width
-;;   (setq default-tab-width 4)
+;; (setq default-tab-width 4)
 
 ;; Line by line scrolling
 (setq scroll-step 1)
@@ -168,14 +194,15 @@
 
 ;; Ignore case when looking for a file
 (setq read-file-name-completion-ignore-case t)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Full-screen mode
 (defun djcb-full-screen-toggle ()
   "toggle full-screen mode"
   (interactive)
   (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
+
+;; set key for the function above
+(global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
 
 ;; autocomplete
 ;;(add-to-list 'load-path "~/.emacs.d/lib/auto-complete/")
@@ -185,43 +212,52 @@
 (add-to-list 'ac-dictionary-directories (concat my-default-lib "/auto-complete/ac-dict"))
 (ac-config-default)
 
+
 ;; dirty fix for having AC everywhere
 (define-globalized-minor-mode real-global-auto-complete-mode
   auto-complete-mode (lambda ()
                        (if (not (minibufferp (current-buffer)))
-                           (auto-complete-mode 1))
-                       ))
-(real-global-auto-complete-mode t)
+                           (auto-complete-mode 1))))
+;; tab in insert mode calls autocomplete
+(ac-set-trigger-key "TAB")
+;; (define-key viper-insert-global-user-map (kbd "<tab>") 'auto-complete)
 
+(real-global-auto-complete-mode 1)
 
-;; color themes
-(require 'color-theme)
-(color-theme-initialize)
-(color-theme-billw)
+;; quack configuration
+(require 'quack)
 
 ;;slime configuration
 (setq inferior-lisp-program "sbcl")
 (add-to-list 'load-path (concat my-default-lib "/slime"))
 (require 'slime)
-(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+(add-hook 'lisp-mode-hook (lambda () (slime-mode 1)))
+(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode 1)))
 
-;; spellchecking flyspell
-(autoload 'flyspell-mode "flyspell" "On-the-fly spelling checker." t)
+;; spell-checking flyspell
 
-(autoload 'flyspell-delay-command "flyspell" "Delay on command." t)
-(autoload 'tex-mode-flyspell-verify "flyspell" "" t) 
+;; must have this attribute set or else will complain about missing
+;; -l parameter. 
+;; http://www.emacswiki.org/emacs/InteractiveSpell
+(setq ispell-program-name "aspell")
+(setq ispell-list-command "list")
 
-(dolist (hook '(lisp-mode-hook 
-                elisp-mode-hook 
+(autoload 'flyspell-mode "flyspell" "On-the-fly spelling checker." 1)
+
+(autoload 'flyspell-delay-command "flyspell" "Delay on command." 1)
+(autoload 'tex-mode-flyspell-verify "flyspell" "" 1) 
+
+(dolist (hook '(lisp-mode-hook
+                elisp-mode-hook
                 ruby-mode-hook
                 c-mode-common-hook))
   (add-hook hook (lambda () (flyspell-prog-mode 1))))
 
-(dolist (hook '(text-mode-hook  
-                TeX-mode-hook 
-                latex-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode 1))))
+;; automatic line breaks and spelling check
+(dolist (hook '(text-mode-hook TeX-mode-hook latex-mode-hook))
+  (add-hook hook (lambda ()
+                   (flyspell-mode 1)
+                   (auto-fill-mode 1))))
 
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
@@ -240,21 +276,82 @@
 (global-set-key (kbd "<f8>") 'fd-switch-dictionary)
 
 
-;; http://rinari.rubyforge.org/Basic-Setup.html#Basic-Setup
+(dolist (hook '(lisp-mode-hook
+                elisp-mode-hook
+                ruby-mode-hook
+                c-mode-common-hook))
+  (add-hook hook (lambda () (flyspell-prog-mode 1))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  Paredit, a mode for editing S-expr based languages  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(autoload 'paredit-mode "paredit"
+  "Minor mode for pseudo-structurally editing Lisp code." 1)
+ 
+(dolist (hook '(lisp-mode-hook
+                emacs-lisp-mode-hook
+                scheme-mode-hook
+                ruby-mode-hook
+                lisp-interaction-mode-hook))
+  (add-hook hook (lambda () (paredit-mode 1))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Some automatic pairs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define-key viper-insert-global-user-map "{"
+    (lambda () (interactive)
+      (insert "{}") (backward-char 1)))
+  
+;; ;easier on the fingers
+;; (define-key viper-insert-global-user-map "\C-\\"
+;;     (lambda () (interactive)
+;;       (insert "()") (backward-char 1)))
+
+;; http://iinari.rubyforge.org/Basic-Setup.html#Basic-Setup
 ;; Interactively Do Things (highly recommended, but not strictly required)
 (require 'ido)
-(ido-mode t)
+(ido-mode 1)
 
-;; Rinari
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rinari, a mode for rails, ruby and rhtml
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-to-list 'load-path (concat my-default-lib "/rinari"))
 (require 'rinari)
+
+(defun my-insert-erb-skeleton ()
+  (interactive)
+  (rinari-insert-erb-skeleton 1))
+
+(define-key rinari-minor-mode-map "\C-c;a" 'my-insert-erb-skeleton)
+
+;; add newline and indent to enter 
+(define-key rinari-minor-mode-map "\r" 'newline-and-indent)
 
 ;;; rhtml-mode
 (add-to-list 'load-path (concat my-default-lib "/rhtml"))
 (require 'rhtml-mode)
 (add-hook 'rhtml-mode-hook
-     	  (lambda () (rinari-launch)))
+     	  (lambda ()
+            (rinari-launch)))
 
+(setq savehist-file "~/.emacs.d/tmp/savehist")
 ;; save history in minibuffer 
 (savehist-mode 1)
-(setq savehist-file "~/.emacs.d/tmp/savehist")
+
+;; buffer to html
+(require 'htmlize)
+
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(quack-fontify-style (quote emacs))
+ '(ruby-indent-level 2))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ )
