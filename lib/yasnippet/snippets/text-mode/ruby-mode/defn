@@ -1,0 +1,6 @@
+#name : defn $1 ... end
+#group : definitions
+# --
+def ${1:function_name}
+  ${2:body}
+end

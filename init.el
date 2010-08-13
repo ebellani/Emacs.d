@@ -10,12 +10,12 @@
 (global-linum-mode 1)
 
 ;; styling. Check if not in terminal to set the nice colors and fonts.
-(unless (string= 'nil window-system) 
+(unless (string= 'nil window-system)
     (progn
-      (set-face-attribute 'default nil :font "Liberation Mono 11")
+      (set-face-attribute 'default nil :font "Liberation Mono 10")
       (require 'color-theme)
       (color-theme-initialize)
-      (load-file "~/.emacs.d/lib/color-theme-twilight.el")
+      (load-file (concat my-default-lib "/color-theme-twilight.el"))
       ;; (color-theme-billw)
       (color-theme-twilight)))
 
@@ -35,7 +35,7 @@
 ;; set the default spacing for ruby editing
 (setq viper-shift-width 2)
 
-;; sets C-[ to also mean C-g 
+;; sets C-[ to also mean C-g
 
 ;; page-up and page-down scroll bars for the tabs
 ;; basically modify the keys of tabbar
@@ -44,17 +44,17 @@
 (global-set-key [S-next] 'tabbar-forward-group)
 (global-set-key [S-prior] 'tabbar-backward-group)
 
-(global-set-key [C-prior] 'tabbar-backward)
+(global-set-key [C-prior]  'tabbar-backward)
 (global-set-key [C-next] 'tabbar-forward)
 
 ;; newline also indents
 (global-set-key "\r" 'newline-and-indent)
 
 ;; hide menus
-(menu-bar-mode -1)
-(tool-bar-mode -1)
+(menu-bar-mode 0)
+(tool-bar-mode 0)
 
-;; some of the information below was lifted from 
+;; some of the information below was lifted from
 ;; http://pintucoperu.wordpress.com/2010/03/04/utilizando-emacs-como-editor-de-texto-para-cc-python-y-vhdl-y-conociendo-el-modo-cua/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -109,14 +109,7 @@
       ";; scratch buffer created -- start typing...\n")
 
 ;; Automatically reload files after they've been modified
-;; (typically in Visual C++)
 (global-auto-revert-mode 1)
-
-;; Bell instead of annoying beep
-;; (setq visible-bell t)
-
-;; Do not add empty lines at the end of our file if we press down key
-(setq next-line-add-newlines nil)
 
 ;; When in text (or related mode) break the lines at 80 chars
 (setq fill-column 80)
@@ -127,16 +120,14 @@
 
 ;; Highlight search object
 (setq search-highlight           t)
-;; Highlight query object 
+
+;; Highlight query object
 (setq query-replace-highlight    t)
 
 (setq standard-indent 2)
 
 ;; Use spaces instead of tab
 (setq-default indent-tabs-mode nil)
-
-;;   ;; Set tab width
-;; (setq default-tab-width 4)
 
 ;; Line by line scrolling
 (setq scroll-step 1)
@@ -152,7 +143,7 @@
 (defun make-backup-file-name (file-name)
   "Create the non-numeric backup file name for `file-name'."
   (require 'dired)
-  (let ((backup-location "~/.emacs.d/backups/")) 
+  (let ((backup-location "~/.emacs.d/backups/"))
     (if (file-exists-p backup-location)
 	(concat (expand-file-name backup-location)
 		(replace-regexp-in-string "/" "!" file-name))
@@ -160,12 +151,12 @@
 
 ;; redefining the make-auto-save-file-name function in order to get
 ;; autosave files sent to a single directory. Note that this function
-;; looks first to determine if you have a ~/.autosaves/ directory. If
+;; looks first to determine if you have a ~/.emacs.d/autosaves/ directory. If
 ;; you do not it proceeds with the standard auto-save procedure.
 (defun make-auto-save-file-name ()
   "Return file name to use for auto-saves of current buffer.."
   (if buffer-file-name
-      (let ((save-location "~/.emacs.d/autosaves/")) 
+      (let ((save-location "~/.emacs.d/autosaves/"))
         (if (file-exists-p save-location)
             (concat (expand-file-name save-location) "#"
                     (replace-regexp-in-string "/" "!" buffer-file-name)
@@ -189,6 +180,7 @@
 
 ;; Remember the position where we closed a file
 (setq save-place-file "~/.emacs.d/saveplace") ;; keep my ~/ clean
+
 (setq-default save-place t) ;; activate it for all buffers
 (require 'saveplace) ;; get the package
 
@@ -205,7 +197,6 @@
 (global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
 
 ;; autocomplete
-;;(add-to-list 'load-path "~/.emacs.d/lib/auto-complete/")
 (add-to-list 'load-path (concat my-default-lib "/auto-complete"))
 
 (require 'auto-complete-config)
@@ -218,6 +209,7 @@
   auto-complete-mode (lambda ()
                        (if (not (minibufferp (current-buffer)))
                            (auto-complete-mode 1))))
+
 ;; tab in insert mode calls autocomplete
 (ac-set-trigger-key "TAB")
 ;; (define-key viper-insert-global-user-map (kbd "<tab>") 'auto-complete)
@@ -237,7 +229,7 @@
 ;; spell-checking flyspell
 
 ;; must have this attribute set or else will complain about missing
-;; -l parameter. 
+;; -l parameter.
 ;; http://www.emacswiki.org/emacs/InteractiveSpell
 (setq ispell-program-name "aspell")
 (setq ispell-list-command "list")
@@ -245,7 +237,7 @@
 (autoload 'flyspell-mode "flyspell" "On-the-fly spelling checker." 1)
 
 (autoload 'flyspell-delay-command "flyspell" "Delay on command." 1)
-(autoload 'tex-mode-flyspell-verify "flyspell" "" 1) 
+(autoload 'tex-mode-flyspell-verify "flyspell" "" 1)
 
 (dolist (hook '(lisp-mode-hook
                 elisp-mode-hook
@@ -267,8 +259,8 @@
 (defun fd-switch-dictionary()
   (interactive)
   (let* ((dic ispell-current-dictionary)
-    	 (change (if (string= dic "brasileiro") 
-                     "american" 
+    	 (change (if (string= dic "brasileiro")
+                     "american"
                      "brasileiro")))
     (ispell-change-dictionary change)
     (message "Dictionary switched from %s to %s" dic change)))
@@ -284,11 +276,19 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  Maps swaps [ for ( and vice versa                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(keyboard-translate ?\( ?\[)
+(keyboard-translate ?\[ ?\()
+(keyboard-translate ?\) ?\])
+(keyboard-translate ?\] ?\))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Paredit, a mode for editing S-expr based languages  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (autoload 'paredit-mode "paredit"
   "Minor mode for pseudo-structurally editing Lisp code." 1)
- 
+
 (dolist (hook '(lisp-mode-hook
                 emacs-lisp-mode-hook
                 scheme-mode-hook
@@ -302,14 +302,8 @@
 (define-key viper-insert-global-user-map "{"
     (lambda () (interactive)
       (insert "{}") (backward-char 1)))
-  
-;; ;easier on the fingers
-;; (define-key viper-insert-global-user-map "\C-\\"
-;;     (lambda () (interactive)
-;;       (insert "()") (backward-char 1)))
 
 ;; http://iinari.rubyforge.org/Basic-Setup.html#Basic-Setup
-;; Interactively Do Things (highly recommended, but not strictly required)
 (require 'ido)
 (ido-mode 1)
 
@@ -325,7 +319,7 @@
 
 (define-key rinari-minor-mode-map "\C-c;a" 'my-insert-erb-skeleton)
 
-;; add newline and indent to enter 
+;; add newline and indent to enter
 (define-key rinari-minor-mode-map "\r" 'newline-and-indent)
 
 ;;; rhtml-mode
@@ -336,22 +330,34 @@
             (rinari-launch)))
 
 (setq savehist-file "~/.emacs.d/tmp/savehist")
-;; save history in minibuffer 
+;; save history in minibuffer
 (savehist-mode 1)
 
 ;; buffer to html
 (require 'htmlize)
 
+;; ecmascript mode
+(require 'ecmascript-mode)
+
+;; yasnippet, loads of emacs snippets
+;; http://code.google.com/p/yasnippet/
+(add-to-list 'load-path (concat my-default-lib "/yasnippet"))
+(require 'yasnippet)
+(yas/initialize)
+(yas/load-directory (concat my-default-lib "/yasnippet/snippets"))
+
+
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(quack-fontify-style (quote emacs))
  '(ruby-indent-level 2))
+
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  )
