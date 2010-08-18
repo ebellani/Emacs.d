@@ -4,6 +4,8 @@
 
 ;; vimpulse, because I really like vim's key-bindings
 (require 'vimpulse)
+;;(require 'viper-in-more-modes)
+(load-file (concat my-default-lib "/viper-boot.el"))
 (require 'redo)
 
 ;; automatically sets the global mode for all buffers
@@ -27,10 +29,12 @@
 ;; for some reason C-u was not working
 (define-key viper-vi-basic-map "\C-u" 'scroll-down)
 
-(setq-default viper-electric-mode 1)
+;; C-\ adds a lambda symbol, as DrRacket
+(define-key viper-insert-global-user-map "\C-\\"
+    (lambda () (interactive)
+      (insert "λ"))) 
 
-;; set the viper >> and << keys to represent increase and decrease left margins
-;;(define-key viper-vi-basic-map ">" 'increase-left-margin)
+(setq-default viper-electric-mode 1)
 
 ;; set the default spacing for ruby editing
 (setq viper-shift-width 2)
@@ -220,11 +224,20 @@
 (require 'quack)
 
 ;;slime configuration
-(setq inferior-lisp-program "sbcl")
 (add-to-list 'load-path (concat my-default-lib "/slime"))
 (require 'slime)
-(add-hook 'lisp-mode-hook (lambda () (slime-mode 1)))
-(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode 1)))
+(slime-setup '(slime-repl))
+(setq inferior-lisp-program "sbcl")
+(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+
+;; To make SLIME connect to your lisp whenever you open a lisp file just add
+;; this to your .emacs:
+;; http://common-lisp.net/project/slime/doc/html/Auto_002dSLIME.html#Auto_002dSLIME
+;; (add-hook 'slime-mode-hook
+;;           (lambda ()
+;;             (unless (slime-connected-p)
+;;               (save-excursion (slime)))))
 
 ;; spell-checking flyspell
 
@@ -239,11 +252,11 @@
 (autoload 'flyspell-delay-command "flyspell" "Delay on command." 1)
 (autoload 'tex-mode-flyspell-verify "flyspell" "" 1)
 
-(dolist (hook '(lisp-mode-hook
-                elisp-mode-hook
-                ruby-mode-hook
-                c-mode-common-hook))
-  (add-hook hook (lambda () (flyspell-prog-mode 1))))
+;;(dolist (hook '(lisp-mode-hook
+;;                elisp-mode-hook
+;;                ruby-mode-hook
+;;                c-mode-common-hook))
+;;  (add-hook hook (lambda () (flyspell-prog-mode 1))))
 
 ;; automatic line breaks and spelling check
 (dolist (hook '(text-mode-hook TeX-mode-hook latex-mode-hook))
@@ -268,12 +281,9 @@
 (global-set-key (kbd "<f8>") 'fd-switch-dictionary)
 
 
-(dolist (hook '(lisp-mode-hook
-                elisp-mode-hook
-                ruby-mode-hook
-                c-mode-common-hook))
-  (add-hook hook (lambda () (flyspell-prog-mode 1))))
-
+;; C style
+(add-hook 'c-mode-hook
+          '(lambda () (c-set-style "k&r")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Maps swaps [ for ( and vice versa                   ;;
@@ -296,12 +306,6 @@
                 lisp-interaction-mode-hook))
   (add-hook hook (lambda () (paredit-mode 1))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Some automatic pairs
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-key viper-insert-global-user-map "{"
-    (lambda () (interactive)
-      (insert "{}") (backward-char 1)))
 
 ;; http://iinari.rubyforge.org/Basic-Setup.html#Basic-Setup
 (require 'ido)
@@ -346,18 +350,24 @@
 (yas/initialize)
 (yas/load-directory (concat my-default-lib "/yasnippet/snippets"))
 
+;; undo-tree
+;; treats undo as a tree
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(quack-fontify-style (quote emacs))
- '(ruby-indent-level 2))
+ '(ruby-indent-level 2)
+ '(safe-local-variable-values (quote ((Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
 
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  )
