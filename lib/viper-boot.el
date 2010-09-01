@@ -39,20 +39,6 @@ viper-use-register)))
                (put-text-property 0 (length text) 'read-only nil text)))
            ad-do-it)))
 
-;; Simple Vim command line functions
-(defun w (&optional args)
-  (interactive "p")
-  (save-buffer args))
-(defun wq (&optional args)
-  (interactive "P")
-  (save-buffers-kill-emacs args))
-
-(setq-default viper-auto-indent t)
-(setq-default viper-keep-point-on-repeat nil)
-(setq-default viper-toggle-key [C-up])
-(setq-default viper-translate-all-ESC-keysequences nil)
-(setq-default viper-change-notification-threshold 200)
-
 ;; Map ":" to M-x.  Drop viper command mode.
 (define-key viper-vi-global-user-map ":" 'execute-extended-command)
 (define-key viper-vi-global-user-map ";" 'execute-extended-command)
@@ -60,13 +46,10 @@ viper-use-register)))
 ;; Add more viper-ified modes
 (setq viper-vi-state-mode-list
       (append viper-vi-state-mode-list
-              '(clojure-mode
-                grep-mode
+              '(grep-mode
                 comint-mode
                 slime-xref-mode
                 slime-repl-mode
-                sldb-mode
-                debugger-mode
                 completion-list-mode)))
 
 ;; SLIME macroexpansion mode -- force change to viper

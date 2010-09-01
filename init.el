@@ -4,7 +4,6 @@
 
 ;; vimpulse, because I really like vim's key-bindings
 (require 'vimpulse)
-;;(require 'viper-in-more-modes)
 (load-file (concat my-default-lib "/viper-boot.el"))
 (require 'redo)
 
@@ -14,7 +13,8 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
     (progn
-      (set-face-attribute 'default nil :font "Liberation Mono 10")
+;;      (set-face-attribute 'default nil :font "Liberation Mono 10")
+      (set-face-attribute 'default nil :font "Anonymous Pro 11")
       (require 'color-theme)
       (color-theme-initialize)
       (load-file (concat my-default-lib "/color-theme-twilight.el"))
@@ -55,7 +55,7 @@
 (global-set-key "\r" 'newline-and-indent)
 
 ;; hide menus
-(menu-bar-mode 0)
+;; (menu-bar-mode 0)
 (tool-bar-mode 0)
 
 ;; some of the information below was lifted from
@@ -82,7 +82,7 @@
 (setq inhibit-startup-message 1)
 
 ;; Makes final line always be a return
-(setq require-final-newline 1)
+;; (setq require-final-newline 1)
 
 ;; Avoid to make a separate frame
 (setq display-buffer nil)
@@ -221,7 +221,7 @@
 (real-global-auto-complete-mode 1)
 
 ;; quack configuration
-(require 'quack)
+;; (require 'quack)
 
 ;;slime configuration
 (add-to-list 'load-path (concat my-default-lib "/slime"))
@@ -230,6 +230,7 @@
 (setq inferior-lisp-program "sbcl")
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+(global-set-key (kbd "C-c s") 'slime-selector)
 
 ;; To make SLIME connect to your lisp whenever you open a lisp file just add
 ;; this to your .emacs:
@@ -340,8 +341,8 @@
 ;; buffer to html
 (require 'htmlize)
 
-;; ecmascript mode
-(require 'ecmascript-mode)
+;; javascript
+(require 'javascript-mode)
 
 ;; yasnippet, loads of emacs snippets
 ;; http://code.google.com/p/yasnippet/
@@ -361,9 +362,7 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(quack-fontify-style (quote emacs))
- '(ruby-indent-level 2)
- '(safe-local-variable-values (quote ((Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
+ '(ruby-indent-level 2))
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
