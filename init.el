@@ -12,14 +12,14 @@
 
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
-    (progn
-;;      (set-face-attribute 'default nil :font "Liberation Mono 10")
-      (set-face-attribute 'default nil :font "Anonymous Pro 11")
-      (require 'color-theme)
-      (color-theme-initialize)
-      (load-file (concat my-default-lib "/color-theme-twilight.el"))
-      ;; (color-theme-billw)
-      (color-theme-twilight)))
+  (progn
+    (set-face-attribute 'default nil :font "Liberation Mono 10")
+                                        ;      (set-face-attribute 'default nil :font "Anonymous Pro 11")
+    (require 'color-theme)
+    (color-theme-initialize)
+    (load-file (concat my-default-lib "/color-theme-twilight.el"))
+    ;; (color-theme-billw)
+    (color-theme-twilight)))
 
 ;;Setting up tabbar
 (require 'tabbar)
@@ -31,8 +31,8 @@
 
 ;; C-\ adds a lambda symbol, as DrRacket
 (define-key viper-insert-global-user-map "\C-\\"
-    (lambda () (interactive)
-      (insert "λ"))) 
+  (lambda () (interactive)
+    (insert "λ"))) 
 
 (setq-default viper-electric-mode 1)
 
@@ -275,7 +275,7 @@
   (let* ((dic ispell-current-dictionary)
     	 (change (if (string= dic "brasileiro")
                      "american"
-                     "brasileiro")))
+                   "brasileiro")))
     (ispell-change-dictionary change)
     (message "Dictionary switched from %s to %s" dic change)))
 
@@ -284,7 +284,7 @@
 
 ;; C style
 (add-hook 'c-mode-hook
-          '(lambda () (c-set-style "k&r")))
+          '(lambda () (c-set-style "gnu")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Maps swaps [ for ( and vice versa                   ;;
@@ -306,6 +306,12 @@
                 ruby-mode-hook
                 lisp-interaction-mode-hook))
   (add-hook hook (lambda () (paredit-mode 1))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; scheme 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq scheme-program-name "mzscheme")
 
 
 ;; http://iinari.rubyforge.org/Basic-Setup.html#Basic-Setup
@@ -342,7 +348,19 @@
 (require 'htmlize)
 
 ;; javascript
-(require 'javascript-mode)
+(autoload 'js2-mode "js2" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+(require 'js-comint)
+(setq inferior-js-program-command "node")
+(add-hook 'js2-mode-hook '(lambda () 
+			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+			    (local-set-key "\C-cb" 'js-send-buffer)
+			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
+			    (local-set-key "\C-cl" 'js-load-file-and-go)))
+
+
 
 ;; yasnippet, loads of emacs snippets
 ;; http://code.google.com/p/yasnippet/
@@ -358,15 +376,17 @@
 
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(ruby-indent-level 2))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  )
+
+(put 'downcase-region 'disabled nil)
