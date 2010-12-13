@@ -27,7 +27,7 @@
 
 ;; define C-u and C-d to be like vim (equal pgup pgdown)
 ;; for some reason C-u was not working
-(define-key viper-vi-basic-map "\C-u" 'scroll-down)
+(define-key viper-vi-basic-map "\C-u" 'viper-scroll-down)
 
 ;; C-\ adds a lambda symbol, as DrRacket
 (define-key viper-insert-global-user-map "\C-\\"
@@ -60,6 +60,11 @@
 
 ;; some of the information below was lifted from
 ;; http://pintucoperu.wordpress.com/2010/03/04/utilizando-emacs-como-editor-de-texto-para-cc-python-y-vhdl-y-conociendo-el-modo-cua/
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; quicklisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; uniquify!
@@ -200,30 +205,41 @@
 ;; set key for the function above
 (global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
 
-;; autocomplete
-(add-to-list 'load-path (concat my-default-lib "/auto-complete"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; autocomplete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'load-path (concat my-default-lib "/auto-complete"))
+ 
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories (concat my-default-lib "/auto-complete/ac-dict"))
 (ac-config-default)
-
-
+ 
+ 
 ;; dirty fix for having AC everywhere
 (define-globalized-minor-mode real-global-auto-complete-mode
   auto-complete-mode (lambda ()
                        (if (not (minibufferp (current-buffer)))
                            (auto-complete-mode 1))))
-
+ 
 ;; tab in insert mode calls autocomplete
 (ac-set-trigger-key "TAB")
-;; (define-key viper-insert-global-user-map (kbd "<tab>") 'auto-complete)
-
+ 
 (real-global-auto-complete-mode 1)
 
-;; quack configuration
-;; (require 'quack)
+;; company, another autocomplete engine. Still testing
+;; used primarily as an AC to geiser, an slime like app for scheme.
+(add-to-list 'load-path (concat my-default-lib "/company"))
+(autoload 'company-mode "company" nil t)
 
-;;slime configuration
+(add-hook 'scheme-mode-hook
+          (lambda () (company-mode 1)))
+                
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; slime configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; https://jandmworks.com/lisp.html#SBCL quirks
 (add-to-list 'load-path (concat my-default-lib "/slime"))
 (require 'slime)
 (slime-setup '(slime-repl))
@@ -231,6 +247,28 @@
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 (global-set-key (kbd "C-c s") 'slime-selector)
+
+(setq common-lisp-hyperspec-root
+      "file:/usr/share/doc/hyperspec/") 
+
+;; autocomplete with slime's documentation
+(add-to-list 'load-path (concat my-default-lib "/ac-slime"))
+
+(require 'ac-slime)
+(add-hook 'slime-mode-hook 'set-up-slime-ac)
+(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+
+
+(defun scratch-lisp-file ()
+  "Insert a template (with DEFPACKAGE and IN-PACKAGE forms) into
+   the current buffer."
+  (interactive)
+  (goto-char 0)
+  (let* ((file (file-name-nondirectory (buffer-file-name)))
+         (package (file-name-sans-extension file)))
+    (insert ";;;; " file "\n")
+    (insert "\n(defpackage :" package "\n  (:use :cl))\n\n")
+    (insert "(in-package :" package ")\n\n")))
 
 ;; To make SLIME connect to your lisp whenever you open a lisp file just add
 ;; this to your .emacs:
@@ -240,7 +278,10 @@
 ;;             (unless (slime-connected-p)
 ;;               (save-excursion (slime)))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; spell-checking flyspell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; must have this attribute set or else will complain about missing
 ;; -l parameter.
@@ -303,7 +344,6 @@
 (dolist (hook '(lisp-mode-hook
                 emacs-lisp-mode-hook
                 scheme-mode-hook
-                ruby-mode-hook
                 lisp-interaction-mode-hook))
   (add-hook hook (lambda () (paredit-mode 1))))
 
@@ -311,15 +351,34 @@
 ;; scheme 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(load-file (concat my-default-lib "/geiser/elisp/geiser.el"))
+
 (setq scheme-program-name "mzscheme")
+;; (setq geiser-racket-use-gracket-p t)
 
+;; adds *.rkt to scheme-mode
+(setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
 
-;; http://iinari.rubyforge.org/Basic-Setup.html#Basic-Setup
+(define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ido
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; http://www.emacswiki.org/emacs/InteractivelyDoThings
 (require 'ido)
 (ido-mode 1)
 
+;; Display ido results vertically, rather than horizontally
+(setq ido-decorations (quote
+                       ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+
+(defun ido-disable-line-trucation () (set (make-local-variable 'truncate-lines) nil))
+(add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-trucation)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; rinari, a mode for rails, ruby and rhtml
+;; ruby -- rinari, a mode for rails, ruby and rhtml
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-to-list 'load-path (concat my-default-lib "/rinari"))
 (require 'rinari)
@@ -339,6 +398,8 @@
 (add-hook 'rhtml-mode-hook
      	  (lambda ()
             (rinari-launch)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq savehist-file "~/.emacs.d/tmp/savehist")
 ;; save history in minibuffer
@@ -374,19 +435,21 @@
 (require 'undo-tree)
 (global-undo-tree-mode)
 
+(server-start)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ruby-indent-level 2))
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(ruby-indent-level 2)
+ '(safe-local-variable-values (quote ((Syntax . ANSI-Common-Lisp) (Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
 
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  )
 
 (put 'downcase-region 'disabled nil)
