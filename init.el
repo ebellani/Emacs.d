@@ -13,8 +13,9 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-attribute 'default nil :font "Liberation Mono 10")
-                                        ;      (set-face-attribute 'default nil :font "Anonymous Pro 11")
+    ;;(set-face-attribute 'default nil :font "Liberation Mono 10")
+    (set-face-attribute 'default nil :font "Inconsolata 10")
+    ;;(set-face-attribute 'default nil :font "Anonymous Pro 11")
     (require 'color-theme)
     (color-theme-initialize)
     (load-file (concat my-default-lib "/color-theme-twilight.el"))
@@ -43,16 +44,17 @@
 
 ;; page-up and page-down scroll bars for the tabs
 ;; basically modify the keys of tabbar
-(global-set-key [C-home] 'tabbar-press-home)
+(global-set-key [C-home]   'tabbar-press-home)
 
-(global-set-key [S-next] 'tabbar-forward-group)
-(global-set-key [S-prior] 'tabbar-backward-group)
+(global-set-key [S-next]   'tabbar-forward-group)
+(global-set-key [S-prior]  'tabbar-backward-group)
 
 (global-set-key [C-prior]  'tabbar-backward)
-(global-set-key [C-next] 'tabbar-forward)
+(global-set-key [C-next]   'tabbar-forward)
 
 ;; newline also indents
 (global-set-key "\r" 'newline-and-indent)
+
 
 ;; hide menus
 ;; (menu-bar-mode 0)
@@ -60,6 +62,16 @@
 
 ;; some of the information below was lifted from
 ;; http://pintucoperu.wordpress.com/2010/03/04/utilizando-emacs-como-editor-de-texto-para-cc-python-y-vhdl-y-conociendo-el-modo-cua/
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; windows
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(winner-mode 1)
+(global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
+(global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
+(global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
+(global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; quicklisp
@@ -231,10 +243,16 @@
 ;; used primarily as an AC to geiser, an slime like app for scheme.
 (add-to-list 'load-path (concat my-default-lib "/company"))
 (autoload 'company-mode "company" nil t)
-
+ 
 (add-hook 'scheme-mode-hook
           (lambda () (company-mode 1)))
                 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; clojure 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'load-path (concat my-default-lib "/clojure-mode"))
+(require 'clojure-mode) 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; slime configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -244,6 +262,7 @@
 (require 'slime)
 (slime-setup '(slime-repl))
 (setq inferior-lisp-program "sbcl")
+
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 (global-set-key (kbd "C-c s") 'slime-selector)
@@ -322,7 +341,6 @@
 
 (global-set-key (kbd "<f8>") 'fd-switch-dictionary)
 
-
 ;; C style
 (add-hook 'c-mode-hook
           '(lambda () (c-set-style "gnu")))
@@ -335,11 +353,28 @@
 (keyboard-translate ?\) ?\])
 (keyboard-translate ?\] ?\))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  minimap, an countour view for your buffer           ;;
+;;   http://www.emacswiki.org/emacs/MiniMap             ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'load-path (concat my-default-lib "/minimap"))
+
+(require 'minimap)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Paredit, a mode for editing S-expr based languages  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (autoload 'paredit-mode "paredit"
   "Minor mode for pseudo-structurally editing Lisp code." 1)
+(require 'paredit)
+
+(eval-after-load 'paredit
+  '(progn
+     ;; instead of moving words, move sexps...
+     (define-key viper-vi-basic-map "\S-w" 'paredit-forward)
+     (define-key viper-vi-basic-map "\S-b" 'paredit-backward)
+     )) 
 
 (dolist (hook '(lisp-mode-hook
                 emacs-lisp-mode-hook
@@ -347,11 +382,16 @@
                 lisp-interaction-mode-hook))
   (add-hook hook (lambda () (paredit-mode 1))))
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; scheme 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load-file (concat my-default-lib "/geiser/elisp/geiser.el"))
+(require 'geiser-mode)
+
+
 
 (setq scheme-program-name "mzscheme")
 ;; (setq geiser-racket-use-gracket-p t)
@@ -360,6 +400,27 @@
 (setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
 
 (define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
+
+(setq geiser-racket-extra-keywords
+       (list "define-syntax-rule"
+             "unless"
+             "when"
+             "with-handlers"
+             "class*"
+             "super-new"
+             "init-field"
+             "struct"
+             "local"
+             "define-require-syntax"
+             "define/public"
+             "define/augment"
+             "define/override"
+             "λ"
+             "true"
+             "false"
+             "#t"
+             "#f"))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ido
@@ -442,6 +503,7 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
+ 
  '(ruby-indent-level 2)
  '(safe-local-variable-values (quote ((Syntax . ANSI-Common-Lisp) (Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
 

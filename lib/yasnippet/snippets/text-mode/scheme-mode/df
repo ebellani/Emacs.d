@@ -1,0 +1,7 @@
+#name : function template
+#contributor : eduardo bellani
+# --
+;; $1 : $2 -> $3
+;; DESCRIBE ME!
+(define ($1) 
+  $0)
