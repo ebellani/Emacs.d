@@ -14,7 +14,7 @@
 (unless (string= 'nil window-system)
   (progn
     ;;(set-face-attribute 'default nil :font "Liberation Mono 10")
-    (set-face-attribute 'default nil :font "Inconsolata 10")
+    (set-face-attribute 'default nil :font "Inconsolata 12")
     ;;(set-face-attribute 'default nil :font "Anonymous Pro 11")
     (require 'color-theme)
     (color-theme-initialize)
@@ -72,10 +72,6 @@
 (global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
 (global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
 (global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; quicklisp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -218,6 +214,10 @@
 (global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
 
 
+;; comment and uncomment region
+(global-set-key (kbd "C-M-;") 'comment-or-uncomment-region)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; autocomplete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,7 +226,6 @@
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories (concat my-default-lib "/auto-complete/ac-dict"))
 (ac-config-default)
- 
  
 ;; dirty fix for having AC everywhere
 (define-globalized-minor-mode real-global-auto-complete-mode
@@ -297,7 +296,9 @@
 ;;             (unless (slime-connected-p)
 ;;               (save-excursion (slime)))))
 
-
+;; lush, a numeric lisp
+;; (load (concat my-default-lib "/lush.el"))
+ 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; spell-checking flyspell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -391,15 +392,12 @@
 (load-file (concat my-default-lib "/geiser/elisp/geiser.el"))
 (require 'geiser-mode)
 
-
-
 (setq scheme-program-name "mzscheme")
-;; (setq geiser-racket-use-gracket-p t)
 
 ;; adds *.rkt to scheme-mode
 (setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
 
-(define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
+;; (define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
 
 (setq geiser-racket-extra-keywords
        (list "define-syntax-rule"
@@ -409,6 +407,8 @@
              "class*"
              "super-new"
              "init-field"
+             "provide"
+             "require"
              "struct"
              "local"
              "define-require-syntax"
@@ -416,10 +416,7 @@
              "define/augment"
              "define/override"
              "λ"
-             "true"
-             "false"
-             "#t"
-             "#f"))
+             "define-runtime-pat"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -503,7 +500,6 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- 
  '(ruby-indent-level 2)
  '(safe-local-variable-values (quote ((Syntax . ANSI-Common-Lisp) (Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
 
