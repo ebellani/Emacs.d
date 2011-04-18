@@ -3,18 +3,21 @@
 (add-to-list 'load-path my-default-lib)
 
 ;; vimpulse, because I really like vim's key-bindings
-(require 'vimpulse)
-(load-file (concat my-default-lib "/viper-boot.el"))
+;; (require 'vimpulse)
+;; (load-file (concat my-default-lib "/viper-boot.el"))
 (require 'redo)
 
 ;; automatically sets the global mode for all buffers
-(global-linum-mode 1)
+(global-linum-mode t)
+
+;; flashes the paren close to the cursor.
+(show-paren-mode   t)
 
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
     ;;(set-face-attribute 'default nil :font "Liberation Mono 10")
-    (set-face-attribute 'default nil :font "Inconsolata 12")
+    (set-face-attribute 'default nil :font "Inconsolata 10")
     ;;(set-face-attribute 'default nil :font "Anonymous Pro 11")
     (require 'color-theme)
     (color-theme-initialize)
@@ -28,17 +31,18 @@
 
 ;; define C-u and C-d to be like vim (equal pgup pgdown)
 ;; for some reason C-u was not working
-(define-key viper-vi-basic-map "\C-u" 'viper-scroll-down)
+;; (define- viper-vi-basic-map "\C-u" 'viper-scroll-down)
+;; (global-set-key [C-home]   'tabbar-press-home)
 
 ;; C-\ adds a lambda symbol, as DrRacket
-(define-key viper-insert-global-user-map "\C-\\"
+(define-key global-map "\C-\\"
   (lambda () (interactive)
-    (insert "λ"))) 
+          (insert "λ"))) 
 
-(setq-default viper-electric-mode 1)
+;; (setq-default viper-electric-mode 1)
 
-;; set the default spacing for ruby editing
-(setq viper-shift-width 2)
+;; ;; set the default spacing for ruby editing
+;; (setq viper-shift-width 2)
 
 ;; sets C-[ to also mean C-g
 
@@ -211,82 +215,76 @@
   (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
 
 ;; set key for the function above
-(global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
+;; (global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
 
 
 ;; comment and uncomment region
-(global-set-key (kbd "C-M-;") 'comment-or-uncomment-region)
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; autocomplete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-to-list 'load-path (concat my-default-lib "/auto-complete"))
- 
+
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories (concat my-default-lib "/auto-complete/ac-dict"))
 (ac-config-default)
- 
+
 ;; dirty fix for having AC everywhere
 (define-globalized-minor-mode real-global-auto-complete-mode
   auto-complete-mode (lambda ()
                        (if (not (minibufferp (current-buffer)))
                            (auto-complete-mode 1))))
- 
+
 ;; tab in insert mode calls autocomplete
 (ac-set-trigger-key "TAB")
- 
+
 (real-global-auto-complete-mode 1)
 
 ;; company, another autocomplete engine. Still testing
 ;; used primarily as an AC to geiser, an slime like app for scheme.
 (add-to-list 'load-path (concat my-default-lib "/company"))
 (autoload 'company-mode "company" nil t)
- 
+
 (add-hook 'scheme-mode-hook
           (lambda () (company-mode 1)))
-                
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; clojure 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'load-path (concat my-default-lib "/clojure-mode"))
-(require 'clojure-mode) 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; slime configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; https://jandmworks.com/lisp.html#SBCL quirks
-(add-to-list 'load-path (concat my-default-lib "/slime"))
-(require 'slime)
-(slime-setup '(slime-repl))
-(setq inferior-lisp-program "sbcl")
+;; (add-to-list 'load-path (concat my-default-lib "/slime"))
+;; (require 'slime)
+;; (slime-setup '(slime-repl))
+;; (setq inferior-lisp-program "sbcl")
 
-(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
-(global-set-key (kbd "C-c s") 'slime-selector)
+;; (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+;; (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+;; (global-set-key (kbd "C-c s") 'slime-selector)
 
-(setq common-lisp-hyperspec-root
-      "file:/usr/share/doc/hyperspec/") 
+;; (setq common-lisp-hyperspec-root
+;;       "file:/usr/share/doc/hyperspec/") 
 
-;; autocomplete with slime's documentation
-(add-to-list 'load-path (concat my-default-lib "/ac-slime"))
+;; ;; autocomplete with slime's documentation
+;; (add-to-list 'load-path (concat my-default-lib "/ac-slime"))
 
-(require 'ac-slime)
-(add-hook 'slime-mode-hook 'set-up-slime-ac)
-(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+;; (require 'ac-slime)
+;; (add-hook 'slime-mode-hook 'set-up-slime-ac)
+;; (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
 
 
-(defun scratch-lisp-file ()
-  "Insert a template (with DEFPACKAGE and IN-PACKAGE forms) into
-   the current buffer."
-  (interactive)
-  (goto-char 0)
-  (let* ((file (file-name-nondirectory (buffer-file-name)))
-         (package (file-name-sans-extension file)))
-    (insert ";;;; " file "\n")
-    (insert "\n(defpackage :" package "\n  (:use :cl))\n\n")
-    (insert "(in-package :" package ")\n\n")))
+;; (defun scratch-lisp-file ()
+;;   "Insert a template (with DEFPACKAGE and IN-PACKAGE forms) into
+;;    the current buffer."
+;;   (interactive)
+;;   (goto-char 0)
+;;   (let* ((file (file-name-nondirectory (buffer-file-name)))
+;;          (package (file-name-sans-extension file)))
+;;     (insert ";;;; " file "\n")
+;;     (insert "\n(defpackage :" package "\n  (:use :cl))\n\n")
+;;     (insert "(in-package :" package ")\n\n")))
 
 ;; To make SLIME connect to your lisp whenever you open a lisp file just add
 ;; this to your .emacs:
@@ -297,8 +295,22 @@
 ;;               (save-excursion (slime)))))
 
 ;; lush, a numeric lisp
-;; (load (concat my-default-lib "/lush.el"))
- 
+(load (concat my-default-lib "/lush.el")) 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Things taken from http://sites.google.com/site/steveyegge2/effective-emacs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; item #2
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-c\C-m" 'execute-extended-command)
+
+;; item #3
+(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key "\C-x\C-k" 'kill-region)
+(global-set-key "\C-c\C-k" 'kill-region)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; spell-checking flyspell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -354,14 +366,17 @@
 (keyboard-translate ?\) ?\])
 (keyboard-translate ?\] ?\))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Highlight-parentheses, a mode for showing where you are  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(load-file (concat my-default-lib "/highlight-parentheses.el"))
+(require 'highlight-parentheses)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;  minimap, an countour view for your buffer           ;;
-;;   http://www.emacswiki.org/emacs/MiniMap             ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'load-path (concat my-default-lib "/minimap"))
-
-(require 'minimap)
+(define-globalized-minor-mode global-highlight-parentheses-mode
+  highlight-parentheses-mode
+  (lambda ()
+    (highlight-parentheses-mode t)))
+(global-highlight-parentheses-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Paredit, a mode for editing S-expr based languages  ;;
@@ -370,12 +385,12 @@
   "Minor mode for pseudo-structurally editing Lisp code." 1)
 (require 'paredit)
 
-(eval-after-load 'paredit
-  '(progn
-     ;; instead of moving words, move sexps...
-     (define-key viper-vi-basic-map "\S-w" 'paredit-forward)
-     (define-key viper-vi-basic-map "\S-b" 'paredit-backward)
-     )) 
+;; (eval-after-load 'paredit
+;;   '(progn
+;;      ;; instead of moving words, move sexps...
+;;      (define-key viper-vi-basic-map "\S-w" 'paredit-forward)
+;;      (define-key viper-vi-basic-map "\S-b" 'paredit-backward)
+;;      )) 
 
 (dolist (hook '(lisp-mode-hook
                 emacs-lisp-mode-hook
@@ -392,7 +407,9 @@
 (load-file (concat my-default-lib "/geiser/elisp/geiser.el"))
 (require 'geiser-mode)
 
-(setq scheme-program-name "mzscheme")
+;; (setq scheme-program-name "gracket-text")
+
+(setq geiser-racket-use-gracket-p t)
 
 ;; adds *.rkt to scheme-mode
 (setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
@@ -400,23 +417,24 @@
 ;; (define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
 
 (setq geiser-racket-extra-keywords
-       (list "define-syntax-rule"
-             "unless"
-             "when"
-             "with-handlers"
-             "class*"
-             "super-new"
-             "init-field"
-             "provide"
-             "require"
-             "struct"
-             "local"
-             "define-require-syntax"
-             "define/public"
-             "define/augment"
-             "define/override"
-             "λ"
-             "define-runtime-pat"))
+      (list "define-syntax-rule"
+            "unless"
+            "when"
+            "with-handlers"
+            "class*"
+            "super-new"
+            "init-field"
+            "provide"
+            "require"
+            "struct"
+            "local"
+            "define-require-syntax"
+            "define/public"
+            "define/augment"
+            "define/override"
+            "λ"
+            "field"
+            "define-runtime-path"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -496,18 +514,18 @@
 (server-start)
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(ruby-indent-level 2)
  '(safe-local-variable-values (quote ((Syntax . ANSI-Common-Lisp) (Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  )
 
 (put 'downcase-region 'disabled nil)
