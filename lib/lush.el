@@ -53,7 +53,7 @@
   (interactive)
   (switch-to-buffer-other-window "*inferior-lisp*")
   (inferior-lisp "lush2")
-  (other-window -1)
+  (other-window 1)
   (set-buffer "*inferior-lisp*")
   (set (make-local-variable '*lush-buffer?*) t)
   (setq comint-prompt-regexp "^?")

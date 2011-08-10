@@ -1,11 +1,9 @@
-(defvar my-default-lib "~/.emacs.d/lib")
+(defvar *my-default-lib* "~/.emacs.d/lib")
 
-(add-to-list 'load-path my-default-lib)
+(add-to-list 'load-path *my-default-lib*)
 
-;; vimpulse, because I really like vim's key-bindings
-;; (require 'vimpulse)
-;; (load-file (concat my-default-lib "/viper-boot.el"))
 (require 'redo)
+(global-set-key [C-?] 'undo)
 
 ;; automatically sets the global mode for all buffers
 (global-linum-mode t)
@@ -16,52 +14,32 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    ;;(set-face-attribute 'default nil :font "Liberation Mono 10")
-    (set-face-attribute 'default nil :font "Inconsolata 10")
-    ;;(set-face-attribute 'default nil :font "Anonymous Pro 11")
+    (set-face-font 'default "Inconsolata 12")
     (require 'color-theme)
     (color-theme-initialize)
-    (load-file (concat my-default-lib "/color-theme-twilight.el"))
-    ;; (color-theme-billw)
-    (color-theme-twilight)))
+    ;; (load-file (concat *my-default-lib* "/color-theme-twilight.el"))
+    (load-file (concat *my-default-lib* "/zenburn-el/zenburn.el"))
+    ;; ;; theme for darker enviroments
 
-;;Setting up tabbar
-(require 'tabbar)
-(tabbar-mode 1)
+    ;; (color-theme-twilight)
+    (color-theme-zenburn)
+    ;; theme for lighted enviroments
+    ;; (color-theme-greiner)
+    ;; greiner is cool in a lighted enviroment.
+    ))
 
-;; define C-u and C-d to be like vim (equal pgup pgdown)
-;; for some reason C-u was not working
-;; (define- viper-vi-basic-map "\C-u" 'viper-scroll-down)
-;; (global-set-key [C-home]   'tabbar-press-home)
 
 ;; C-\ adds a lambda symbol, as DrRacket
-(define-key global-map "\C-\\"
-  (lambda () (interactive)
-          (insert "λ"))) 
-
-;; (setq-default viper-electric-mode 1)
-
-;; ;; set the default spacing for ruby editing
-;; (setq viper-shift-width 2)
-
-;; sets C-[ to also mean C-g
-
-;; page-up and page-down scroll bars for the tabs
-;; basically modify the keys of tabbar
-(global-set-key [C-home]   'tabbar-press-home)
-
-(global-set-key [S-next]   'tabbar-forward-group)
-(global-set-key [S-prior]  'tabbar-backward-group)
-
-(global-set-key [C-prior]  'tabbar-backward)
-(global-set-key [C-next]   'tabbar-forward)
+;; (define-key global-map "\C-\\"
+;;   (lambda () (interactive)
+;;           (insert "λ")))
 
 ;; newline also indents
 (global-set-key "\r" 'newline-and-indent)
 
 
 ;; hide menus
-;; (menu-bar-mode 0)
+(menu-bar-mode 0)
 (tool-bar-mode 0)
 
 ;; some of the information below was lifted from
@@ -75,7 +53,7 @@
 (global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
 (global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
 (global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
-(global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window 
+(global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,10 +95,10 @@
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; we want fontification in all modes
-(global-font-lock-mode t t)
+;; (global-font-lock-mode t t)
 
-;; maximum possible fontification
-(setq font-lock-maximum-decoration t)
+;; ;; maximum possible fontification
+;; (setq font-lock-maximum-decoration t)
 
 ;; Provide templates for new files
 (auto-insert-mode t)
@@ -164,7 +142,7 @@
 (defun make-backup-file-name (file-name)
   "Create the non-numeric backup file name for `file-name'."
   (require 'dired)
-  (let ((backup-location "~/.emacs.d/backups/"))
+  (let ((backup-location "~/.backups/"))
     (if (file-exists-p backup-location)
 	(concat (expand-file-name backup-location)
 		(replace-regexp-in-string "/" "!" file-name))
@@ -177,7 +155,7 @@
 (defun make-auto-save-file-name ()
   "Return file name to use for auto-saves of current buffer.."
   (if buffer-file-name
-      (let ((save-location "~/.emacs.d/autosaves/"))
+      (let ((save-location "~/.autosaves/"))
         (if (file-exists-p save-location)
             (concat (expand-file-name save-location) "#"
                     (replace-regexp-in-string "/" "!" buffer-file-name)
@@ -200,7 +178,7 @@
 (column-number-mode 1)
 
 ;; Remember the position where we closed a file
-(setq save-place-file "~/.emacs.d/saveplace") ;; keep my ~/ clean
+(setq save-place-file "~/.saveplace") ;; keep my ~/ clean
 
 (setq-default save-place t) ;; activate it for all buffers
 (require 'saveplace) ;; get the package
@@ -208,34 +186,45 @@
 ;; Ignore case when looking for a file
 (setq read-file-name-completion-ignore-case t)
 
-;; Full-screen mode
-(defun djcb-full-screen-toggle ()
-  "toggle full-screen mode"
-  (interactive)
-  (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
-
-;; set key for the function above
-;; (global-set-key (kbd "<f11>") 'djcb-full-screen-toggle)
-
-
 ;; comment and uncomment region
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 
+;; +-------------------------------------------------------+
+;; |                                                       |
+;; |                    eshell                             |
+;; |                                                       |
+;; +-------------------------------------------------------+
+
+(require 'eshell)
+(require 'em-smart)
+(setq eshell-where-to-jump 'begin)
+(setq eshell-review-quick-commands nil)
+(setq eshell-smart-space-goes-to-end t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; autocomplete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'load-path (concat my-default-lib "/auto-complete"))
+(add-to-list 'load-path (concat *my-default-lib* "/auto-complete"))
 
 (require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories (concat my-default-lib "/auto-complete/ac-dict"))
+(add-to-list 'ac-dictionary-directories (concat *my-default-lib* "/auto-complete/ac-dict"))
 (ac-config-default)
 
 ;; dirty fix for having AC everywhere
+;; (define-globalized-minor-mode real-global-auto-complete-mode
+;;   auto-complete-mode (lambda ()
+;;                        (if (not (minibufferp (current-buffer)))
+;;                          (auto-complete-mode 1))
+;;                        ))
+
 (define-globalized-minor-mode real-global-auto-complete-mode
   auto-complete-mode (lambda ()
-                       (if (not (minibufferp (current-buffer)))
-                           (auto-complete-mode 1))))
+                       (if (not (or (minibufferp (current-buffer))
+                                    (not (numberp
+                                          (compare-strings "*eshell*" 0 7
+                                                           (buffer-name
+                                                            (current-buffer)) 0 7)))))
+                         (auto-complete-mode 1))))
 
 ;; tab in insert mode calls autocomplete
 (ac-set-trigger-key "TAB")
@@ -244,7 +233,7 @@
 
 ;; company, another autocomplete engine. Still testing
 ;; used primarily as an AC to geiser, an slime like app for scheme.
-(add-to-list 'load-path (concat my-default-lib "/company"))
+(add-to-list 'load-path (concat *my-default-lib* "/company"))
 (autoload 'company-mode "company" nil t)
 
 (add-hook 'scheme-mode-hook
@@ -255,36 +244,36 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; https://jandmworks.com/lisp.html#SBCL quirks
-;; (add-to-list 'load-path (concat my-default-lib "/slime"))
-;; (require 'slime)
-;; (slime-setup '(slime-repl))
-;; (setq inferior-lisp-program "sbcl")
+(add-to-list 'load-path (concat *my-default-lib* "/slime"))
+(require 'slime)
+(slime-setup '(slime-repl))
+(setq inferior-lisp-program "sbcl")
 
-;; (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-;; (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
-;; (global-set-key (kbd "C-c s") 'slime-selector)
+(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+(global-set-key (kbd "C-c s") 'slime-selector)
 
-;; (setq common-lisp-hyperspec-root
-;;       "file:/usr/share/doc/hyperspec/") 
+(setq common-lisp-hyperspec-root
+      "file:/usr/share/doc/hyperspec/")
 
-;; ;; autocomplete with slime's documentation
-;; (add-to-list 'load-path (concat my-default-lib "/ac-slime"))
+;; autocomplete with slime's documentation
+(add-to-list 'load-path (concat *my-default-lib* "/ac-slime"))
 
-;; (require 'ac-slime)
-;; (add-hook 'slime-mode-hook 'set-up-slime-ac)
-;; (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+(require 'ac-slime)
+(add-hook 'slime-mode-hook 'set-up-slime-ac)
+(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
 
 
-;; (defun scratch-lisp-file ()
-;;   "Insert a template (with DEFPACKAGE and IN-PACKAGE forms) into
-;;    the current buffer."
-;;   (interactive)
-;;   (goto-char 0)
-;;   (let* ((file (file-name-nondirectory (buffer-file-name)))
-;;          (package (file-name-sans-extension file)))
-;;     (insert ";;;; " file "\n")
-;;     (insert "\n(defpackage :" package "\n  (:use :cl))\n\n")
-;;     (insert "(in-package :" package ")\n\n")))
+(defun scratch-lisp-file ()
+  "Insert a template (with DEFPACKAGE and IN-PACKAGE forms) into
+   the current buffer."
+  (interactive)
+  (goto-char 0)
+  (let* ((file (file-name-nondirectory (buffer-file-name)))
+         (package (file-name-sans-extension file)))
+    (insert ";;;; " file "\n")
+    (insert "\n(defpackage :" package "\n  (:use :cl))\n\n")
+    (insert "(in-package :" package ")\n\n")))
 
 ;; To make SLIME connect to your lisp whenever you open a lisp file just add
 ;; this to your .emacs:
@@ -294,8 +283,12 @@
 ;;             (unless (slime-connected-p)
 ;;               (save-excursion (slime)))))
 
+
+;; quicklisp slime
+;; (load (expand-file-name "~/.quicklisp/slime-helper.el"))
+
 ;; lush, a numeric lisp
-(load (concat my-default-lib "/lush.el")) 
+;; (load (concat *my-default-lib* "/lush.el"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Things taken from http://sites.google.com/site/steveyegge2/effective-emacs
@@ -303,6 +296,7 @@
 
 ;; item #2
 (global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-xm" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 
 ;; item #3
@@ -369,7 +363,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Highlight-parentheses, a mode for showing where you are  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-file (concat my-default-lib "/highlight-parentheses.el"))
+(load-file (concat *my-default-lib* "/highlight-parentheses.el"))
 (require 'highlight-parentheses)
 
 (define-globalized-minor-mode global-highlight-parentheses-mode
@@ -385,13 +379,6 @@
   "Minor mode for pseudo-structurally editing Lisp code." 1)
 (require 'paredit)
 
-;; (eval-after-load 'paredit
-;;   '(progn
-;;      ;; instead of moving words, move sexps...
-;;      (define-key viper-vi-basic-map "\S-w" 'paredit-forward)
-;;      (define-key viper-vi-basic-map "\S-b" 'paredit-backward)
-;;      )) 
-
 (dolist (hook '(lisp-mode-hook
                 emacs-lisp-mode-hook
                 scheme-mode-hook
@@ -401,15 +388,24 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scheme 
+;; scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load-file (concat my-default-lib "/geiser/elisp/geiser.el"))
+;; gambit
+;; (load-file (concat *my-default-lib* "/gambit.el"))
+;; (autoload 'gambit-inferior-mode "gambit" "Hook Gambit mode into cmuscheme.")
+;; (autoload 'gambit-mode "gambit" "Hook Gambit mode into scheme.")
+;; (add-hook 'inferior-scheme-mode-hook (function gambit-inferior-mode))
+;; (add-hook 'scheme-mode-hook (function gambit-mode))
+;; (setq scheme-program-name "gsc -:d")
+
+;; geiser for racket
+(load-file (concat *my-default-lib* "/geiser/elisp/geiser.el"))
 (require 'geiser-mode)
 
 ;; (setq scheme-program-name "gracket-text")
 
-(setq geiser-racket-use-gracket-p t)
+(setq geiser-racket-use-gracket-p nil)
 
 ;; adds *.rkt to scheme-mode
 (setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
@@ -432,9 +428,156 @@
             "define/public"
             "define/augment"
             "define/override"
+            "define-values"
             "λ"
             "field"
             "define-runtime-path"))
+
+;; pretty things up
+(defconst schemecmpct-lambda-char    (decode-char 'ucs #x03BB))
+;; (make-char 'greek-iso8859-7 107)
+(defconst schemecmpct-delta-char     (decode-char 'ucs #x03B4))
+;; (make-char 'greek-iso8859-7 100)
+
+(defconst schemecmpct-upper-sigma-char (decode-char 'ucs #x03a3))
+
+(defconst schemecmpct-beta-char      (decode-char 'ucs #x03B2))
+;; 'greek-iso8859-7 98))
+(defconst schemecmpct-xor-char       (decode-char 'ucs #x22BB))
+(defconst schemecmpct-rho-char       (decode-char 'ucs #x03C1))
+(defconst schemecmpct-sigma-char     (decode-char 'ucs #x03C2))
+(defconst schemecmpct-iota-char      (decode-char 'ucs #x03B9))
+(defconst schemecmpct-log-and-char   (decode-char 'ucs #x2227))
+(defconst schemecmpct-log-or-char    (decode-char 'ucs #x2228))
+(defconst schemecmpct-log-not-char   (decode-char 'ucs #x00AC))
+(defconst schemecmpct-log-true-char  (decode-char 'ucs #x22A4))
+(defconst schemecmpct-log-false-char (decode-char 'ucs #x22A5))
+(defconst schemecmpct-less-equal-char    (decode-char 'ucs #x2264))
+(defconst schemecmpct-greater-equal-char (decode-char 'ucs #x2265))
+
+(defconst schemecmpct-key-words
+  '(("[[(]\\(case-\\|match-\\|opt-\\)?\\(lambda\\)\\>"
+     2
+     (progn (compose-region (match-beginning 2)
+                            (match-end       2)
+                            schemecmpct-lambda-char)
+            nil))
+    ("[[(]\\(define\\)\\(-.+\\)?\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-delta-char)
+            nil))
+    ("[[(]\\(let\\)\\(*\\|-\\)?"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-beta-char)
+            nil))
+    ("[[(]\\(set!\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-sigma-char)
+            nil))
+    ("[[(]\\(begin\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-rho-char)
+
+            nil))
+    ("[[(]\\(if\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-iota-char)
+            nil))
+    ("[[(]\\(for \\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-upper-sigma-char)
+            nil))
+    ("[[(]\\(for/\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (1- (match-end       1))
+                            schemecmpct-upper-sigma-char)
+            nil)) 
+    ("\\(-and\\)"
+     1
+     (progn (compose-region (1+ (match-beginning 1))
+                            (match-end       1)
+                            schemecmpct-log-and-char)
+            nil))
+    ("[[(]\\(and\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-log-and-char)
+            nil))
+    ("\\(-xor\\)"
+     1
+     (progn (compose-region (1+ (match-beginning 1))
+                            (match-end       1)
+                            schemecmpct-xor-char)
+            nil))
+    ("\\(-or\\)"
+     1
+     (progn (compose-region (1+ (match-beginning 1))
+                            (match-end       1)
+                            schemecmpct-log-or-char)
+            nil))
+    ("[[(]\\(or\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-log-or-char)
+            nil))
+    ("[[(]\\(-not\\)\\>"
+     1
+     (progn (compose-region (1+ (match-beginning 1))
+                            (match-end       1)
+                            schemecmpct-log-not-char)
+            nil))
+    ("[[(]\\(not\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-log-not-char)
+            nil))
+    ("[[(]\\(<=\\)"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-less-equal-char)
+            nil))
+    ("[[(]\\(>=\\)"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-greater-equal-char)
+            nil))
+    ("\\(#t\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                            (match-end       1)
+                            schemecmpct-log-true-char)
+            nil))
+    ("\\(#f\\)\\>"
+     1
+     (progn (compose-region (match-beginning 1)
+                             (match-end       1)
+                            schemecmpct-log-false-char)
+            nil))))
+
+(defun schemecmpct-install-fontification ()
+  "Install font lock extensions to scheme mode."
+  (font-lock-add-keywords nil schemecmpct-key-words))
+
+;; (add-hook 'scheme-mode-hook 'schemecmpct-install-fontification)
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -456,7 +599,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ruby -- rinari, a mode for rails, ruby and rhtml
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'load-path (concat my-default-lib "/rinari"))
+(add-to-list 'load-path (concat *my-default-lib* "/rinari"))
 (require 'rinari)
 
 (defun my-insert-erb-skeleton ()
@@ -469,11 +612,13 @@
 (define-key rinari-minor-mode-map "\r" 'newline-and-indent)
 
 ;;; rhtml-mode
-(add-to-list 'load-path (concat my-default-lib "/rhtml"))
+(add-to-list 'load-path (concat *my-default-lib* "/rhtml"))
 (require 'rhtml-mode)
 (add-hook 'rhtml-mode-hook
      	  (lambda ()
             (rinari-launch)))
+
+(setq ruby-indent-level 2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -484,48 +629,123 @@
 ;; buffer to html
 (require 'htmlize)
 
-;; javascript
+
+
+;; +---------------------------------------------------------------------------+
+;; |                                                                           |
+;; |                                                                           |
+;; |                          javascript & mozrepl                             |
+;; |                                                                           |
+;; |                                                                           |
+;; +---------------------------------------------------------------------------+
 (autoload 'js2-mode "js2" nil t)
+
+;;     C-c C-s: open a MozRepl interaction buffer and switch to it
+;;     C-c C-l: save the current buffer and load it in MozRepl
+;;     C-M-x: send the current function (as recognized by c-mark-function) to MozRepl
+;;     C-c C-c: send the current function to MozRepl and switch to the interaction buffer
+;;     C-c C-r: send the current region to MozRepl
+
+;; In the interaction buffer:
+
+;;     C-c c: insert the current name of the REPL plus the dot operator (usually repl.)
+
+(autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
+
+(add-hook 'js2-mode-hook 'js2-custom-setup)
+(defun js2-custom-setup ()
+  (moz-minor-mode 1))
+
+;; (autoload 'js2-mode "js2" nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 
-(require 'js-comint)
-(setq inferior-js-program-command "node")
-(add-hook 'js2-mode-hook '(lambda () 
-			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
-			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
-			    (local-set-key "\C-cb" 'js-send-buffer)
-			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
-			    (local-set-key "\C-cl" 'js-load-file-and-go)))
+;; (require 'js-comint)
+;; (setq inferior-js-program-command "node")
+;; (add-hook 'js2-mode-hook '(lambda ()
+;; 			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+;; 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+;; 			    (local-set-key "\C-cb" 'js-send-buffer)
+;; 			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
+;; 			    (local-set-key "\C-cl" 'js-load-file-and-go)))
 
 
 
 ;; yasnippet, loads of emacs snippets
 ;; http://code.google.com/p/yasnippet/
-(add-to-list 'load-path (concat my-default-lib "/yasnippet"))
+(add-to-list 'load-path (concat *my-default-lib* "/yasnippet"))
 (require 'yasnippet)
 (yas/initialize)
-(yas/load-directory (concat my-default-lib "/yasnippet/snippets"))
+(yas/load-directory (concat *my-default-lib* "/yasnippet/snippets"))
 
 ;; undo-tree
 ;; treats undo as a tree
 (require 'undo-tree)
 (global-undo-tree-mode)
 
+;; starts the emacs server so I can access it with emacsclient.
 (server-start)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ruby-indent-level 2)
- '(safe-local-variable-values (quote ((Syntax . ANSI-Common-Lisp) (Syntax . Common-Lisp) (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
+;; default browser is conkeror, so we can get a truly smooth emacs
+;; cult going.
+(setq browse-url-browser-function 'browse-url-generic)
+(setq browse-url-generic-program "conkeror")
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; +----------------------------------------------------------------+
+;; |              i-menu-mode, with ido support                     |
+;; | http://www.emacswiki.org/emacs/ImenuMode#toc10                 |
+;; +----------------------------------------------------------------+
+(load-file (concat *my-default-lib* "/idomenu.el"))
+
+;; http://www.masteringemacs.org/articles/2011/01/14/effective-editing-movement/
+(global-set-key (kbd "M-i") 'idomenu)
+
+;; +-------------------------------------------------------------------------+
+;; |                        VisibleMark                                      |
+;; |           http://www.emacswiki.org/emacs/VisibleMark                    |
+;; +-------------------------------------------------------------------------+
+;; (load-file (concat *my-default-lib* "/visible-mark.el"))
+;; (require 'visible-mark)
+;; (setq-default visible-mark-mode t)
+
+
+;; +------------------------------------------------------------+
+;; |        cua-mode                                            |
+;; +------------------------------------------------------------+
+;; (cua-mode t)
+
+;; +------------------------------------------------------------+
+;; |                       Erlang                               |
+;; +------------------------------------------------------------+
+(add-to-list 'load-path (concat *my-default-lib* "/erlang"))
+(require 'erlang-start)
+(add-to-list 'load-path  (concat *my-default-lib* "/distel/elisp"))
+(require 'distel)
+(distel-setup)
+
+
+;; +----------------------------------------------------------------+
+;; |          legalese, insert legal licenses.                      |
+;; |      http://www.emacswiki.org/emacs/legalese.el                |
+;; +----------------------------------------------------------------+
+(load-file (concat *my-default-lib* "/legalese.el"))
+;; (require 'legalese)
+
 
 (put 'downcase-region 'disabled nil)
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(legalese-default-license (quote fdl))
+ '(safe-local-variable-values (quote ((erlang-indent-level . 4) (c-file-style . k&r) (c-font-lock-extra-types "FILE" "\\sw+_t" "at" "gptr" "real" "flt" "intg") (ruby-compilation-executable . "ruby") (ruby-compilation-executable . "ruby1.8") (ruby-compilation-executable . "ruby1.9") (ruby-compilation-executable . "rbx") (ruby-compilation-executable . "jruby")))))
+
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ )
+
+(put 'upcase-region 'disabled nil)
+(put 'scroll-left 'disabled nil)
