@@ -17,7 +17,7 @@
     (set-face-font 'default "Inconsolata 12")
     (require 'color-theme)
     (color-theme-initialize)
-    ;; (load-file (concat *my-default-lib* "/color-theme-twilight.el"))
+    (load-file (concat *my-default-lib* "/color-theme-twilight.el"))
     (load-file (concat *my-default-lib* "/zenburn-el/zenburn.el"))
     ;; ;; theme for darker enviroments
 
