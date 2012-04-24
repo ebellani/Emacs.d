@@ -27,14 +27,26 @@
   (documentation slot t))
 
 
+;;;; UTF8
+
+(defimplementation string-to-utf8 (s)
+  (let ((ef (load-time-value (excl:find-external-format :utf-8) t)))
+    (excl:string-to-octets s :external-format ef)))
+
+(defimplementation utf8-to-string (u)
+  (let ((ef (load-time-value (excl:find-external-format :utf-8) t)))
+    (excl:octets-to-string u :external-format ef)))
+
+
 ;;;; TCP Server
 
 (defimplementation preferred-communication-style ()
   :spawn)
 
-(defimplementation create-socket (host port)
+(defimplementation create-socket (host port &key backlog)
   (socket:make-socket :connect :passive :local-port port 
-                      :local-host host :reuse-address t))
+                      :local-host host :reuse-address t
+                      :backlog (or backlog 5)))
 
 (defimplementation local-port (socket)
   (socket:local-port socket))
@@ -49,6 +61,9 @@
     (when external-format
       (setf (stream-external-format s) external-format))
     s))
+
+(defimplementation socket-fd (stream)
+  (excl::stream-input-handle stream))
 
 (defvar *external-format-to-coding-system*
   '((:iso-8859-1 
@@ -146,7 +161,7 @@
 (defun find-topframe ()
   (let ((magic-symbol (intern (symbol-name :swank-debugger-hook)
                               (find-package :swank)))
-        (top-frame (excl::int-newest-frame)))
+        (top-frame (excl::int-newest-frame (excl::current-thread))))
     (loop for frame = top-frame then (next-frame frame)
           for name  = (debugger:frame-name frame)
           for i from 0
@@ -459,7 +474,7 @@
                    (merge-pathnames (pathname filename))
                    *default-pathname-defaults*)))
           (compile-from-temp-file string buffer position filename)))
-    (reader-error () (values nil nil t))))
+    (reader-error () nil)))
 
 ;;;; Definition Finding
 
@@ -533,7 +548,7 @@
   (cond
     ((and (listp fspec)
           (eql (car fspec) :top-level-form))
-     (destructuring-bind (top-level-form file &optional position) fspec 
+     (destructuring-bind (top-level-form file &optional (position 0)) fspec 
        (declare (ignore top-level-form))
        `((,fspec
           ,(buffer-or-file-location file position)))))
@@ -639,17 +654,14 @@
   ;; As the CL:Y-OR-N-P question is (for some reason) not directly
   ;; sent to the Slime user, the function CL:Y-OR-N-P is temporarily
   ;; overruled.
-  `(let* ((pkg       (find-package "common-lisp"))
+  `(let* ((pkg       (find-package :common-lisp))
           (saved-pdl (excl::package-definition-lock pkg))
           (saved-ynp (symbol-function 'cl:y-or-n-p)))
-     
      (setf (excl::package-definition-lock pkg) nil
-           (symbol-function 'cl:y-or-n-p)   (symbol-function
-                                             (find-symbol "y-or-n-p-in-emacs"
-                                                          "swank")))
+           (symbol-function 'cl:y-or-n-p)
+           (symbol-function (read-from-string "swank:y-or-n-p-in-emacs")))
      (unwind-protect
-         (progn ,@body)
-       
+          (progn ,@body)
        (setf (symbol-function 'cl:y-or-n-p)      saved-ynp
              (excl::package-definition-lock pkg) saved-pdl))))
 
@@ -720,8 +732,8 @@
   (with-struct (inspect::field-def- name type access) def
     (ecase type
       ((:unsigned-word :unsigned-byte :unsigned-natural
-                       :unsigned-long :unsigned-half-long 
-                       :unsigned-3byte)
+                       :unsigned-long :unsigned-half-long
+                       :unsigned-3byte :unsigned-long32)
        (label-value-line name (inspect::component-ref-v object access type)))
       ((:lisp :value :func)
        (label-value-line name (inspect::component-ref object access)))
@@ -819,9 +831,31 @@
      (mp:process-wait-with-timeout "receive-if" 0.5
                                    #'mp:gate-open-p (mailbox.gate mbox)))))
 
+(let ((alist '())
+      (lock (mp:make-process-lock :name "register-thread")))
+
+  (defimplementation register-thread (name thread)
+    (declare (type symbol name))
+    (mp:with-process-lock (lock)
+      (etypecase thread
+        (null 
+         (setf alist (delete name alist :key #'car)))
+        (mp:process
+         (let ((probe (assoc name alist)))
+           (cond (probe (setf (cdr probe) thread))
+                 (t (setf alist (acons name thread alist))))))))
+    nil)
+
+  (defimplementation find-registered (name)
+    (mp:with-process-lock (lock)
+      (cdr (assoc name alist)))))
+
 (defimplementation set-default-initial-binding (var form)
-  (setq excl:*cl-default-special-bindings*
-        (acons var form excl:*cl-default-special-bindings*)))
+  (push (cons var form)
+        #+(version>= 9 0)
+        excl:*required-thread-bindings*
+        #-(version>= 9 0)
+        excl::required-thread-bindings))
 
 (defimplementation quit-lisp ()
   (excl:exit 0 :quiet t))

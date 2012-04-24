@@ -1,25 +1,43 @@
 (1
+ (adaptive-wrap .
+		[(0 1)
+		 nil "Smart line-wrapping with wrap-prefix" single])
  (all .
       [(1 0)
        nil "Edit all lines matching a given regexp" single])
+ (ampc .
+       [(0 1 2)
+	nil "Asynchronous Music Player Controller" single])
  (auctex .
 	 [(11 86)
 	  nil "Integrated environment for *TeX*" tar])
  (company .
 	  [(0 5)
 	   nil "Flexible inline text and code completion" tar])
+ (csv-mode .
+	   [(1 0)
+	    nil "Major mode for editing comma/char separated values" single])
  (debbugs .
 	  [(0 3)
 	   nil "SOAP library to access debbugs servers" tar])
  (djvu .
        [(0 5)
-	nil "edit and view Djvu files via djvused" single])
+	nil "Edit and view Djvu files via djvused" single])
+ (ediprolog .
+	    [(1 0)
+	     nil "Emacs Does Interactive Prolog" single])
  (eldoc-eval .
 	     [(0 1)
 	      nil "Enable eldoc support when minibuffer is in use." single])
  (epoch-view .
 	     [(0 0 1)
 	      nil "Minor mode to visualize epoch timestamps" single])
+ (f90-interface-browser .
+			[(1 0)
+			 nil "Parse and browse f90 interfaces" single])
+ (ioccur .
+	 [(2 4)
+	  nil "Incremental occur" single])
  (jgraph-mode .
 	      [(0 0)
 	       nil "Major mode for Jgraph files" single])
@@ -44,15 +62,18 @@
  (muse .
        [(3 20)
 	nil "Authoring and publishing tool" tar])
+ (nhexl-mode .
+	     [(0 1)
+	      nil "Minor mode to edit files via hex-dump format  -*- lexical-binding: t -*-" single])
  (oauth2 .
-	 [(0 1)
+	 [(0 3)
 	  nil "OAuth 2.0 Authorization Protocol" single])
  (org .
-      [(20111206)
+      [(20120424)
        nil "Outline-based notes management and organizer" tar])
  (quarter-plane .
 		[(0 1)
-		 nil "editing using quarter-plane screen model" single])
+		 nil "Minor mode for quarter-plane style editing" single])
  (rainbow-mode .
 	       [(0 2)
 		nil "Colorize color names in buffers" single])
@@ -66,15 +87,18 @@
 	    [(3 0 3)
 	     nil "Major mode for SiSU markup text" single])
  (svg-clock .
-	    [(0 2)
+	    [(0 4)
 	     nil "Analog clock using Scalable Vector Graphics" single])
  (undo-tree .
-	    [(0 3 1)
+	    [(0 3 3)
 	     nil "Treat undo history as a tree" single])
  (uni-confusables .
 		  [(0 1)
 		   nil "Unicode confusables table" tar])
  (windresize .
 	     [(0 1)
-	      nil "Resize windows interactively" single]))
+	      nil "Resize windows interactively" single])
+ (xclip .
+	[(1 0)
+	 nil "Emacs Interface to XClip" single]))
 

@@ -44,7 +44,7 @@ hit C-a twice:"
           '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
 
 
-(defun eshell/latex-cleaner (filename &optional pdfviewer)
+(defun latex-cleaner (filename &optional pdfviewer)
   "Uses pdf latex in batchmode for the FILENAME and removes
 everything that is created by pdflatex but the log file and the
 pdf. If there is no PDFVIEWER, uses the system default."

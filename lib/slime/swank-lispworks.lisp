@@ -62,6 +62,14 @@
                                 :check-redefinition-p nil)
        ,(funcall *original-defimplementation* whole env))))
 
+;;; UTF8
+
+(defimplementation string-to-utf8 (string)
+  (ef:encode-lisp-string string :utf-8))
+
+(defimplementation utf8-to-string (octets)
+  (ef:decode-external-string octets :utf-8))
+
 ;;; TCP server
 
 (defimplementation preferred-communication-style ()
@@ -72,10 +80,11 @@
     (fixnum socket)
     (comm:socket-stream (comm:socket-stream-socket socket))))
 
-(defimplementation create-socket (host port)
+(defimplementation create-socket (host port &key backlog)
   (multiple-value-bind (socket where errno)
       #-(or lispworks4.1 (and macosx lispworks4.3))
-      (comm::create-tcp-socket-for-service port :address host)
+      (comm::create-tcp-socket-for-service port :address host
+                                           :backlog (or backlog 5))
       #+(or lispworks4.1 (and macosx lispworks4.3))
       (comm::create-tcp-socket-for-service port)
     (cond (socket socket)
@@ -96,25 +105,34 @@
   (declare (ignore buffering))
   (let* ((fd (comm::get-fd-from-socket socket)))
     (assert (/= fd -1))
-    (assert (valid-external-format-p external-format))
-    (cond ((member (first external-format) '(:latin-1 :ascii))
+    (cond ((not external-format)
            (make-instance 'comm:socket-stream
                           :socket fd
                           :direction :io
                           :read-timeout timeout
-                          :element-type 'base-char))
+                          :element-type '(unsigned-byte 8)))
           (t
-           (make-flexi-stream 
-            (make-instance 'comm:socket-stream
-                           :socket fd
-                           :direction :io
-                           :read-timeout timeout
-                           :element-type '(unsigned-byte 8))
-            external-format)))))
+           (assert (valid-external-format-p external-format))
+           (ecase (first external-format)
+             ((:latin-1 :ascii)
+              (make-instance 'comm:socket-stream
+                             :socket fd
+                             :direction :io
+                             :read-timeout timeout
+                             :element-type 'base-char))
+             (:utf-8
+              (make-flexi-stream 
+               (make-instance 'comm:socket-stream
+                              :socket fd
+                              :direction :io
+                              :read-timeout timeout
+                              :element-type '(unsigned-byte 8))
+               external-format)))))))
 
 (defun make-flexi-stream (stream external-format)
   (unless (member :flexi-streams *features*)
-    (error "Cannot use external format ~A without having installed flexi-streams in the inferior-lisp."
+    (error "Cannot use external format ~A~
+            without having installed flexi-streams in the inferior-lisp."
            external-format))
   (funcall (read-from-string "FLEXI-STREAMS:MAKE-FLEXI-STREAM")
            stream
@@ -131,13 +149,12 @@
 (defvar *external-format-to-coding-system*
   '(((:latin-1 :eol-style :lf) 
      "latin-1-unix" "iso-latin-1-unix" "iso-8859-1-unix")
-    ((:latin-1) 
-     "latin-1" "iso-latin-1" "iso-8859-1")
-    ((:utf-8) "utf-8")
+    ;;((:latin-1) "latin-1" "iso-latin-1" "iso-8859-1")
+    ;;((:utf-8) "utf-8")
     ((:utf-8 :eol-style :lf) "utf-8-unix")
-    ((:euc-jp) "euc-jp")
+    ;;((:euc-jp) "euc-jp")
     ((:euc-jp :eol-style :lf) "euc-jp-unix")
-    ((:ascii) "us-ascii")
+    ;;((:ascii) "us-ascii")
     ((:ascii :eol-style :lf) "us-ascii-unix")))
 
 (defimplementation find-external-format (coding-system)
@@ -336,7 +353,7 @@ Return NIL if the symbol is unbound."
 
 (defun nth-frame (index)
   (nth-next-frame *sldb-top-frame* index))
-           
+
 (defun find-top-frame ()
   "Return the most suitable top-frame for the debugger."
   (or (do ((frame (dbg::debugger-stack-current-frame dbg::*debugger-stack*)
@@ -365,20 +382,39 @@ Return NIL if the symbol is unbound."
 	(push frame backtrace)))))
 
 (defun frame-actual-args (frame)
-  (let ((*break-on-signals* nil))
-    (mapcar (lambda (arg)
-              (case arg
-                ((&rest &optional &key) arg)
-                (t
-                 (handler-case (dbg::dbg-eval arg frame)
-                   (error (e) (format nil "<~A>" arg))))))
-            (dbg::call-frame-arglist frame))))
+  (let ((*break-on-signals* nil)
+        (kind nil))
+    (loop for arg in (dbg::call-frame-arglist frame)
+          if (eq kind '&rest)
+          nconc (handler-case
+                    (dbg::dbg-eval arg frame)
+                  (error (e) (list (format nil "<~A>" arg))))
+          and do (loop-finish)
+          else
+          if (member arg '(&rest &optional &key))
+          do (setq kind arg)
+          else
+          nconc
+          (handler-case
+              (nconc (and (eq kind '&key)
+                          (list (cond ((symbolp arg)
+                                       (intern (symbol-name arg) :keyword))
+                                      ((and (consp arg) (symbolp (car arg)))
+                                       (intern (symbol-name (car arg)) :keyword))
+                                      (t (caar arg)))))
+                     (list (dbg::dbg-eval
+                            (cond ((symbolp arg) arg)
+                                  ((and (consp arg) (symbolp (car arg)))
+                                   (car arg))
+                                  (t (cadar arg)))
+                            frame)))
+            (error (e) (list (format nil "<~A>" arg)))))))
 
 (defimplementation print-frame (frame stream)
   (cond ((dbg::call-frame-p frame)
-         (format stream "~S ~S"
-                 (dbg::call-frame-function-name frame)
-                 (frame-actual-args frame)))
+         (prin1 (cons (dbg::call-frame-function-name frame)
+                      (frame-actual-args frame))
+                stream))
         (t (princ frame stream))))
 
 (defun frame-vars (frame)
@@ -406,9 +442,11 @@ Return NIL if the symbol is unbound."
     (if (dbg::call-frame-p frame)
 	(let ((dspec (dbg::call-frame-function-name frame))
               (cname (and (dbg::call-frame-p callee)
-                          (dbg::call-frame-function-name callee))))
+                          (dbg::call-frame-function-name callee)))
+              (path (and (dbg::call-frame-p frame)
+                         (dbg::call-frame-edit-path frame))))
 	  (if dspec
-              (frame-location dspec cname))))))
+              (frame-location dspec cname path))))))
 
 (defimplementation eval-in-frame (form frame-number)
   (let ((frame (nth-frame frame-number)))
@@ -432,18 +470,33 @@ Return NIL if the symbol is unbound."
 
 ;;; Definition finding
 
-(defun frame-location (dspec callee-name)
+(defun frame-location (dspec callee-name edit-path)
   (let ((infos (dspec:find-dspec-locations dspec)))
     (cond (infos 
            (destructuring-bind ((rdspec location) &rest _) infos
              (declare (ignore _))
              (let ((name (and callee-name (symbolp callee-name)
-                              (string callee-name))))
-               (make-dspec-location rdspec location 
-                                    `(:call-site ,name)))))
+                              (string callee-name)))
+                   (path (edit-path-to-cmucl-source-path edit-path)))
+               (make-dspec-location rdspec location
+                                    `(:call-site ,name :edit-path ,path)))))
           (t 
            (list :error (format nil "Source location not available for: ~S" 
                                 dspec))))))
+
+;; dbg::call-frame-edit-path is not documented but lets assume the
+;; binary representation of the integer EDIT-PATH should be
+;; interpreted as a sequence of CAR or CDR.  #b1111010 is roughly the
+;; same as cadadddr.  Something is odd with the highest bit.
+(defun edit-path-to-cmucl-source-path (edit-path)
+  (and edit-path
+       (cons 0
+             (let ((n -1))
+               (loop for i from (1- (integer-length edit-path)) downto 0
+                     if (logbitp i edit-path) do (incf n)
+                     else collect (prog1 n (setq n 0)))))))
+
+;; (edit-path-to-cmucl-source-path #b1111010) => (0 3 1)
 
 (defimplementation find-definitions (name)
   (let ((locations (dspec:find-name-locations dspec:*dspec-classes* name)))
@@ -503,8 +556,10 @@ Return NIL if the symbol is unbound."
 (defun map-error-database (database fn)
   (loop for (filename . defs) in database do
 	(loop for (dspec . conditions) in defs do
-	      (dolist (c conditions) 
-		(funcall fn filename dspec (if (consp c) (car c) c))))))
+	      (dolist (c conditions)
+                (multiple-value-bind (condition path)
+                    (if (consp c) (values (car c) (cdr c)) (values c nil))
+                  (funcall fn filename dspec condition path))))))
 
 (defun lispworks-severity (condition)
   (cond ((not condition) :warning)
@@ -604,7 +659,7 @@ Return NIL if the symbol is unbound."
     (with-open-file (stream file)
       (let ((pos 
              #-(or lispworks4.1 lispworks4.2)
-             (dspec-stream-position stream dspec)))
+             (ignore-errors (dspec-stream-position stream dspec))))
         (if pos
             (list :position (1+ pos))
             (dspec-function-name-position dspec `(:position 1)))))))
@@ -632,23 +687,25 @@ Return NIL if the symbol is unbound."
                       (dspec-function-name-position dspec `(:offset ,offset 0))
                       hints)))))
 
-(defun make-dspec-progenitor-location (dspec location)
+(defun make-dspec-progenitor-location (dspec location edit-path)
   (let ((canon-dspec (dspec:canonicalize-dspec dspec)))
     (make-dspec-location
      (if canon-dspec
          (if (dspec:local-dspec-p canon-dspec)
              (dspec:dspec-progenitor canon-dspec)
-           canon-dspec)
-       nil)
-     location)))
+             canon-dspec)
+         nil)
+     location
+     (if edit-path
+         (list :edit-path (edit-path-to-cmucl-source-path edit-path))))))
 
 (defun signal-error-data-base (database &optional location)
   (map-error-database 
    database
-   (lambda (filename dspec condition)
+   (lambda (filename dspec condition edit-path)
      (signal-compiler-condition
       (format nil "~A" condition)
-      (make-dspec-progenitor-location dspec (or location filename))
+      (make-dspec-progenitor-location dspec (or location filename) edit-path)
       condition))))
 
 (defun unmangle-unfun (symbol)
@@ -663,10 +720,11 @@ function names like \(SETF GET)."
 	     (dolist (dspec dspecs)
 	       (signal-compiler-condition 
 		(format nil "Undefined function ~A" (unmangle-unfun unfun))
-		(make-dspec-progenitor-location dspec
-                                                (or filename
-                                                    (gethash (list unfun dspec)
-                                                             *undefined-functions-hash*)))
+		(make-dspec-progenitor-location 
+                 dspec
+                 (or filename
+                     (gethash (list unfun dspec) *undefined-functions-hash*))
+                 nil)
 		nil)))
 	   htab))
 
@@ -697,7 +755,7 @@ function names like \(SETF GET)."
 (defxref who-macroexpands hcl:who-calls) ; macros are in the calls table too
 (defxref calls-who      hcl:calls-who)
 (defxref list-callers   list-callers-internal)
-;; (defxref list-callees   list-callees-internal)
+(defxref list-callees   list-callees-internal)
 
 (defun list-callers-internal (name)
   (let ((callers (make-array 100
@@ -706,7 +764,8 @@ function names like \(SETF GET)."
     (hcl:sweep-all-objects
      #'(lambda (object)
          (when (and #+Harlequin-PC-Lisp (low:compiled-code-p object)
-                    #-Harlequin-PC-Lisp (sys::callablep object)
+                    #+Harlequin-Unix-Lisp (sys:callablep object)
+                    #-(or Harlequin-PC-Lisp Harlequin-Unix-Lisp) (sys:compiled-code-p object)
                     (system::find-constant$funcallable name object))
            (vector-push-extend object callers))))
     ;; Delay dspec:object-dspec until after sweep-all-objects
@@ -715,6 +774,19 @@ function names like \(SETF GET)."
           collect (if (symbolp object)
 		      (list 'function object)
                       (or (dspec:object-dspec object) object)))))
+
+(defun list-callees-internal (name)
+  (let ((callees '()))
+    (system::find-constant$funcallable
+     'junk name
+     :test #'(lambda (junk constant)
+               (declare (ignore junk))
+               (when (and (symbolp constant)
+                          (fboundp constant))
+                 (pushnew (list 'function constant) callees :test 'equal))
+               ;; Return nil so we iterate over all constants.
+               nil))
+    callees))
 
 ;; only for lispworks 4.2 and above
 #-lispworks4.1
@@ -872,6 +944,26 @@ function names like \(SETF GET)."
     (mp:with-lock ((mailbox.mutex mbox))
       (setf (mailbox.queue mbox)
             (nconc (mailbox.queue mbox) (list message))))))
+
+(let ((alist '())
+      (lock (mp:make-lock :name "register-thread")))
+
+  (defimplementation register-thread (name thread)
+    (declare (type symbol name))
+    (mp:with-lock (lock)
+      (etypecase thread
+        (null 
+         (setf alist (delete name alist :key #'car)))
+        (mp:process
+         (let ((probe (assoc name alist)))
+           (cond (probe (setf (cdr probe) thread))
+                 (t (setf alist (acons name thread alist))))))))
+    nil)
+
+  (defimplementation find-registered (name)
+    (mp:with-lock (lock)
+      (cdr (assoc name alist)))))
+
 
 (defimplementation set-default-initial-binding (var form)
   (setq mp:*process-initial-bindings* 

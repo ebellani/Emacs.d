@@ -1,3 +1,1017 @@
+2012-03-06  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-kawa.scm (module-method>meth-ref):  Slightly better
+	heuristic for vararg functions.
+
+2012-03-06  Helmut Eller  <heller@common-lisp.net>
+
+	Add missing provide.
+
+	* swank-repl.lisp
+	* swank-util.lisp
+	* swank-mrepl.lisp
+	* swank-snapshot.lisp
+
+2012-03-06  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-package-fu.el (slime-export-save-file): New variable, when
+	set to T saves package.lisp after each modification. Defaults to NIL.
+
+2012-01-06  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-mrepl.lisp (send-prompt): Fix use of OR.
+	Reported by Mark H. David.
+
+2011-12-30  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-looking-at-keyword): New function. Looks
+	past #+foo expressions.
+	(common-lisp-backward-keyword-argument): New function. Semi-aware
+	of #+foo expressions.
+	(common-lisp-indent-function-1):
+	1. Use `common-lisp-indent-parse-state-start'.
+	2. Move #+/- cleavernes outside the cond: it is always a default, and shouldn't
+	trump other indentation logic. Also make it use the column of the first feature
+	expression, not the last.
+	3. Make keyword alignment somewhat feature-expression aware.
+	4. Make heuristics not force remaining forms to be indented at the same line.
+	(common-lisp-indent-test): Leave one leading whitespace on comment lines
+	when messing up indentation.
+
+	* slime-cl-indent-test.txt (tests 77-83): Tests for feature-expression
+	and keyword alignment interaction.
+
+2011-12-24  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-tramp.el (slime-find-filename-translators): Don't signal
+	an error if there's no translators for a hostname, just use 'identity.
+
+2011-12-23  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-change-repl-to-default-connection): New
+	function.
+	Changes the current REPL to the REPL of the default connection. If
+	the current buffer is not a REPL, don't do anything.
+	Put it into `slime-cycle-connections-hook', so that when
+	connections are cycled through it will change the currently
+	displayed REPL.
+
+2011-12-10  Helmut Eller  <heller@common-lisp.net>
+
+	Don't call init-global-stream-redirection in *after-init-hook*.
+	*after-init-hook* may be called before the contrib was loaded.
+
+	* swank-repl.lisp (maybe-redirect-global-io): Call
+	init-global-stream-redirection here instead.
+
+2011-12-08  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-indent-maximum-backtracking)
+	("basic"): Increase default backtracking level to 6, so that at
+	least mildly nested macrolet-lambda lists can be identified as
+	such.
+
+	* slime-cl-indent.el (common-lisp-init-standard-indentation): Fix
+	FLET indentation spec, which caused local function lambda-lists to
+	be indented as part of the body.
+
+	* slime-cl-indent-test.txt (tests 72-76): New tests.
+
+	* slime-cl-indent.el (common-lisp-init-standard-indentation): New function,
+	wraps initialization of the common-lisp-indent-function properties.
+
+2011-12-06  Didier Verna  <didier@xemacs.org>
+
+	* slime-asdf.el (slime-asdf): New custom group.
+	* slime-asdf.el (slime-asdf-collect-notes): Put this variable in.
+
+2011-12-05  Helmut Eller  <heller@common-lisp.net>
+
+	Drop flow control from repl-output-stream.
+	That's now done at a lower level.
+
+	* swank-repl.lisp (make-output-function): Use :write-string directly.
+	(send-user-output, *maximum-pipelined-output-chunks*)
+	(*maximum-pipelined-output-length*): Deleted.
+
+	* swank-repl.lisp (create-repl, open-streams, find-repl-thread):
+	Use accessors for multithreaded-connection where needed.
+
+2011-12-04  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-repl.lisp: New file.
+	* slime-repl.el (slime-repl): Add swank-dependecy.
+
+2011-12-03  Didier Verna  <didier@xemacs.org>
+
+       * slime-cl-indent.el (common-lisp-loop-type)
+       (common-lisp-loop-part-indentation)
+       (common-lisp-indent-body-introducing-loop-macro-keyword)
+       (common-lisp-indent-prefix-loop-macro-keyword)
+       (common-lisp-indent-clause-joining-loop-macro-keyword)
+       (common-lisp-indent-indented-loop-macro-keyword)
+       (common-lisp-indent-indenting-loop-macro-keyword)
+       (common-lisp-indent-loop-macro-else-keyword)
+       (common-lisp-indent-loop-macro-1): Match not only KEYWORD but also
+       :KEYWORD and #:KEYWORD in the LOOP macro.
+
+2011-12-03  Didier Verna  <didier@xemacs.org>
+
+       * slime-cl-indent.el (lisp-indent-lambda-list-keywords-regexp):
+       Match empty string after a word consitituent (\>) instead of a
+       symbol constituent (\_>) because XEmacs doesn't have that syntax,
+       and here, it doesn't hurt anyway.
+
+2011-12-03  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-mrepl.lisp (package-prompt): Use <= instead of < to give
+	package-name priority over nicknames.
+
+2011-12-02  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-send-input): Don't put `read-only'
+	property on an overlay, overlays don't support it.
+
+2011-12-02  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-kawa.scm (inspect-obj-ref): Use for instead of iter.
+
+2011-12-02  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-mrepl.el: Drop dependency on slime-repl. Use comint
+	instead.
+
+2011-12-02  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-mrepl.lisp: New file.
+
+2011-12-01  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-kawa.scm (mangled-name): Try to deal unnamed lambdas.
+	(inspect): Split up into inspect-array-ref and inspect-obj-ref.
+	(inspect-array-ref): New.
+	(inspect-obj-ref): New. Include methods in result.
+
+2011-11-29  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-util.lisp: New file.
+	* swank-c-p-c.lisp: Use it.
+	* swank-fancy-inspector.lisp:
+	* swank-fuzzy.lisp:
+
+2011-11-28  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-trailing-comment): New function.
+	Returns the column of a trailing comment.
+	(common-lisp-loop-part-indentation)
+	(common-lisp-indent-loop-macro-1): fix indentation of multiline
+	comments starting from a trailing position.
+
+
+	* slime-cl-indent-test.txt: Add tests 68 and 69.
+
+2011-11-28  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el: fix DEFCLASS and DEFINE-CONDITION superclass-list
+	indentation.
+
+	* slime-cl-indent-test.txt: Add tests 66 and 67.
+
+2011-11-27  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-repl.el (slime-repl-choose-coding-system): New.
+	(slime-repl-connected-hook-function): Use it.
+
+2011-11-23  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-open-stream-to-lisp): Convert "utf-8-unix"
+	to 'utf-8-unix.
+
+2011-11-19  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el ("sbcl"): Add indentation alias for !def-debug-command.
+
+2011-11-16  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-open-stream-to-lisp): Set the process coding system
+	to the right coding system.
+
+2011-11-12  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	Fix DEFMETHOD indentation when the name is a SETF-name, and qualifiers
+	are present.
+
+	* slime-cl-indent.el (lisp-beginning-of-defmethod-qualifiers): Renamed
+	from `lisp-beginning-of-defmethod'. Skip the method name as well, since
+	unlike qualifiers it can be list -- eg. (setf foo).
+	(lisp-indent-defmethod): Use the above to get the number of skips right.
+
+	* slime-cl-indent-test.txt: Tests 64 and 65.
+
+2011-11-11  Anton Kovalenko  <anton@sw4me.com>
+
+	* swank-fancy-inspector.lisp (make-pathname-ispec): Use :position
+	instead of :charpos, according to slime-ed interface. Add :bytep
+	t, telling slime-ed to interpret it as byte offset.
+
+2011-10-31  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-run-indentation-tests): Make it
+	possible to run only a specific test.
+
+2011-10-31  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	Improve indentation of comments inside LOOP.
+
+	* slime-cl-indent-test.txt: New tests 54-63.
+
+	* slime-cl-indent.el (common-lisp-loop-type): Deal with comments
+	at the start of the loop, add simple/split type.
+
+	* slime-cl-indent.el (lisp-indent-loop): Use
+	common-lisp-loop-part-indentation for simple loops regardless of
+	the value of lisp-loop-indent-subclauses.
+
+	* slime-cl-indent.el (common-lisp-loop-part-indentation): Handle the
+	new simple/split type, improve comment indentation logic.
+
+2011-10-31  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (style "sbcl"): Indentation for !DEF-TYPE-TRANSLATOR.
+
+2011-10-29  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	Two patches by Tomohiro Matsuyama <tomo@cx4a.org>.
+
+	* slime-cl-indent.el (define-common-lisp-style): Fix handling
+	of :documentation option, which accidentally threw out the docstring.
+	(lisp-indent-lambda-list-keywords-regexp): Handle trailing
+	&allow-other-keys correctly.
+
+	* slime-cl-indent-test.txt: Tests 50-53.
+
+2011-10-07  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-clear-output): Fix clearing output
+	when there's something entered after the prompt.
+
+2011-10-05  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-autodoc.el (slime-autodoc): Don't cache variable values.
+	(slime-autodoc-global-at-point): Remove, unused.
+
+2011-10-05  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-clear-repl-variables): New function, clears *, /,
+	and + variables.
+	(slime-repl-clear-buffer-hook): Add `slime-clear-repl-variables'
+	to it, now C-c M-o clears variables, allowing bound objects to be GCed.
+
+2011-10-05  Anton Kovalenko  <anton@sw4me.com>
+
+	* swank-asdf.lisp (asdf-system-directory): preserve
+	pathname-device and use NAMESTRING for final conversion, so both
+	device and directory are passed to SLIME. It is required e.g. on
+	MS Windows with implementations using PATHNAME-DEVICE for drive
+	letters (SBCL); intended to be portable and useful on every
+	platform where DEVICE is important.
+
+2011-10-01  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-set-package): Don't redisplay the
+	prompt if it doesn't change.
+
+2011-10-01  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-fuzzy.el (slime-fuzzy-done): Fix completion in the minibuffer.
+
+2011-10-01  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-asdf.lisp (xref-doit): Guard against using on things
+	other than symbols and strings. slime-edit-uses may call it on
+	(setf function), and it'll pop into the debugger.
+	Report by Bart Botta.
+
+2011-09-12  Christophe Rhodes  <csr21@cantab.net>
+
+	* slime-media.el (slime-dispatch-media-event): allow swank to
+	popup a buffer with a given name, mode and contents.  Intended to
+	support display of information formatted by the inferior process
+	as a return value: in particular, R help_files_with_topic objects.
+
+2011-09-01  Anton Kovalenko  <anton@sw4me.com>
+
+	* slime-c-p-c.el (slime-complete-symbol*-fancy-bit): "imitate" a
+	close-paren, or a space, with exec-kbd-macro instead of inserting
+	them. Makes slime-complete-symbol*-fancy compatible with paredit
+	and probably other smart or "electric" stuff that could be bound
+	to these keys.
+
+2011-08-30  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-repl.el	(slime-repl-suppress-prompt): New variable. Bind to T to
+	temporarily suppress the prompt.
+	(slime-eval-last-expression-in-repl): New command. Sends form from
+	another buffer to REPL for evaluation.
+	(slime-mode-map): Bind slime-eval-last-expression-in-repl to C-c C-j.
+
+2011-08-05  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* swank-indentation.lisp (macro-indentation): Tweak so that
+	things that could be bindings are indented by 1, not 4.
+
+2011-07-27  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el: Tweak COND indentation.
+	* slime-cl-indent-test.txt: Tests 48 and 49.
+
+2011-06-21  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-loop-indent-forms-like-keywords): Fix type error.
+	(common-lisp-style-default): Fix type error, move to after styles have been
+	defined so as to be able to offer a menu for picking the predefined styles.
+	("sbcl"): Oops! It's (as ...) not (:as ...). Also add couple of missing defining
+	forms.
+
+2011-06-16  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* swank-indentation.lisp (macro-indentation): More complex
+	version than the default. Fixes some of the misbehaviour of
+	the previous complex version.
+
+2011-06-15  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-scheme.el (slime-scheme-indentation-update):
+	`slime-indentation-update-hooks' now requires functions to accept
+	three arguments. Add `packages' parameter.
+
+2011-06-14  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	WITH-COMPILATION-UNIT indentation.
+
+	* slime-cl-indent.el: Add indentation method.
+
+	* slime-cl-indent-test.txt: Test 47.
+
+	Fix indentation of incomplete destructring.
+
+	* slime-cl-indent.el (lisp-indent-259): If there's a level of
+	destructuring specified in a tail, but we're looking at a word,
+	indent to sexp instead.
+
+	* slime-cl-indent-test.txt: Test 46.
+
+	Don't consider DEFINER and DEFINITION as tentative defuns.
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Don't consider
+	"definition" or "definer" to be tentative defuns.
+
+	* slime-cl-indent-test.txt: Tests 44-45.
+
+	Better DEFMETHOD and :METHOD indentation.
+
+	* slime-cl-indent.el (lisp-beginning-of-defmethod): New function.
+	(lisp-indent-defmethod): Extend to work with non-toplevel defmethods,
+	and method definitions inside defgenerics.
+
+	* slime-cl-indent-test.txt: Tests 40-43.
+
+2011-06-11  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-style-names): XEmacs doesn't
+	like lists either in completing-read -- need an alist.
+
+	XEmacs compatibility.
+
+	* slime-cl-indent.el (common-lisp-style-names): New function.
+	(common-lisp-set-style): Call common-lisp-style-names instead of
+	using the hashtable directly: XEmacs doesn't like hash-tables in
+	completing-read.
+	(common-lisp-looking-back): New function.
+	(common-lisp-indent-function-1): Use common-lisp-looking-back instead
+	of looking-back: XEmacs doesn't have looking-back.
+
+	Refactoring named styles.
+
+	* slime-cl-indent.el (define-common-lisp-style): Not a list of hooks anymore,
+	but just a single hook. Document the fact that code in :eval option may get
+	called multiple times over the lifetime of a buffer.
+	(common-lisp-style-name, common-lisp-style-inherits)
+	(common-lisp-style-variables, common-lisp-style-indentation)
+	(common-lisp-style-hook, common-lisp-style-docstring)
+	(common-lisp-make-style, common-lisp-find-style): New functions.
+	Convenience accessors, locator, and constructor.
+	(common-lisp-add-style): Don't precompute inheritance.
+	(common-lisp-safe-style-p): For use with safe-local-variable.
+	(common-lisp-activate-style): Now handles inheritance.
+	(common-lisp-active-style-methods): New function, computes and caches
+	inheritance.
+	(common-lisp-set-style): Changes to match others.
+	(common-lisp-get-indentation): Use common-lisp-active-style-methods.
+
+2011-06-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	Boa-constructor indentation.
+
+	* slime-cl-indent.el: Give :constructor the appropriate
+	indentation method.
+
+	* slime-cl-indent-test.txt: Test-case 39.
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Missing
+	paren. Teaches me to to paredit.
+
+	Take , and ,@ into account properly.
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Adjust
+	normal-indent to take , and ,@ into account
+
+	* slime-cl-indent-test.txt: Test case 36-38.
+
+	Better handling of complex indentation specs.
+
+	* slime-cl-indent.el (common-lisp-run-indentation-tests): Add
+	a style with complex specs for testing.
+	(lisp-indent-259): fix handling of nested &whole. Hopefully.
+
+	slime-indentation: Comment indentation in styles.
+
+	* slime-cl-indent.el ("basic"): Hack comment indentation
+	to avoid inserting spaces where they don't belong.
+
+	slime-indentation: More adjustment to the fallback method.
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): handle
+	case of empty or comment line following the opening paren
+	of the containing expression.
+
+	* slime-cl-indent-test.txt: new test case.
+
+	slime-indentation: Test refactoring.
+
+	* slime-cl-indent.el (common-lisp-indent-test): replaces
+	test-lisp-indent.
+	(common-lisp-run-indentation-tests): replaces
+	run-lisp-indent-tests.
+
+	* slime-cl-indent-test.txt: new file, contains all the indentation
+	tests.
+
+2011-06-09  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-lambda-list-keyword-parameter-alignment):
+	fix docstring: key1 and key3 were aligned in source, but not in *Help*.
+	(common-lisp-delete-style): Missing function, needed by tests.
+	(common-lisp-indent-function-1, run-lisp-indent-tests): Fix fallback
+	to handle case of first function argument on its own line.
+
+	Support for per-package derived indentation.
+
+	* slime-cl-indent.el (common-lisp-system-indentation)
+	(common-lisp-guess-current-package)
+	(common-lisp-current-package-function)
+	(common-lisp-symbol-package): New variables and functions.
+	(common-lisp-get-indentation): Adjust to use system derived
+	information when available.
+	(common-lisp-indent-function-1): Adust to provide
+	`common-lisp-get-indentation' with the full symbol incl.
+	package prefix.
+
+	* slime-indentation.el (common-lisp-current-package-function): set
+	to `slime-current-package'.
+
+	Support for named styles.
+
+	* slime-cl-indent.el (common-lisp-style)
+	(common-lisp-style-default, common-lisp-active-style)
+	(common-lisp-lisp-mode-hook, common-lisp-styles)
+	(common-lisp-add-style, define-common-lisp-style)
+	(common-lisp-set-style, common-lisp-set-style-history)
+	(common-lisp-activate-style, common-lisp-get-indentation): New
+	functions and variables. Setting `common-lisp-style' buffer local
+	variable in a file picks a style -- or use `common-lisp-set-style"
+	to do it. Indentation from style takes precedence.
+
+	Indirect indentation specs.
+
+	* slime-cl-indent.el (common-lisp-indent-function)
+	(common-lisp-get-indentation, common-lisp-indent-function-1)
+	(lisp-indent-defmethod): Indirect using (as foo) -style specs.
+
+2011-06-08  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): fallback
+	method to deal with trailing expressions on the previous line.
+
+2011-06-04  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (toplevel):
+	(run-lisp-indent-tests): Better named-lambda and
+	destructuring-bind indenation.
+
+2011-05-31  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-package-fu.el (slime-export-symbol-representation-auto):
+	New variable. Default value is t.
+	Determine automatically which style is used for symbols, #: or :
+	If it's mixed or no symbols are exported so far,
+	use `slime-export-symbol-representation-function'.
+
+2011-05-26  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-package-fu.el (slime-add-export): Add :export to the end
+	of a defpackage form when there's no :export present.
+
+2011-05-21  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-snapshot.el: License is GPL.
+
+2011-05-21  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-indentation.lisp: Provide :swank-indentation.
+	Reported by Robert Brown
+
+2011-05-19  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1)
+	(lisp-align-keywords-in-calls): Support for aligning keyword
+	arguments in calls.
+	(lisp-lambda-list-indentation, lisp-indent-lambda-list)
+	(run-lisp-indent-tests): Support for turning off the
+	fancy lambda-list indentation.
+
+2011-05-18  Nikodemus Siivola  <nikodemus@solipsist>
+
+	* slime-cl-indent.el (lisp-indent-defsetf, run-lisp-indent-tests):
+	Better DEFSETF indentation: support both long and short forms.
+
+2011-05-17  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (run-lisp-indent-tests, lisp-indent-loop): Fix
+	indentation of function calls, etc, inside loop forms.
+
+2011-05-16  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-loop-indent-forms-like-keywords)
+	(common-lisp-loop-part-indentation, run-lisp-indent-tests): Cater
+	to loop indentation style that prefers to align forms with keywords.
+	Activated by setting lisp-loop-indent-forms-like-keywords to t,
+	and lisp-loop-indent-subclauses to nil.
+
+2011-05-15  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Better #+
+	support.
+	(common-lisp-loop-part-indentation): Make newline-and-indent work better
+	with non-subclause-aware loop indentation.
+
+2011-05-15  Didier Verna  <didier@xemacs.org>
+
+	* slime-cl-indent.el (test-lisp-indent): Make sure
+	indent-tabs-mode is nil in the test buffer. Otherwise, spaces may
+	be converted into tabs which would make the tests fail.
+
+2011-05-15  Didier Verna  <didier@xemacs.org>
+
+	* slime-cl-indent.el (lisp-indent-tagbody):
+	(lisp-indent-lambda-list): Use back-to-indentation.
+
+2011-05-14  Nikodemus Siivola  <nikodemus@solipsist>
+
+	* slime-cl-indent.el (common-lisp-indent-if*-keyword):
+	(common-lisp-indent-if*, common-lisp-indent-if*-1):
+	(common-lisp-indent-if*-advance-past-keyword-on-line): IF*
+	indentation code from Gabor Melis. It should be noted that this
+	should not be considered an endorsement on IF* by the commiter,
+	but rather an act of compassion to all who labor under its shadow.
+	(run-lisp-indent-tests): Test-case for IF* indentation.
+
+2011-05-12  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-indent-lambda-list): Use sexp-based
+	traversal instead of regular expressions to figure out how to
+	indent lambda-lists. Allows indenting destructuring lambda-lists correctly:
+	previously we could align to a keyword in a previous sublist, instead
+	of the sublist itself.
+	(lisp-indent-lambda-list-keywords-regexp): Add support for non-standard &more.
+	(test-lisp-indent, run-lisp-indent-tests): Rudimentary tests.
+	(lisp-indent-259): Use lambda-list-indentation even if the CDR of the path
+	isn't null: this allows correct indentation of destructuring sublists.
+	(run-lisp-indent-tests): More test-cases.
+
+2011-05-11  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Handle
+	#+ and #-. Also support the SBCL idiom of #!+ #!-.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el: whitespace cleanup.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el: subclause aware loop indentation, adapted from
+	cl-indent-patches.el.
+	(lisp-indent-loop-subclauses): New customization.
+	(common-lisp-indent-function): Trampoline directly to
+	common-lisp-indent-function-1 -- loop indentation is now picked up
+	by the normal machinery instead of being special cased here.
+	(lisp-indent-loop): New function. Chooses between the old naive
+	indentation and new subclause-aware version based on
+	lisp-indent-loop-subclauses.
+	(common-lisp-indent-body-introducing-loop-macro-keyword):
+	(common-lisp-indent-prefix-loop-macro-keyword):
+	(common-lisp-indent-clause-joining-loop-macro-keyword):
+	(common-lisp-indent-indented-loop-macro-keyword):
+	(common-lisp-indent-indenting-loop-macro-keyword):
+	(common-lisp-indent-loop-macro-else-keyword): Regular expressions
+	for identifying loop parts.
+	(common-lisp-indent-parse-state-depth):
+	(common-lisp-indent-parse-state-start):
+	(common-lisp-indent-parse-state-prev): Parse state accessors.
+	(common-lisp-indent-loop-macro-1): Subclause aware loop indentation.
+	(common-lisp-indent-loop-advance-past-keyword-on-line): Utility used by the above.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-loop-type): New function,
+	replaces extended-loop-p.
+	(common-lisp-loop-part-indentation): Use common-lisp-loop-type to
+	decide how to indent, supporting both "split" and "unsplit" styles.
+	(lisp-loop-keyword-indentation, lisp-loop-forms-indentation):
+	Deleted: pointless now that both split and unsplit styles work
+	automatically.
+	(extended-loop-p): Deleted.
+	(lisp-simple-loop-indentation): Change default to 2.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-loop-part-indentation): Return
+	(<indent> <loop-start>) instead of <indent> for non-simple loops.
+	This lets calculate-lisp-indent know that the following lines of
+	the loop might be indented differently -- fixing indent-sexp for
+	loops.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Remove
+	bogus special casing of ,(...) and ,@(...). Even if backquote
+	was being indented as data, the escaped forms are evaluated,
+	and hence should be indented as lisp code.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (lisp-indent-259): Don't throw to exit with
+	normal-indent if processing a tail that isn't a cons. Doing that
+	breaks (... &rest foo) specs.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el (common-lisp-indent-function-1): Don't take
+	`default' for a tentative defun, unlike anything else starting
+	with `def'.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	slime-indentation: indentation improvements on defmethod and
+	lambda-lists for cl-indent.el by Didier Verna, from emacs-devel.
+
+	* slime-cl-indent.el: Advertise the changes and remove obsolete TODO
+        entries.
+	* slime-cl-indent.el (lisp-lambda-list-keyword-alignment):
+	* slime-cl-indent.el (lisp-lambda-list-keyword-parameter-indentation):
+	* slime-cl-indent.el (lisp-lambda-list-keyword-parameter-alignment): New
+        customizable user options.
+	* slime-cl-indent.el (lisp-indent-defun-method): Improve docstring.
+	* slime-cl-indent.el (extended-loop-p): Fix comment.
+	* slime-cl-indent.el (lisp-indent-lambda-list-keywords-regexp): New
+        variable.
+	* slime-cl-indent.el (lisp-indent-lambda-list): New function.
+	* slime-cl-indent.el (lisp-indent-259): Use it.
+	* slime-cl-indent.el (lisp-indent-defmethod): Support for more than one
+        method qualifier and properly indent methods lambda-lists.
+	* slime-cl-indent.el: Provide a missing common-lisp-indent-function
+        property for defgeneric.
+
+2011-05-10  Nikodemus Siivola  <nikodemus@random-state.net>
+
+	* slime-cl-indent.el: New file. Copy of cl-indent.el from current
+	GNU Emacs HEAD. Replaces the ancient copy previously kept as part
+	of slime-indentation.el.
+	* slime-indentation.el (slime-handle-indentation-update): Deleted.
+	Since we now directly replace the previous version of
+	cl-indent.el, the normal version defined in slime.el works fine.
+	ALSO DELETED: the inline copy of 1995 vintage cl-indent.el.
+
+2011-03-14  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-sprof.lisp (swank-sprof-get-call-graph): Don't call
+	serialize-call-graph when there's no samples. That prevents it
+	from crashing.
+
+2011-03-13  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-sprof.el(abbreviate-name): Rename to
+	slime-sprof-abbreviate-name (no package system, oh well...).
+
+2011-03-09  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-editing-commands.el (slime-beginning-of-defun): Call
+	beginning-of-defun with call-interactively so that the mark gets
+	pushed.
+
+2011-01-22  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-shortcut-help): Don't make ? an alias
+	for help, ? is bound to minibuffer-completion-help, and you can't
+	enter it.
+
+2011-01-20  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-mit-scheme.scm (swank:load-file): Print the result
+	instead of returning it which breaks the protocol.
+
+	* swank-mit-scheme.scm: Require release 9.
+
+2011-01-12  Helmut Eller  <heller@common-lisp.net>
+
+	Some more MIT Scheme fixes.
+
+	* swank-mit-scheme.scm (swank:compile-string-for-emacs)
+	(swank:compile-file-for-emacs): Use new result format.
+	(swank:disassemble-form): Added with the needed kludgery for
+	quoted forms.
+	(swank:swank-require): Define this as nop.
+
+2011-01-11  Helmut Eller  <heller@common-lisp.net>
+
+	Some upgrades for MIT Scheme backend.
+
+	* swank-mit-scheme.scm (netcat, netcat-accept): Use netcat-openbsd
+	syntax.  This version doesn't print the port number anymore
+	defeating the original purpose of using netcat.
+	(start-swank): Hardcode portnumber to 4055 until somebody cares
+	enough to write proper server ports.
+	(emacs-rex): Include a nonsense message with the :abort reply.
+
+2010-12-10  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-sprof.el (slime-sprof-browser): Rename to
+	`slime-sprof-report', leave `slime-sprof-browser' as an alias.
+
+2010-12-09  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-fancy-inspector.lisp (emacs-inspect): Work on methods
+	without associated generic function.
+
+2010-10-28  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-package-fu.lisp (list-structure-symbols): Include the name
+	of the structure too.
+
+2010-10-17  Helmut Eller  <heller@common-lisp.net>
+
+	Some updates to the Kawa backend.
+
+	* swank-kawa.scm (%%runnable): Use standard
+	gnu.mapping.RunnableClosure but print the stacktrace on
+	exceptions.
+	(listener-loop): Invoke debugger on unhandled exceptions.  The
+	debugger will use stacksnapshots if the exception matches.
+	(invoke-debugger, break, breakpoint, request-breakpoint): New.
+	Used to "invoke" the debugger from normal code.
+	(process-vm-event, debug-info, event-stacktrace): Handle
+	breakpoint events.
+	(interrupt-thread, throwable-stacktrace, breakpoint-condition):
+	New.
+	(throw-to-toplevel): For breakpoint events use
+	Thread#forceEarlyReturn.
+	(typecase): Add support for or and eql types.
+	(bytemethod>src-loc): New.
+	(src-loc>elisp): Use stratum "java" as this seems to work better.
+	(print-object, print-unreadable-object): New
+	(pprint-to-string): Use it.
+
+2010-09-26  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-history-pattern): Match \t too,
+	besides \  and \n.
+
+2010-09-22  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el: Handle (:abort condition) message from lisp.
+
+2010-09-18  Tobias C. Rittweiler <tcr@freebits.de>
+
+	* slime-parse.el (slime-parse-form-upto-point): Fix lp#627308.
+
+	* slime-autodoc.el (slime-canonicalize-whitespace): New
+	helper. Extracted out of `slime-format-autodoc'.
+	(slime-autodoc-to-string): New helper.
+	(slime-check-autodoc-at-point): Use it.
+	(autodoc.1): Add test case for above fix.
+
+2010-09-18  Tobias C. Rittweiler <tcr@freebits.de>
+
+	* swank-arglist.lisp (function-exists-p): Renamed from
+	FUNCTION-EXISTS-P. Uses new SWANK-BACKEND:VALID-FUNCTION-NAME-P
+	underneath.
+	(valid-operator-name-p): Unused, hence deleted.
+	(boundp-and-interesting): Renamed from INTERESTING-VARIABLE-P.
+
+2010-09-17  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-sprof.lisp (filter-swank-nodes): Filter other swank
+	packages too, not only SWANK.
+
+2010-09-16  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-arglists.lisp (print-variable-to-string): Use
+	without-printing-errors when printing the value.
+	Reported by Tobias C. Rittweiler on lp#628945.
+
+2010-09-16  Christophe Rhodes  <csr21@cantab.net>
+
+	Image display support for the REPL.
+
+	* slime-media.el: New file.
+	* swank-media.lisp: New file.
+
+2010-09-09  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-c-p-c.lisp (longest-compound-prefix): Wrong arguments for
+	longest-common-prefix.
+	Reported by Peter Stirling.
+
+2010-09-07  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-c-p-c.lisp: s/delimeter/delimiter/, correct spelling.
+
+2010-09-07  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-c-p-c.lisp (untokenize-completion): Take an optional
+	argument "delimiter".
+	(longest-compound-prefix): Pass delimiter to untokenize-completion.
+
+2010-09-04  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-fuzzy.lisp (*fuzzy-completion-...*): Change defparameter
+	to defvar for easier customization.
+
+2010-09-03  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-search-property-change): XEmacs may return
+	nil on previous/next-single-char-property-change, don't pass it to
+	goto-char.
+
+2010-09-03  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-repl-mode-end-of-defun)
+	(slime-repl-mode-beginning-of-defun): Take an optional argument
+	which specifies how many defuns it should move. GNU Emacs catches
+	wrong-number-of-arguments condition and does this by itself, but
+	XEmacs doesn't.
+
+2010-09-03  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-kawa.scm (%%runnable): Update for changes in SVN version.
+
+2010-08-21  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-fuzzy.el (slime-fuzzy-choices-buffer): XEmacs compatibility.
+
+2010-08-21  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-repl.el: Specify :on-unload action.
+
+2010-08-21  Anton Kovalenko <anton@sw4me.com>
+
+	Add support to save snapshots in backround.
+
+	* swank-snapshot.lisp (background-save-snapshot): New.
+	(resurrect): Initialize repl streams.
+	* slime-snapshot.el (slime-snapshot): With prefix-arg perform
+	saving in background.  Also ask before overwriting existing files.
+
+2010-08-13  Helmut Eller  <heller@common-lisp.net>
+
+	Fix slime-restore.
+
+	* swank-snapshot.lisp (swank-snapshot::resurrect): Adapted to
+	new MAKE-CONNECTION.
+
+2010-07-29  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-c-p-c.el (slime-complete-form): Limit `looking-back' too.
+
+2010-07-28  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-presentations.el (slime-copy-presentation-to-repl): Limit
+	looking-back to one character before point. Solves long freeze on a
+	large buffer.
+
+2010-07-27  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-sprof.el (slime-sprof-start): change defun to defun*,
+	elisp doesn't understand default values for &optional.
+
+2010-07-24  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-package-fu.el (slime-frob-defpackage-form): Accept a
+	symbol or a list of symbols. Optimize inserting several symbols at
+	a time.
+	(slime-search-exports-in-defpackage): Search forward until nothing
+	is found, otherwise it searching for FOO will stop after encountering
+	FOO-B.
+	(slime-export-class): Rename from slime-export-structure.
+
+	* swank-package-fu.lisp (export-symbol-for-emacs): Fix typo.
+	(export-structure): Add support for CCL and for exporting
+	standard-class accessors using MOP.
+
+	* slime-sprof.el (slime-sprof-start-alloc)
+	(slime-sprof-start-time): New functions to start profiling in
+	:alloc and :time mode. The default slime-sprof-start is :cpu.
+	* swank-sprof.lisp (swank-sprof-start): Accept :mode keyword.
+
+2010-07-24  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-package-fu.el (slime-export-structure): New function,
+	export all constructors, accessors, etc.
+	* swank-package-fu.lisp (export-structure): Lisp side of the above
+	function, works only on SBCL for now.
+
+2010-07-23  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-arglists.lisp (arglist-dispatch): Export it, so it may be
+	extended more easily.
+
+	* slime-fancy-inspector.el (slime-fancy-inspector): Add
+	slime-parse dependency.
+
+2010-07-16  Stas Boukarev  <stassats@gmail.com>
+
+	* slime-repl.el (slime-call-defun): Handle setf-functions.
+
+2010-07-04  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-asdf.lisp (asdf:operation-done-p): Fix reloading on
+	ASDF2. ASDF2 no longer has `asdf:around' method combination.
+
+2010-07-02  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-fancy-inspector.lisp (docstring-ispec): Don't insert an
+	unnecessary space.
+	(emacs-inspect): Delete unnecessary "it" in [... it]
+	buttons.
+	Don't capitalize every word in some messages.
+
+2010-06-15  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-asdf.lisp (asdf-central-registry): Use an exported
+	interface for ASDF2.
+
+2010-06-14  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-asdf.lisp (asdf-central-registry): ASDF2 compatibility.
+	Patch by Leo Liu.
+
+2010-06-04  Helmut Eller  <heller@common-lisp.net>
+
+	* inferior-slime.el (inferior-slime-show-transcript): Update
+	window point
+
+2010-05-29  Stas Boukarev  <stassats@gmail.com>
+
+	* swank-fancy-inspector.lisp (emacs-inspect): Add [finalize]
+	button for not finalized classes.
+
+2010-05-28  Helmut Eller  <heller@common-lisp.net>
+
+	Call provide at the end of the file.
+
+	* slime-asdf.el slime-banner.el slime-clipboard.el
+	slime-compiler-notes-tree.el slime-enclosing-context.el
+	slime-highlight-edits.el slime-hyperdoc.el slime-indentation.el
+	slime-mdot-fu.el slime-motd.el slime-mrepl.el
+	slime-presentation-streams.el slime-sbcl-exts.el slime-snapshot.el
+	slime-sprof.el slime-tramp.el slime-typeout-frame.el
+	slime-xref-browser.el:
+
+2010-05-28  Helmut Eller  <heller@common-lisp.net>
+
+	* slime-c-p-c.el slime-fancy-inspector.el slime-fancy.el
+	slime-fontifying-fu.el slime-fuzzy.el slime-package-fu.el
+	slime-parse.el slime-presentations.el slime-references.el
+	slime-repl.el slime-scratch.el: Call provide at the end of the
+	file.
+
+2010-05-28  Helmut Eller  <heller@common-lisp.net>
+
+	* swank-kawa.scm (wrap-compilation): Set Compilation.explict flag.
+	(list-file): Add cast to resolve overloaded parse method.
+	(disassemble-form): Update for change from 2010-05-18.
+
 2010-05-19  Stas Boukarev  <stassats@gmail.com>
 
 	* slime-repl.el (slime-list-repl-short-cuts): Don't scroll to the

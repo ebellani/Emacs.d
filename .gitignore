@@ -1,3 +1,14 @@
 backups/*
 autosaves/*
 tmp/*
+auto-save-list
+recentf
+savehist
+saveplace
+eshell
+elpa/*
+session*
+swank
+tramp
+url
+*~

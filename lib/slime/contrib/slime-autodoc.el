@@ -58,7 +58,7 @@
   (let ((name (etypecase name
                  (string name)
                  (symbol (symbol-name name)))))
-    (slime-eval `(swank:autodoc '(,name ,slime-cursor-marker)))))
+    (car (slime-eval `(swank:autodoc '(,name ,slime-cursor-marker))))))
 
 
 ;;;; Autodocs (automatic context-sensitive help)
@@ -72,24 +72,6 @@
               `(swank:autodoc ',buffer-form
                               :print-right-margin
                               ,(window-width (minibuffer-window)))))))
-
-(defun slime-autodoc-global-at-point ()
-  "Return the global variable name at point, if any."
-  (when-let (name (slime-symbol-at-point))
-    (and (slime-global-variable-name-p name) name)))
-
-(defcustom slime-global-variable-name-regexp "^\\(.*:\\)?\\([*+]\\).+\\2$"
-  "Regexp used to check if a symbol name is a global variable.
-
-Default value assumes +this+ or *that* naming conventions."
-  :type 'regexp
-  :group 'slime)
-
-(defun slime-global-variable-name-p (name)
-  "Is NAME a global variable?
-Globals are recognised purely by *this-naming-convention*."
-  (and (< (length name) 80) ; avoid overflows in regexp matcher
-       (string-match slime-global-variable-name-regexp name)))
 
 
 ;;;; Autodoc cache
@@ -111,11 +93,14 @@ Return DOCUMENTATION."
 
 ;;;; Formatting autodoc
 
+(defsubst slime-canonicalize-whitespace (string)
+  (replace-regexp-in-string "[ \n\t]+" " "  string))
+
 (defun slime-format-autodoc (doc multilinep)
   (let ((doc (slime-fontify-string doc)))
     (if multilinep
         doc
-        (slime-oneliner (replace-regexp-in-string "[ \n\t]+" " "  doc)))))
+        (slime-oneliner (slime-canonicalize-whitespace doc)))))
 
 (defun slime-fontify-string (string)
   "Fontify STRING as `font-lock-mode' does in Lisp mode."
@@ -171,12 +156,14 @@ If it's not in the cache, the cache will be updated asynchronously."
                  (lexical-let ((cache-key cache-key)
                                (multilinep multilinep))
                    (lambda (doc)
-                     (unless (eq doc :not-available)
-                       (slime-store-into-autodoc-cache cache-key doc)
-                       ;; Now that we've got our information,
-                       ;; get it to the user ASAP.
-                       (eldoc-message
-                        (slime-format-autodoc doc multilinep))))))
+                     (destructuring-bind (doc cache-p) doc
+                       (unless (eq doc :not-available)
+                         (when cache-p
+                           (slime-store-into-autodoc-cache cache-key doc))
+                         ;; Now that we've got our information,
+                         ;; get it to the user ASAP.
+                         (eldoc-message
+                          (slime-format-autodoc doc multilinep)))))))
                nil))))))))
 
 (defvar slime-autodoc-cache-car nil)
@@ -238,13 +225,19 @@ display multiline arglist"
 
 ;;;; Test cases
 
+(defun slime-autodoc-to-string ()
+  "Retrieve and return autodoc for form at point."
+  (let ((autodoc (car (slime-eval (second (slime-make-autodoc-rpc-form))))))
+    (if (eq autodoc :not-available)
+        :not-available
+        (slime-canonicalize-whitespace autodoc))))
+
 (defun slime-check-autodoc-at-point (arglist)
-  (let ((slime-autodoc-use-multiline-p nil))
-    (slime-test-expect (format "Autodoc in `%s' (at %d) is as expected" 
-                               (buffer-string) (point)) 
-                       arglist
-                       (slime-eval (second (slime-make-autodoc-rpc-form)))
-                       'equal)))
+  (slime-test-expect (format "Autodoc in `%s' (at %d) is as expected" 
+                             (buffer-string) (point)) 
+                     arglist
+                     (slime-autodoc-to-string)
+                     'equal))
 
 (def-slime-test autodoc.1
     (buffer-sexpr wished-arglist &optional skip-trailing-test-p)
@@ -310,6 +303,8 @@ display multiline arglist"
       ;; Test &KEY and nested arglists
       ("(swank::with-retry-restart (:msg *HERE*"
        "(with-retry-restart (&key ===> (msg \"Retry.\") <===) &body body)")
+      ("(swank::with-retry-restart (:msg *HERE*(foo"
+       "(with-retry-restart (&key ===> (msg \"Retry.\") <===) &body body)" t)
       ("(swank::start-server \"/tmp/foo\" :coding-system *HERE*"
        "(start-server port-file &key (style swank:*communication-style*) (dont-close swank:*dont-close*) ===> (coding-system swank::*coding-system*) <===)")
       

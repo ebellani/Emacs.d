@@ -11,6 +11,7 @@
 (in-package :swank)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  (swank-require :swank-util)
   (swank-require :swank-c-p-c))
 
 ;;; For nomenclature of the fuzzy completion section, please read
@@ -465,8 +466,9 @@ this call will also recurse.
 
 Once a word has been completely matched, the chunks are pushed
 onto the special variable *ALL-CHUNKS* and the function returns."
-  (declare ;(optimize speed)
-           (fixnum short-index initial-full-index)
+  (declare (optimize speed)
+           (type fixnum short-index initial-full-index)
+           (type list current-chunk)
            (simple-string short full)
            (special *all-chunks*))
   (flet ((short-cur () 
@@ -485,10 +487,13 @@ onto the special variable *ALL-CHUNKS* and the function returns."
            "Collects the current chunk to CHUNKS and prepares for
             a new chunk."
            (when current-chunk
-             (push (list current-chunk-pos
-                         (coerce (reverse current-chunk) 'string)) chunks)
-             (setf current-chunk nil
-                   current-chunk-pos nil))))
+             (let ((current-chunk-as-string (nreverse
+                                             (make-array (length current-chunk)
+                                                         :element-type 'character
+                                                         :initial-contents current-chunk))))
+               (push (list current-chunk-pos current-chunk-as-string) chunks)
+               (setf current-chunk nil
+                     current-chunk-pos nil)))))
     ;; If there's an outstanding chunk coming in collect it.  Since
     ;; we're recursively called on skipping an input character, the
     ;; chunk can't possibly continue on.
@@ -521,15 +526,15 @@ onto the special variable *ALL-CHUNKS* and the function returns."
 
 ;;;;; Fuzzy completion scoring
 
-(defparameter *fuzzy-completion-symbol-prefixes* "*+-%&?<"
+(defvar *fuzzy-completion-symbol-prefixes* "*+-%&?<"
   "Letters that are likely to be at the beginning of a symbol.
 Letters found after one of these prefixes will be scored as if
 they were at the beginning of ths symbol.")
-(defparameter *fuzzy-completion-symbol-suffixes* "*+->"
+(defvar *fuzzy-completion-symbol-suffixes* "*+->"
   "Letters that are likely to be at the end of a symbol.
 Letters found before one of these suffixes will be scored as if
 they were at the end of the symbol.")
-(defparameter *fuzzy-completion-word-separators* "-/."
+(defvar *fuzzy-completion-word-separators* "-/."
   "Letters that separate different words in symbols.  Letters
 after one of these symbols will be scores more highly than other
 letters.")

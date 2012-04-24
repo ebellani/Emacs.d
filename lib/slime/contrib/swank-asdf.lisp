@@ -38,15 +38,16 @@
       result)))
 
 (defmethod xref-doit ((type (eql :depends-on)) thing)
-  (loop for dependency in (who-depends-on thing)
-        for asd-file = (asdf:system-definition-pathname dependency)
-        when asd-file
+  (when (typep thing '(or string symbol))
+    (loop for dependency in (who-depends-on thing)
+          for asd-file = (asdf:system-definition-pathname dependency)
+          when asd-file
           collect (list dependency
                         (swank-backend::make-location
                          `(:file ,(namestring asd-file))
                          `(:position 1)
                          `(:snippet ,(format nil "(defsystem :~A" dependency)
-                           :align t)))))
+                           :align t))))))
 
 
 (defslimefun operate-on-system-for-emacs (system-name operation &rest keywords)
@@ -69,7 +70,8 @@ Example:
     (asdf:compile-error () nil)))
 
 (defun asdf-central-registry ()
-  asdf:*central-registry*)
+  (append asdf:*central-registry*
+          #+asdf2 (asdf:ensure-source-registry)))
 
 (defslimefun list-all-systems-in-central-registry ()
   "Returns a list of all systems in ASDF's central registry."
@@ -139,9 +141,12 @@ already knows."
        t))
 
 (defslimefun asdf-system-directory (name)
-  (cl:directory-namestring
-   (cl:truename
-    (asdf:system-definition-pathname (asdf:find-system name)))))
+  (let ((truename
+          (truename
+           (asdf:system-definition-pathname (asdf:find-system name)))))
+    (namestring
+     (make-pathname :device (pathname-device truename)
+                    :directory (pathname-directory truename)))))
 
 (defun system-contains-file-p (module pathname pathname-name)
   (some #'(lambda (component)
@@ -188,12 +193,14 @@ already knows."
 
 (defvar *recompile-system* nil)
 
-#+#.(swank-backend:with-symbol 'around 'asdf)
-(defmethod asdf:operation-done-p asdf:around ((operation asdf:compile-op)
-                                              component)
-  (unless (eql *recompile-system*
-               (asdf:component-system component))
-    (call-next-method)))
+(defmethod asdf:operation-done-p
+    #+#.(swank-backend:with-symbol 'around 'asdf) asdf:around
+    #-#.(swank-backend:with-symbol 'around 'asdf) :around
+    ((operation asdf:compile-op)
+     component)
+    (unless (eql *recompile-system*
+                 (asdf:component-system component))
+      (call-next-method)))
 
 (defslimefun reload-system (name)
   (let ((*recompile-system* (asdf:find-system name)))

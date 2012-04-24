@@ -435,7 +435,7 @@ Also return the start position, end position, and buffer of the presentation."
     (unless (eql major-mode 'slime-repl-mode)
       (slime-switch-to-output-buffer))
     (flet ((do-insertion ()
-	     (unless (looking-back "\\s-")
+	     (unless (looking-back "\\s-" (- (point) 1))
 	       (insert " "))
 	     (insert presentation-text)
 	     (unless (or (eolp) (looking-at "\\s-"))
@@ -830,6 +830,8 @@ even on Common Lisp implementations without weak hash tables."
                  'mouse-face 'highlight
                  'face 'slime-inspector-value-face)
          (slime-insert-presentation string `(:inspected-part ,id) t)))
+      ((:label string)
+       (insert (slime-inspector-fontify label string)))
       ((:action string id)
        (slime-insert-propertized (list 'slime-action-number id
                                        'mouse-face 'highlight
@@ -841,3 +843,4 @@ even on Common Lisp implementations without weak hash tables."
    (in-sldb-face local-value value)
    `(:frame-var ,slime-current-thread ,(car frame) ,index) t))
 
+(provide 'slime-presentations)

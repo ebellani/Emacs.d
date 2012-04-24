@@ -61,27 +61,35 @@
 (defimplementation getpid ()
   (sb-posix:getpid))
 
+;;; UTF8
+
+(defimplementation string-to-utf8 (string)
+  (sb-ext:string-to-octets string :external-format :utf8))
+
+(defimplementation utf8-to-string (octets)
+  (sb-ext:octets-to-string octets :external-format :utf8))
+
 ;;; TCP Server
 
 (defimplementation preferred-communication-style ()
   (cond
     ;; fixme: when SBCL/win32 gains better select() support, remove
     ;; this.
-    ((member :win32 *features*) nil)
     ((member :sb-thread *features*) :spawn)
+    ((member :win32 *features*) nil)
     (t :fd-handler)))
 
 (defun resolve-hostname (name)
   (car (sb-bsd-sockets:host-ent-addresses
         (sb-bsd-sockets:get-host-by-name name))))
 
-(defimplementation create-socket (host port)
+(defimplementation create-socket (host port &key backlog)
   (let ((socket (make-instance 'sb-bsd-sockets:inet-socket
 			       :type :stream
 			       :protocol :tcp)))
     (setf (sb-bsd-sockets:sockopt-reuse-address socket) t)
     (sb-bsd-sockets:socket-bind socket (resolve-hostname host) port)
-    (sb-bsd-sockets:socket-listen socket 5)
+    (sb-bsd-sockets:socket-listen socket (or backlog 5))
     socket))
 
 (defimplementation local-port (socket)
@@ -95,9 +103,11 @@
                                       external-format
                                       buffering timeout)
   (declare (ignore timeout))
-  (make-socket-io-stream (accept socket)
-                         (or external-format :iso-latin-1-unix)
-                         (or buffering :full)))
+  (make-socket-io-stream (accept socket) external-format 
+                         (ecase buffering
+                           ((t :full) :full)
+                           ((nil :none) :none)
+                           ((:line) :line))))
 
 #-win32
 (defimplementation install-sigint-handler (function)
@@ -155,11 +165,17 @@
 (defimplementation remove-fd-handlers (socket)
   (sb-sys:invalidate-descriptor (socket-fd socket)))
 
-(defun socket-fd (socket)
+(defimplementation socket-fd (socket)
   (etypecase socket
     (fixnum socket)
     (sb-bsd-sockets:socket (sb-bsd-sockets:socket-file-descriptor socket))
     (file-stream (sb-sys:fd-stream-fd socket))))
+
+(defimplementation command-line-args ()
+  sb-ext:*posix-argv*)
+
+(defimplementation dup (fd)
+  (sb-posix:dup fd))
 
 (defvar *wait-for-input-called*)
 
@@ -169,32 +185,34 @@
     (setq *wait-for-input-called* t))
   (let ((*wait-for-input-called* nil))
     (loop
-     (let ((ready (remove-if-not #'input-ready-p streams)))
-       (when ready (return ready)))
-     (when timeout (return nil))
-     (when (check-slime-interrupts) (return :interrupt))
-            (when *wait-for-input-called* (return :interrupt))
-     (sleep 0.2))))
+      (let ((ready (remove-if-not #'input-ready-p streams)))
+        (when ready (return ready)))
+      (when (check-slime-interrupts)
+        (return :interrupt))
+      (when *wait-for-input-called*
+        (return :interrupt))
+      (when timeout
+        (return nil))
+      (sleep 0.1))))
+
+(defun fd-stream-input-buffer-empty-p (stream)
+  (let ((buffer (sb-impl::fd-stream-ibuf stream)))
+    (or (not buffer)
+        (= (sb-impl::buffer-head buffer)
+           (sb-impl::buffer-tail buffer)))))
 
 #-win32
 (defun input-ready-p (stream)
-  (let ((c (read-char-no-hang stream nil :eof)))
-    (etypecase c
-      (character (unread-char c stream) t)
-      (null nil)
-      ((member :eof) t))))
+  (or (not (fd-stream-input-buffer-empty-p stream))
+      #+#.(swank-backend:with-symbol 'fd-stream-fd-type 'sb-impl)
+      (eq :regular (sb-impl::fd-stream-fd-type stream))
+      (not (sb-impl::sysread-may-block-p stream))))
 
 #+win32
 (progn
   (defun input-ready-p (stream)
-    (or (has-buffered-input-p stream)
-        (handle-listen (sockint::fd->handle 
-                        (sb-impl::fd-stream-fd stream)))))
-
-  (defun has-buffered-input-p (stream)
-    (let ((ibuf (sb-impl::fd-stream-ibuf stream)))
-      (/= (sb-impl::buffer-head ibuf)
-          (sb-impl::buffer-tail ibuf))))
+    (or (not (fd-stream-input-buffer-empty-p stream))
+        (handle-listen (sockint::fd->handle (sb-impl::fd-stream-fd stream)))))
 
   (sb-alien:define-alien-routine ("WSACreateEvent" wsa-create-event)
       sb-win32:handle)
@@ -267,14 +285,25 @@
                   *external-format-to-coding-system*)))
 
 (defun make-socket-io-stream (socket external-format buffering)
-  (sb-bsd-sockets:socket-make-stream socket
-                                     :output t
-                                     :input t
-                                     :element-type 'character
-                                     :buffering buffering
-                                     #+sb-unicode :external-format
-                                     #+sb-unicode external-format
-                                     ))
+  (let ((args `(,@()
+                :output t
+                :input t
+                :element-type ,(if external-format
+                                   'character 
+                                   '(unsigned-byte 8))
+                :buffering ,buffering
+                ,@(cond ((and external-format (sb-int:featurep :sb-unicode))
+                         `(:external-format ,external-format))
+                        (t '()))
+                :serve-events ,(eq :fd-handler
+                                   ;; KLUDGE: SWANK package isn't
+                                   ;; available when backend is loaded.
+                                   (symbol-value
+                                    (intern "*COMMUNICATION-STYLE*" :swank)))
+                  ;; SBCL < 1.0.42.43 doesn't support :SERVE-EVENTS
+                  ;; argument.
+                :allow-other-keys t)))
+  (apply #'sb-bsd-sockets:socket-make-stream socket args)))
 
 (defun accept (socket)
   "Like socket-accept, but retry on EAGAIN."
@@ -404,6 +433,7 @@
 
 
 (defvar *buffer-name* nil)
+(defvar *buffer-tmpfile* nil)
 (defvar *buffer-offset*)
 (defvar *buffer-substring* nil)
 
@@ -486,11 +516,22 @@ information."
 (defun compiling-from-buffer-p (filename)
   (and *buffer-name*
        ;; The following is to trigger COMPILING-FROM-GENERATED-CODE-P
-       ;; in LOCATE-COMPILER-NOTE.
-       (not (eq filename :lisp))))
+       ;; in LOCATE-COMPILER-NOTE, and allows handling nested
+       ;; compilation from eg. hitting C-C on (eval-when ... (require ..))).
+       ;;
+       ;; PROBE-FILE to handle tempfile directory being a symlink.
+       (pathnamep filename)
+       (let ((true1 (probe-file filename))
+             (true2 (probe-file *buffer-tmpfile*)))
+         (and true1 (equal true1 true2)))))
 
 (defun compiling-from-file-p (filename)
-  (and (pathnamep filename) (null *buffer-name*)))
+  (and (pathnamep filename)
+       (or (null *buffer-name*)
+           (null *buffer-tmpfile*)
+           (let ((true1 (probe-file filename))
+                 (true2 (probe-file *buffer-tmpfile*)))
+             (not (and true1 (equal true1 true2)))))))
 
 (defun compiling-from-generated-code-p (filename source)
   (and (eq filename :lisp) (stringp source)))
@@ -556,7 +597,7 @@ compiler state."
     (funcall function)))
 
 
-(defvar *trap-load-time-warnings* nil)
+(defvar *trap-load-time-warnings* t)
 
 (defun compiler-policy (qualities)
   "Return compiler policy qualities present in the QUALITIES alist.
@@ -623,7 +664,7 @@ QUALITIES is an alist with (quality . value)"
   (let ((*buffer-name* buffer)
         (*buffer-offset* position)
         (*buffer-substring* string)
-        (temp-file-name (temp-file-name)))
+        (*buffer-tmpfile* (temp-file-name)))
     (flet ((load-it (filename)
              (when filename (load filename)))
            (compile-it (cont)
@@ -632,13 +673,15 @@ QUALITIES is an alist with (quality . value)"
                    (:source-plist (list :emacs-buffer buffer
                                         :emacs-filename filename
                                         :emacs-string string
-                                        :emacs-position position))
+                                        :emacs-position position)
+                    :source-namestring filename
+                    :allow-other-keys t)
                  (multiple-value-bind (output-file warningsp failurep)
-                     (compile-file temp-file-name)
+                     (compile-file *buffer-tmpfile*)
                    (declare (ignore warningsp))
                    (unless failurep
                      (funcall cont output-file)))))))
-      (with-open-file (s temp-file-name :direction :output :if-exists :error)
+      (with-open-file (s *buffer-tmpfile* :direction :output :if-exists :error)
         (write-string string s))
       (unwind-protect
            (with-compiler-policy policy
@@ -646,8 +689,8 @@ QUALITIES is an alist with (quality . value)"
                 (compile-it #'load-it)
                 (load-it (compile-it #'identity))))
         (ignore-errors
-          (delete-file temp-file-name)
-          (delete-file (compile-file-pathname temp-file-name)))))))
+          (delete-file *buffer-tmpfile*)
+          (delete-file (compile-file-pathname *buffer-tmpfile*)))))))
 
 ;;;; Definitions
 
@@ -682,9 +725,18 @@ QUALITIES is an alist with (quality . value)"
       (getf *definition-types* type)))
 
 (defun make-dspec (type name source-location)
-  (list* (definition-specifier type name)
-         name
-         (sb-introspect::definition-source-description source-location)))
+  (let ((spec (definition-specifier type name))
+        (desc (sb-introspect::definition-source-description source-location)))
+    (if (eq :define-vop spec)
+        ;; The first part of the VOP description is the name of the template
+        ;; -- which is actually good information and often long. So elide the
+        ;; original name in favor of making the interesting bit more visible.
+        ;;
+        ;; The second part of the VOP description is the associated compiler note, or
+        ;; NIL -- which is quite uninteresting and confuses the eye when reading the actual
+        ;; name which usually has a worthwhile postfix. So drop the note.
+        (list spec (car desc))
+        (list* spec name desc))))
 
 (defimplementation find-definitions (name)
   (loop for type in *definition-types* by #'cddr
@@ -1159,20 +1211,62 @@ stack."
     (:valid (sb-di:debug-var-value var frame))
     ((:invalid :unknown) ':<not-available>)))
 
+(defun debug-var-info (var)
+  ;; Introduced by SBCL 1.0.49.76.
+  (let ((s (find-symbol "DEBUG-VAR-INFO" :sb-di)))
+    (when (and s (fboundp s))
+      (funcall s var))))
+
 (defimplementation frame-locals (index)
   (let* ((frame (nth-frame index))
 	 (loc (sb-di:frame-code-location frame))
-	 (vars (frame-debug-vars frame)))
+	 (vars (frame-debug-vars frame))
+         ;; Since SBCL 1.0.49.76 PREPROCESS-FOR-EVAL understands SB-DEBUG::MORE
+         ;; specially.
+         (more-name (or (find-symbol "MORE" :sb-debug) 'more))
+         (more-context nil)
+         (more-count nil)
+         (more-id 0))
     (when vars
-      (loop for v across vars collect
-            (list :name (sb-di:debug-var-symbol v)
-                  :id (sb-di:debug-var-id v)
-                  :value (debug-var-value v frame loc))))))
+      (let ((locals
+              (loop for v across vars
+                    do (when (eq (sb-di:debug-var-symbol v) more-name)
+                         (incf more-id))
+                       (case (debug-var-info v)
+                         (:more-context
+                          (setf more-context (debug-var-value v frame loc)))
+                         (:more-count
+                          (setf more-count (debug-var-value v frame loc))))
+                    collect
+                       (list :name (sb-di:debug-var-symbol v)
+                             :id (sb-di:debug-var-id v)
+                             :value (debug-var-value v frame loc)))))
+        (when (and more-context more-count)
+          (setf locals (append locals
+                               (list
+                                (list :name more-name
+                                      :id more-id
+                                      :value (multiple-value-list
+                                              (sb-c:%more-arg-values more-context
+                                                                     0 more-count)))))))
+        locals))))
 
 (defimplementation frame-var-value (frame var)
   (let* ((frame (nth-frame frame))
-         (dvar (aref (frame-debug-vars frame) var)))
-    (debug-var-value dvar frame (sb-di:frame-code-location frame))))
+         (vars (frame-debug-vars frame))
+         (loc (sb-di:frame-code-location frame))
+         (dvar (if (= var (length vars))
+                   ;; If VAR is out of bounds, it must be the fake var we made up for
+                   ;; &MORE.
+                   (let* ((context-var (find :more-context vars :key #'debug-var-info))
+                          (more-context (debug-var-value context-var frame loc))
+                          (count-var (find :more-count vars :key #'debug-var-info))
+                          (more-count (debug-var-value count-var frame loc)))
+                     (return-from frame-var-value
+                       (multiple-value-list (sb-c:%more-arg-values more-context
+                                                                   0 more-count))))
+                   (aref vars var))))
+    (debug-var-value dvar frame loc)))
 
 (defimplementation frame-catch-tags (index)
   (mapcar #'car (sb-di:frame-catches (nth-frame index))))
@@ -1194,18 +1288,23 @@ stack."
                                                    (lambda ()
                                                      (values-list values)))))
             (t (format nil "Cannot return from frame: ~S" frame)))))
-  
+
   (defimplementation restart-frame (index)
-    (let* ((frame (nth-frame index)))
-      (cond ((sb-debug:frame-has-debug-tag-p frame)
-             (let* ((call-list (sb-debug::frame-call-as-list frame))
-                    (fun (fdefinition (car call-list)))
-                    (thunk (lambda () 
-                             ;; Ensure that the thunk gets tail-call-optimized
-                             (declare (optimize (debug 1)))
-                             (apply fun (cdr call-list)))))
-               (sb-debug:unwind-to-frame-and-call frame thunk)))
-            (t (format nil "Cannot restart frame: ~S" frame))))))
+    (let ((frame (nth-frame index)))
+      (when (sb-debug:frame-has-debug-tag-p frame)
+        (multiple-value-bind (fname args) (sb-debug::frame-call frame)
+          (multiple-value-bind (fun arglist)
+              (if (and (sb-int:legal-fun-name-p fname) (fboundp fname))
+                  (values (fdefinition fname) args)
+                  (values (sb-di:debug-fun-fun (sb-di:frame-debug-fun frame))
+                          (sb-debug::frame-args-as-list frame)))
+            (when (functionp fun)
+              (sb-debug:unwind-to-frame-and-call frame
+                                                 (lambda ()
+                                                   ;; Ensure TCO.
+                                                   (declare (optimize (debug 0)))
+                                                   (apply fun arglist)))))))
+      (format nil "Cannot restart frame: ~S" frame))))
 
 ;; FIXME: this implementation doesn't unwind the stack before
 ;; re-invoking the function, but it's better than no implementation at
@@ -1482,13 +1581,32 @@ stack."
              (return (car tail))))
          (when (eq timeout t) (return (values nil t)))
          (condition-timed-wait waitq mutex 0.2)))))
+
+  (let ((alist '())
+        (mutex (sb-thread:make-mutex :name "register-thread")))
+
+    (defimplementation register-thread (name thread)
+      (declare (type symbol name))
+      (sb-thread:with-mutex (mutex)
+        (etypecase thread
+          (null 
+           (setf alist (delete name alist :key #'car)))
+          (sb-thread:thread
+           (let ((probe (assoc name alist)))
+             (cond (probe (setf (cdr probe) thread))
+                   (t (setf alist (acons name thread alist))))))))
+      nil)
+
+    (defimplementation find-registered (name)
+      (sb-thread:with-mutex (mutex) 
+        (cdr (assoc name alist)))))
+
   )
 
 (defimplementation quit-lisp ()
   #+sb-thread
   (dolist (thread (remove (current-thread) (all-threads)))
-    (ignore-errors (sb-thread:interrupt-thread
-                    thread (lambda () (sb-ext:quit :recklessly-p t)))))
+    (ignore-errors (sb-thread:terminate-thread thread)))
   (sb-ext:quit))
 
 
@@ -1550,14 +1668,110 @@ stack."
 
 #-win32
 (defimplementation save-image (filename &optional restart-function)
-  (let ((pid (sb-posix:fork)))
-    (cond ((= pid 0) 
-           (let ((args `(,filename 
-                         ,@(if restart-function
-                               `((:toplevel ,restart-function))))))
-             (apply #'sb-ext:save-lisp-and-die args)))
-          (t
-           (multiple-value-bind (rpid status) (sb-posix:waitpid pid 0)
-             (assert (= pid rpid))
-             (assert (and (sb-posix:wifexited status)
-                          (zerop (sb-posix:wexitstatus status)))))))))
+  (flet ((restart-sbcl ()
+           (sb-debug::enable-debugger)
+           (setf sb-impl::*descriptor-handlers* nil)
+           (funcall restart-function)))
+    (let ((pid (sb-posix:fork)))
+      (cond ((= pid 0)
+             (sb-debug::disable-debugger)
+             (apply #'sb-ext:save-lisp-and-die filename
+                    (when restart-function
+                      (list :toplevel #'restart-sbcl))))
+            (t
+             (multiple-value-bind (rpid status) (sb-posix:waitpid pid 0)
+               (assert (= pid rpid))
+               (assert (and (sb-posix:wifexited status)
+                            (zerop (sb-posix:wexitstatus status))))))))))
+
+#+unix
+(progn
+  (sb-alien:define-alien-routine ("execv" sys-execv) sb-alien:int
+    (program sb-alien:c-string)
+    (argv (* sb-alien:c-string)))
+
+  (defun execv (program args)
+    "Replace current executable with another one."
+    (let ((a-args (sb-alien:make-alien sb-alien:c-string
+                                       (+ 1 (length args)))))
+      (unwind-protect
+           (progn
+             (loop for index from 0 by 1
+                   and item in (append args '(nil))
+                   do (setf (sb-alien:deref a-args index)
+                            item))
+             (when (minusp
+                    (sys-execv program a-args))
+               (error "execv(3) returned.")))
+        (sb-alien:free-alien a-args))))
+
+  (defun runtime-pathname ()
+    #+#.(swank-backend:with-symbol
+            '*runtime-pathname* 'sb-ext)
+    sb-ext:*runtime-pathname*
+    #-#.(swank-backend:with-symbol
+            '*runtime-pathname* 'sb-ext)
+    (car sb-ext:*posix-argv*))
+
+  (defimplementation exec-image (image-file args)
+    (loop with fd-arg =
+          (loop for arg in args
+                and key = "" then arg
+                when (string-equal key "--swank-fd")
+                return (parse-integer arg))
+          for my-fd from 3 to 1024
+          when (/= my-fd fd-arg)
+          do (ignore-errors (sb-posix:fcntl my-fd sb-posix:f-setfd 1)))
+    (let* ((self-string (pathname-to-filename (runtime-pathname))))
+      (execv
+       self-string
+       (apply 'list self-string "--core" image-file args)))))
+
+(defimplementation make-fd-stream (fd external-format)
+  (sb-sys:make-fd-stream fd :input t :output t
+                         :element-type 'character
+                         :buffering :full
+                         :dual-channel-p t                         
+                         :external-format external-format))
+
+(defimplementation call-with-io-timeout (function &key seconds)
+  (handler-case
+      (sb-sys:with-deadline (:seconds seconds)
+        (funcall function))
+    (sb-sys:deadline-timeout ()
+      nil)))
+
+#-win32
+(defimplementation background-save-image (filename &key restart-function
+                                                   completion-function)
+  (flet ((restart-sbcl ()
+           (sb-debug::enable-debugger)
+           (setf sb-impl::*descriptor-handlers* nil)
+           (funcall restart-function)))
+    (multiple-value-bind (pipe-in pipe-out) (sb-posix:pipe)
+      (let ((pid (sb-posix:fork)))
+        (cond ((= pid 0)
+               (sb-posix:close pipe-in)
+               (sb-debug::disable-debugger)
+               (apply #'sb-ext:save-lisp-and-die filename
+                      (when restart-function
+                        (list :toplevel #'restart-sbcl))))
+              (t
+               (sb-posix:close pipe-out)
+               (sb-sys:add-fd-handler
+                pipe-in :input
+                (lambda (fd)
+                  (sb-sys:invalidate-descriptor fd)
+                  (sb-posix:close fd)
+                  (multiple-value-bind (rpid status) (sb-posix:waitpid pid 0)
+                    (assert (= pid rpid))
+                    (assert (sb-posix:wifexited status))
+                    (funcall completion-function
+                             (zerop (sb-posix:wexitstatus status))))))))))))
+
+(defun deinit-log-output ()
+  ;; Can't hang on to an fd-stream from a previous session.
+  (setf (symbol-value (find-symbol "*LOG-OUTPUT*" 'swank))
+        nil))
+
+(pushnew 'deinit-log-output sb-ext:*save-hooks*)
