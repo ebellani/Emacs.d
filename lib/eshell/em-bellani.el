@@ -43,20 +43,46 @@ hit C-a twice:"
 (add-hook 'eshell-mode-hook
           '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
 
+(defun show-it ()
+  #'(lambda (f)
+      (eshell-evaln (eshell-parse-command
+                     (format "%s %s.pdf" pdfviewer f)))))
 
-(defun latex-cleaner (filename &optional pdfviewer)
+(defun pdflatex-simple ()
+  "Simple pdflatex execution"
+  #'(lambda (f)
+      (eshell-evaln (eshell-parse-command
+                     (format "pdflatex -interaction batchmode %s.tex" f)))))
+
+(defun lt-simple (filename &optional pdfviewer)
+  (lt-complex filename
+              #'(lambda (f)
+                  (eshell/wait
+                   (funcall (pdflatex-simple) f))
+                  (funcall  (show-it) f))
+              pdfviewer))
+
+(defun lt-bibtex (filename &optional pdfviewer)
+  (lt-complex filename
+              #'(lambda (f)
+                  (eshell/wait
+                   (funcall (pdflatex-simple) f))
+                  (eshell/wait
+                   (eshell-evaln (eshell-parse-command
+                                  (format "bibtex %s.aux" f))))
+                  (eshell/wait
+                   (funcall (pdflatex-simple) f))
+                  (funcall (show-it) f))
+              pdfviewer))
+
+
+(defun lt-complex (filename func &optional pdfviewer)
   "Uses pdf latex in batchmode for the FILENAME and removes
 everything that is created by pdflatex but the log file and the
 pdf. If there is no PDFVIEWER, uses the system default."
   (unless pdfviewer (setf pdfviewer "evince"))
-  (let ((pdflatex-in-batchmode #'(lambda (f)
-                                   (eshell/wait
-                                    (eshell-evaln (eshell-parse-command
-                                                   (format "pdflatex -interaction batchmode %s.tex" f))))
-                                   (eshell-evaln (eshell-parse-command
-                                                  (format "%s %s.pdf" pdfviewer f))))))
-    (funcall pdflatex-in-batchmode filename)
-    (mapc #'eshell/rm (directory-files "." t (format "%s\\.\\(out\\|blg\\|aux\\)" filename)))))
+  (funcall func filename)
+  (mapc #'eshell/rm (directory-files "." t (format "%s\\.\\(out\\|blg\\|aux\\)" filename))))
 
 (provide 'em-bellani)
 ;;; eshell-functions.el ends here

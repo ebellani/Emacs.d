@@ -24,7 +24,8 @@
      (setq geiser-racket-use-gracket-p nil)
 
      ;; (define-key geiser-mode-map "\C-c\C-x\C-z" 'geiser-mode-switch-to-repl-and-enter)
-
+     ;; add paredit to geiser repl
+     (add-hook 'geiser-repl-mode-hook (lambda () (paredit-mode +1)))
      (setq geiser-racket-extra-keywords
            (list "define-syntax-rule"
                  "unless"
@@ -46,4 +47,13 @@
                  "field"
                  "define-runtime-path"))))
 
+;; company, another autocomplete engine. Still testing
+;; used primarily as an AC to geiser, an slime like app for scheme.
+;; (add-to-list 'load-path (concat *my-default-lib* "/company"))
+;; (autoload 'company-mode "company" nil t)
+
+;; (add-hook 'scheme-mode-hook
+;;           (lambda () (company-mode 1)))
+
+(setq geiser-repl-read-only-prompt-p nil)
 ;; (setq scheme-program-name "gracket-text")

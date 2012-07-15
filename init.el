@@ -30,11 +30,11 @@
 (load "ruby-conf.el")
 (load "js-conf.el")
 (load "haskell-conf.el")
-
+(load "scala-conf.el")
+(load "oz-conf.el")
 
 (setq custom-file (concat *my-conf* "custom.el"))
 (load custom-file 'noerror)
-
 
 ;; find out the time your emacs took to load.
 ;; (message "My .emacs loaded in %ds"

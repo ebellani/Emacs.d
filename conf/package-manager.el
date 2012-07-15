@@ -10,8 +10,11 @@
                       highlight-parentheses
                       highlight-symbol
                       paredit
+                      scala-mode
+                      auctex
                       rainbow-delimiters
                       ido-ubiquitous
+                      javadoc-help
                       smex
 		      undo-tree
 		      haskell-mode
@@ -21,10 +24,10 @@
                       zenburn-theme)
   "A list of packages to ensure are installed at launch.")
 
-
 (defun my-packages-installed-p ()
   (loop for p in my-packages
-        when (not (package-installed-p p)) do (progn (message "%s" p) (return nil))
+        when (not (package-installed-p p)) 
+        do (progn (message "%s" p) (return nil))
         finally (return t)))
 
 (unless (my-packages-installed-p)
@@ -36,5 +39,3 @@
   (dolist (p my-packages)
     (when (not (package-installed-p p))
       (package-install p))))
-
-

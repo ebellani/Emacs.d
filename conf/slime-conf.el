@@ -18,10 +18,23 @@
      (global-set-key (kbd "C-c s") 'slime-selector)
      ;; autocomplete with slime's documentation
      (add-to-list 'load-path (concat *my-default-lib* "/ac-slime"))
-
+     ;; bug in emacs 24?
+     (setq apropos-symbol-face nil)
+     (setq apropos-label-face nil)
+     
      (require 'ac-slime)
      (add-hook 'slime-mode-hook 'set-up-slime-ac)
-     (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)))
+     (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+
+     ;; http://emacswiki.org/emacs/ParEdit
+     (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+     ;; Stop SLIME's REPL from grabbing DEL,
+     ;; which is annoying when backspacing over a '('
+
+     (defun override-slime-repl-bindings-with-paredit ()
+       (define-key slime-repl-mode-map
+         (read-kbd-macro paredit-backward-delete-key) nil))
+     (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)))
 
 
 (dolist (hook '(lisp-mode-hook

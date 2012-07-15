@@ -32,8 +32,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; global highlight of whitespace
-(setq whitespace-style '(face lines-tail))
-(global-whitespace-mode t)
+;; (setq whitespace-style '(face lines-tail))
+;; (global-whitespace-mode nil)
 
 ;; Keep session
 (desktop-save-mode 1)
@@ -161,3 +161,6 @@
 (setq browse-url-generic-program "conkeror")
 
 
+;; help-fns+
+;; http://www.emacswiki.org/emacs/help-fns%2b.el
+(require 'help-fns+)
