@@ -8,6 +8,7 @@
 (unless (string= 'nil window-system)
   (progn
     (set-face-font 'default "Inconsolata 11")
+
     ;; (require 'color-theme)
     ;; (color-theme-initialize)
     ;; (load-file (concat *my-default-lib* "/color-theme-twilight.el"))
