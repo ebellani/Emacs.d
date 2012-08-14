@@ -14,10 +14,11 @@
 ;; windows
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (winner-mode 1)
-(global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
-(global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
-(global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
-(global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window
+(windmove-default-keybindings)
+;; (global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
+;; (global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
+;; (global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
+;; (global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window
 
 
 ;; highligh symbols
