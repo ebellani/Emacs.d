@@ -7,7 +7,7 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-font 'default "Inconsolata 11")
+    (set-face-font 'default "Inconsolata 12")
 
     ;; (require 'color-theme)
     ;; (color-theme-initialize)
@@ -155,11 +155,6 @@
 
 ;; starts the emacs server so I can access it with emacsclient.
 (server-start)
-
-;; default browser is conkeror, so we can get a truly smooth emacs
-;; cult going.
-(setq browse-url-browser-function 'browse-url-generic)
-(setq browse-url-generic-program "conkeror")
 
 
 ;; help-fns+

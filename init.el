@@ -15,7 +15,7 @@
 (add-to-list 'load-path *my-default-lib*)
 (add-to-list 'load-path *my-conf*)
 
-
+(load "elisp.el")
 (load "package-manager.el")
 (load "misc.el")
 (load "history.el")
@@ -32,6 +32,8 @@
 (load "haskell-conf.el")
 (load "scala-conf.el")
 (load "oz-conf.el")
+(load "w3m-conf.el")
+(load "sql-conf.el")
 
 (setq custom-file (concat *my-conf* "custom.el"))
 (load custom-file 'noerror)

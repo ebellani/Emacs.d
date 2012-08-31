@@ -7,11 +7,11 @@
 ;; the following to switch between clojure and CL.
 
 ;; https://jandmworks.com/lisp.html#SBCL quirks
-;; (add-to-list 'load-path (concat *my-default-lib* "/slime"))
-;; (autoload 'slime-mode "slime" nil)
-;; (require slime)
-;; (setq inferior-lisp-program "sbcl")
-;;
+(setq inferior-lisp-program "sbcl")
+(add-to-list 'load-path (concat *my-default-lib* "/slime"))
+(autoload 'slime-mode "slime" nil)
+(require 'slime)
+
 
 (defun configure-slime ()
   "Perform all the slime-specific configurations. Here so it can
@@ -48,10 +48,8 @@ common lisp."
 (eval-after-load "slime"
   '(configure-slime))
 
-(eval-after-load "slime-repl-79b38c83"
-  '(progn
-     (print "oiaaa")
-     (configure-slime)))
+;; (eval-after-load "slime-repl-79b38c83"
+;;   ('configure-slime))
 
 ;; clojure's jack-in advice
 ;; clojure-jack-in
@@ -59,7 +57,8 @@ common lisp."
 ;; (configure-slime))
 
 (dolist (hook '(lisp-mode-hook
-                clojure-mode-hook))
+                ;; clojure-mode-hook
+                ))
   (add-hook hook (lambda () (slime-mode t))))
 
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))

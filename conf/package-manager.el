@@ -16,6 +16,7 @@
                       ido-ubiquitous
                       javadoc-help
                       smex
+                      nrepl
 		      undo-tree
 		      haskell-mode
                       yasnippet

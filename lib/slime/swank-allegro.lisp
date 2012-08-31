@@ -29,13 +29,17 @@
 
 ;;;; UTF8
 
+(define-symbol-macro utf8-ef 
+    (load-time-value 
+     (excl:crlf-base-ef (excl:find-external-format :utf-8))
+     t))
+
 (defimplementation string-to-utf8 (s)
-  (let ((ef (load-time-value (excl:find-external-format :utf-8) t)))
-    (excl:string-to-octets s :external-format ef)))
+  (excl:string-to-octets s :external-format utf8-ef 
+                         :null-terminate nil))
 
 (defimplementation utf8-to-string (u)
-  (let ((ef (load-time-value (excl:find-external-format :utf-8) t)))
-    (excl:octets-to-string u :external-format ef)))
+  (excl:octets-to-string u :external-format utf8-ef))
 
 
 ;;;; TCP Server
@@ -220,7 +224,8 @@
                          (car (debugger:frame-expression frame))))))))))
 
 (defun function-source-location (fun)
-  (cadr (car (fspec-definition-locations (xref::object-to-function-name fun)))))
+  (cadr (car (fspec-definition-locations 
+              (xref::object-to-function-name fun)))))
 
 #+(version>= 8 2)
 (defun pc-source-location (fun pc)
@@ -336,7 +341,7 @@
   `(satisfies redefinition-p))
 
 (defun signal-compiler-condition (&rest args)
-  (signal (apply #'make-condition 'compiler-condition args)))
+  (apply #'signal 'compiler-condition args))
 
 (defun handle-compiler-warning (condition)
   (declare (optimize (debug 3) (speed 0) (space 0)))
@@ -530,7 +535,8 @@
                  (t
                   (find-definition-in-file fspec type file top-level)))))
         ((member :top-level)
-         (make-error-location "Defined at toplevel: ~A" (fspec->string fspec))))
+         (make-error-location "Defined at toplevel: ~A" 
+                              (fspec->string fspec))))
     (error (e)
       (make-error-location "Error: ~A" e))))
 
@@ -643,7 +649,8 @@
 ;;;; Profiling
 
 ;; Per-function profiling based on description in
-;;  http://www.franz.com/support/documentation/8.0/doc/runtime-analyzer.htm#data-collection-control-2
+;;  http://www.franz.com/support/documentation/8.0/\
+;;  doc/runtime-analyzer.htm#data-collection-control-2
 
 (defvar *profiled-functions* ())
 (defvar *profile-depth* 0)

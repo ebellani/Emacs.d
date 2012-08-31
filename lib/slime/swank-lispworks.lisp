@@ -65,10 +65,10 @@
 ;;; UTF8
 
 (defimplementation string-to-utf8 (string)
-  (ef:encode-lisp-string string :utf-8))
+  (ef:encode-lisp-string string '(:utf-8 :eol-style :lf)))
 
 (defimplementation utf8-to-string (octets)
-  (ef:decode-external-string octets :utf-8))
+  (ef:decode-external-string octets '(:utf-8 :eol-style :lf)))
 
 ;;; TCP server
 
@@ -363,7 +363,8 @@ Return NIL if the symbol is unbound."
                     (eq (dbg::call-frame-function-name frame) 
                         'invoke-debugger)))
            (nth-next-frame frame 1)))
-      ;; if we can't find a invoke-debugger frame, take any old frame at the top
+      ;; if we can't find a invoke-debugger frame, take any old frame
+      ;; at the top
       (dbg::debugger-stack-current-frame dbg::*debugger-stack*)))
   
 (defimplementation call-with-debugging-environment (fn)
@@ -400,7 +401,8 @@ Return NIL if the symbol is unbound."
                           (list (cond ((symbolp arg)
                                        (intern (symbol-name arg) :keyword))
                                       ((and (consp arg) (symbolp (car arg)))
-                                       (intern (symbol-name (car arg)) :keyword))
+                                       (intern (symbol-name (car arg))
+                                               :keyword))
                                       (t (caar arg)))))
                      (list (dbg::dbg-eval
                             (cond ((symbolp arg) arg)
@@ -681,8 +683,8 @@ Return NIL if the symbol is unbound."
     (symbol 
      `(:error ,(format nil "Cannot resolve location: ~S" location)))
     ((satisfies emacs-buffer-location-p)
-     (destructuring-bind (_ buffer offset string) location
-       (declare (ignore _ string))
+     (destructuring-bind (_ buffer offset) location
+       (declare (ignore _))
        (make-location `(:buffer ,buffer)
                       (dspec-function-name-position dspec `(:offset ,offset 0))
                       hints)))))
@@ -733,7 +735,7 @@ function names like \(SETF GET)."
   (declare (ignore filename policy))
   (assert buffer)
   (assert position)
-  (let* ((location (list :emacs-buffer buffer position string))
+  (let* ((location (list :emacs-buffer buffer position))
          (tmpname (hcl:make-temp-file nil "lisp")))
     (with-swank-compilation-unit (location)
       (compile-from-temp-file 
@@ -765,7 +767,8 @@ function names like \(SETF GET)."
      #'(lambda (object)
          (when (and #+Harlequin-PC-Lisp (low:compiled-code-p object)
                     #+Harlequin-Unix-Lisp (sys:callablep object)
-                    #-(or Harlequin-PC-Lisp Harlequin-Unix-Lisp) (sys:compiled-code-p object)
+                    #-(or Harlequin-PC-Lisp Harlequin-Unix-Lisp) 
+                    (sys:compiled-code-p object)
                     (system::find-constant$funcallable name object))
            (vector-push-extend object callers))))
     ;; Delay dspec:object-dspec until after sweep-all-objects

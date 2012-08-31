@@ -890,3 +890,60 @@
            #+quux #+quux
            :quux t
            :zot t)
+
+;;; Test: 84
+
+(and ;; Foo
+     (something)
+     ;; Quux
+     (more))
+
+;;; Test: 85
+
+(and      ;; Foo
+     (something)
+     ;; Quux
+     (more))
+
+;;; Test: 86
+
+(foo (
+      bar quux
+      zor))
+
+;;; Test: 87
+;;
+;; lisp-lambda-list-keyword-parameter-alignment: t
+;; lisp-lambda-list-keyword-alignment: t
+
+(defmacro foo ((foo &optional (opt1 (or (this)
+                                        (that)))
+                              (opt2 (the-default)
+                                    opt2-p)
+                              (opt3
+                               (the-default (foo)
+                                            (bar)))
+                    &rest rest))
+  (list foo opt1 opt2
+        rest))
+
+;;; Test: 88
+
+(defstruct (foo
+            (:constructor make-foo
+                (bar &aux (quux (quux-from-bar bar
+                                               :for 'foo)))))
+  bar
+  quux)
+
+;;; Test: 89
+
+(define-tentative-thing foo
+    (bar)
+  quux)
+
+;;; Test: 90
+
+(define-tentative-thing foo
+  bar
+  quux)

@@ -1,9 +1,7 @@
-;;; -*- outline-regexp:";;;;;*" indent-tabs-mode:nil coding:latin-1-unix -*-
+;;;; swank.lisp --- Server for SLIME commands.
 ;;;
 ;;; This code has been placed in the Public Domain.  All warranties
 ;;; are disclaimed.
-;;;
-;;;; swank.lisp
 ;;;
 ;;; This file defines the "Swank" TCP server for Emacs to talk to. The
 ;;; code in this file is purely portable Common Lisp. We do require a
@@ -65,7 +63,9 @@
            #:quit-lisp
            #:eval-for-emacs
            #:eval-in-emacs
-           #:y-or-n-p-in-emacs))
+           #:y-or-n-p-in-emacs
+           #:*find-definitions-right-trim*
+           #:*find-definitions-left-trim*))
 
 (in-package :swank)
 
@@ -134,7 +134,9 @@ ALIST is a list of the form ((VAR . VAL) ...)."
   "A DEFUN for functions that Emacs can call by RPC."
   `(progn
      (defun ,name ,arglist ,@rest)
-     ;; see <http://www.franz.com/support/documentation/6.2/doc/pages/variables/compiler/s_cltl1-compile-file-toplevel-compatibility-p_s.htm>
+     ;; see <http://www.franz.com/support/documentation/6.2/\
+     ;; doc/pages/variables/compiler/\
+     ;; s_cltl1-compile-file-toplevel-compatibility-p_s.htm>
      (eval-when (:compile-toplevel :load-toplevel :execute)
        (export ',name (symbol-package ',name)))))
 
@@ -289,8 +291,8 @@ Backend code should treat the connection structure as opaque.")
   (:report (lambda (c s) (princ (swank-error.condition c) s)))
   (:documentation "Condition which carries a backtrace."))
 
-(defun make-swank-error (condition &optional (backtrace (safe-backtrace)))
-  (make-condition 'swank-error :condition condition :backtrace backtrace))
+(defun signal-swank-error (condition &optional (backtrace (safe-backtrace)))
+  (error 'swank-error :condition condition :backtrace backtrace))
 
 (defvar *debug-on-swank-protocol-error* nil
   "When non-nil invoke the system debugger on errors that were
@@ -877,7 +879,7 @@ if the file doesn't exist; otherwise the first line of the file."
   "Read an S-expression from STREAM using the SLIME protocol."
   (log-event "decode-message~%")
   (without-slime-interrupts
-    (handler-bind ((error (lambda (c) (error (make-swank-error c)))))
+    (handler-bind ((error #'signal-swank-error))
       (handler-case (read-message stream *swank-io-package*)
         (swank-reader-error (c) 
           `(:reader-error ,(swank-reader-error.packet c)
@@ -887,7 +889,7 @@ if the file doesn't exist; otherwise the first line of the file."
   "Write an S-expression to STREAM using the SLIME protocol."
   (log-event "encode-message~%")
   (without-slime-interrupts
-    (handler-bind ((error (lambda (c) (error (make-swank-error c)))))
+    (handler-bind ((error #'signal-swank-error))
       (write-message message *swank-io-package* stream))))
 
 
@@ -993,31 +995,37 @@ The processing is done in the extent of the toplevel restart."
    (sleep *auto-flush-interval*)))
 
 ;; FIXME: drop dependency on find-repl-thread
+;; FIXME: and don't add and any more 
 (defun find-worker-thread (connection id)
   (etypecase id
     ((member t)
      (etypecase connection
-       (multithreaded-connection (car (mconn.active-threads connection)))
+       (multithreaded-connection (or (car (mconn.active-threads connection))
+                                     (find-repl-thread connection)))
        (singlethreaded-connection (current-thread))))
     ((member :repl-thread) 
      (find-repl-thread connection))
-    (fixnum 
+    (fixnum
      (find-thread id))))
 
+;; FIXME: the else branch does look like it was written by someone who
+;; doesn't know what he is doeing.
 (defun interrupt-worker-thread (connection id)
-  (let ((thread (or (find-worker-thread connection id)
-                    ;; FIXME: to something better here
-                    (spawn (lambda ()) :name "ephemeral"))))
+  (let ((thread (find-worker-thread connection id)))
     (log-event "interrupt-worker-thread: ~a ~a~%" id thread)
-    (assert thread)
-    (etypecase connection
-      (multithreaded-connection
-       (interrupt-thread thread
-                         (lambda ()
-                           ;; safely interrupt THREAD
-                           (invoke-or-queue-interrupt #'simple-break))))
-      (singlethreaded-connection
-       (simple-break)))))
+    (if thread
+        (etypecase connection
+          (multithreaded-connection
+           (interrupt-thread thread
+                             (lambda ()
+                               ;; safely interrupt THREAD
+                               (invoke-or-queue-interrupt #'simple-break))))
+          (singlethreaded-connection
+           (simple-break)))
+        (let ((*send-counter* 0)) ;; shouldn't be necessary, but it is
+          (send-to-emacs (list :debug-condition (current-thread-id)
+                               (format nil "Thread with id ~a not found" 
+                                       id)))))))
 
 (defun thread-for-evaluation (connection id)
   "Find or create a thread to evaluate the next request."
@@ -1937,7 +1945,8 @@ N.B. this is not an actual package name or nickname."
   (when *auto-abbreviate-dotted-packages*
     (loop with package-name = (package-name package)
           with offset = nil
-          do (let ((last-dot-pos (position #\. package-name :end offset :from-end t)))
+          do (let ((last-dot-pos (position #\. package-name :end offset 
+                                           :from-end t)))
                (unless last-dot-pos
                  (return nil))
                ;; If a dot chunk contains only numbers, that chunk most
@@ -2274,10 +2283,12 @@ Operation was KERNEL::DIVISION, operands (1 0).\"
   (with-simple-restart (continue "Continue from break.")
     (invoke-slime-debugger (coerce-to-condition datum args))))
 
+;; FIXME: (last (compute-restarts)) looks dubious.
 (defslimefun throw-to-toplevel ()
   "Invoke the ABORT-REQUEST restart abort an RPC from Emacs.
 If we are not evaluating an RPC then ABORT instead."
-  (let ((restart (or (and *sldb-quit-restart* (find-restart *sldb-quit-restart*))
+  (let ((restart (or (and *sldb-quit-restart* 
+                          (find-restart *sldb-quit-restart*))
                      (car (last (compute-restarts))))))
     (cond (restart (invoke-restart restart))
           (t (format nil "Restart not active [~s]" *sldb-quit-restart*)))))
@@ -2907,12 +2918,30 @@ Include the nicknames if NICKNAMES is true."
      (inspector-nth-part part))
     ((:sldb frame var)
      (frame-var-value frame var))))
-  
+
+(defvar *find-definitions-right-trim* ",:.")
+(defvar *find-definitions-left-trim* "#:")
+
+(defun find-definitions-find-symbol (name)
+  (flet ((do-find (name)
+           (multiple-value-bind (symbol found)
+               (with-buffer-syntax ()
+                 (parse-symbol name))
+             (when found
+               (return-from find-definitions-find-symbol
+                 (values symbol found))))))
+    (do-find name)
+    (do-find (string-right-trim *find-definitions-right-trim* name))
+    (do-find (string-left-trim *find-definitions-left-trim* name))
+    (do-find (string-left-trim *find-definitions-left-trim*
+                               (string-right-trim
+                                *find-definitions-right-trim* name)))))
+
 (defslimefun find-definitions-for-emacs (name)
   "Return a list ((DSPEC LOCATION) ...) of definitions for NAME.
 DSPEC is a string and LOCATION a source location. NAME is a string."
-  (multiple-value-bind (symbol found) (with-buffer-syntax () 
-                                        (parse-symbol name))
+  (multiple-value-bind (symbol found)
+      (find-definitions-find-symbol name)
     (when found
       (mapcar #'xref>elisp (find-definitions symbol)))))
 
@@ -3656,5 +3685,11 @@ Collisions are caused because package information is ignored."
 
 (defun init ()
   (run-hook *after-init-hook*))
+
+;; Local Variables:
+;; coding: latin-1-unix
+;; indent-tabs-mode: nil
+;; outline-regexp: ";;;;;*"
+;; End:
 
 ;;; swank.lisp ends here

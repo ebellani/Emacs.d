@@ -1,4 +1,4 @@
-;;; -*- Mode: lisp; indent-tabs-mode: nil; outline-regexp: ";;;;;*" -*-
+;;; -*- indent-tabs-mode: nil; outline-regexp: ";;;;;*" -*-
 ;;;
 ;;; slime-backend.lisp --- SLIME backend interface.
 ;;;
@@ -160,7 +160,6 @@ Backends implement these functions using DEFIMPLEMENTATION."
        ,(if (null default-body)
             `(pushnew ',name *unimplemented-interfaces*)
             (gen-default-impl))
-       ;; see <http://www.franz.com/support/documentation/6.2/doc/pages/variables/compiler/s_cltl1-compile-file-toplevel-compatibility-p_s.htm>
        (eval-when (:compile-toplevel :load-toplevel :execute)
          (export ',name :swank-backend))
        ',name)))
@@ -240,19 +239,21 @@ EXCEPT is a list of symbol names which should be ignored."
 
 (defmacro with-struct ((conc-name &rest names) obj &body body)
   "Like with-slots but works only for structs."
-  (flet ((reader (slot) (intern (concatenate 'string
-					     (symbol-name conc-name)
-					     (symbol-name slot))
-				(symbol-package conc-name))))
+  (check-type conc-name symbol)
+  (flet ((reader (slot)
+           (intern (concatenate 'string
+                                (symbol-name conc-name)
+                                (symbol-name slot))
+                   (symbol-package conc-name))))
     (let ((tmp (gensym "OO-")))
-    ` (let ((,tmp ,obj))
-        (symbol-macrolet
-            ,(loop for name in names collect 
-                   (typecase name
-                     (symbol `(,name (,(reader name) ,tmp)))
-                     (cons `(,(first name) (,(reader (second name)) ,tmp)))
-                     (t (error "Malformed syntax in WITH-STRUCT: ~A" name))))
-          ,@body)))))
+      ` (let ((,tmp ,obj))
+          (symbol-macrolet
+              ,(loop for name in names collect 
+                     (typecase name
+                       (symbol `(,name (,(reader name) ,tmp)))
+                       (cons `(,(first name) (,(reader (second name)) ,tmp)))
+                       (t (error "Malformed syntax in WITH-STRUCT: ~A" name))))
+            ,@body)))))
 
 (defmacro when-let ((var value) &body body)
   `(let ((,var ,value))
@@ -755,10 +756,12 @@ additional information on the specifiers defined in ANSI Common Lisp.")
       (type           '(type-specifier &rest args))
       (ftype          '(type-specifier &rest function-names))
       (otherwise
-       (flet ((typespec-p (symbol) (member :type (describe-symbol-for-emacs symbol))))
+       (flet ((typespec-p (symbol) 
+                (member :type (describe-symbol-for-emacs symbol))))
          (cond ((and (symbolp decl-identifier) (typespec-p decl-identifier))
                 '(&rest variables))
-               ((and (listp decl-identifier) (typespec-p (first decl-identifier)))
+               ((and (listp decl-identifier) 
+                     (typespec-p (first decl-identifier)))
                 '(&rest variables))
                (t :not-available)))))))
 
@@ -781,7 +784,8 @@ additional information on the specifiers defined in ANSI Common Lisp.")
 (definterface function-name (function)
   "Return the name of the function object FUNCTION.
 
-The result is either a symbol, a list, or NIL if no function name is available."
+The result is either a symbol, a list, or NIL if no function name is
+available."
   (declare (ignore function))
   nil)
 
@@ -1066,7 +1070,8 @@ returns.")
   (cond ((typep datum 'condition)
          `(:error ,(format nil "Error: ~A" datum)))
         ((symbolp datum)
-         `(:error ,(format nil "Error: ~A" (apply #'make-condition datum args))))
+         `(:error ,(format nil "Error: ~A" 
+                           (apply #'make-condition datum args))))
         (t
          (assert (stringp datum))
          `(:error ,(apply #'format nil datum args)))))
@@ -1419,12 +1424,6 @@ but that thread may hold it more than once."
    (declare (ignore lock)
             (type function function))
    (funcall function))
-
-;; Same here: don't use this outside of swank-gray.lisp.
-(definterface call-with-io-timeout (function &key seconds)
-  "Calls function with the specified IO timeout."
-  (declare (ignore seconds))
-  (funcall function))
 
 
 ;;;; Weak datastructures
