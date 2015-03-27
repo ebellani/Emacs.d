@@ -20,7 +20,11 @@
                                     (not (numberp
                                           (compare-strings "*eshell*" 0 7
                                                            (buffer-name
-                                                            (current-buffer)) 0 7)))))
+                                                            (current-buffer)) 0 7)))
+                                    (not (numberp
+                                          (compare-strings "*shell*" 0 6
+                                                           (buffer-name
+                                                            (current-buffer)) 0 6)))))
                          (auto-complete-mode 1))))
 
 ;; tab in insert mode calls autocomplete

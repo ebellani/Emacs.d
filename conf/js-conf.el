@@ -7,7 +7,7 @@
 ;; |                                                                           |
 ;; |                                                                           |
 ;; +---------------------------------------------------------------------------+
-(autoload 'js2-mode "js2" nil t)
+;; (autoload 'js2-mode "js2" nil t)
 
 ;;     C-c C-s: open a MozRepl interaction buffer and switch to it
 ;;     C-c C-l: save the current buffer and load it in MozRepl
@@ -19,12 +19,12 @@
 
 ;;     C-c c: insert the current name of the REPL plus the dot operator (usually repl.)
 
-(autoload 'moz-minor-mode "moz"
-  "Mozilla Minor and Inferior Mozilla Modes" t)
+;; (autoload 'moz-minor-mode "moz"
+;;   "Mozilla Minor and Inferior Mozilla Modes" t)
 
-(add-hook 'js2-mode-hook 'js2-custom-setup)
-(defun js2-custom-setup ()
-  (moz-minor-mode 1))
+;; (add-hook 'js2-mode-hook 'js2-custom-setup)
+;; (defun js2-custom-setup ()
+;;   (moz-minor-mode 1))
 
-
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js-mode))
+(add-hook 'js-mode-hook (lambda () (smartparens-mode t)))

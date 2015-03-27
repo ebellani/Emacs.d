@@ -43,16 +43,27 @@ hit C-a twice:"
 (add-hook 'eshell-mode-hook
           '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
 
+(defun eval-string-and-wait (a-string)
+  (eshell/wait (eshell-eval (eshell-parse-command a-string))))
+
 (defun show-it ()
   #'(lambda (f)
-      (eshell-evaln (eshell-parse-command
-                     (format "%s %s.pdf" pdfviewer f)))))
+      (eshell-eval (eshell-parse-command
+                    (format "%s %s.pdf" pdfviewer f)))))
 
 (defun pdflatex-simple ()
   "Simple pdflatex execution"
   #'(lambda (f)
       (eshell-evaln (eshell-parse-command
                      (format "pdflatex -interaction batchmode %s.tex" f)))))
+
+(defun lt-complex (filename func &optional pdfviewer)
+  "Uses pdf latex in batchmode for the FILENAME and removes
+everything that is created by pdflatex but the log file and the
+pdf. If there is no PDFVIEWER, uses the system default."
+  (unless pdfviewer (setf pdfviewer "evince"))
+  (funcall func filename)
+  (mapc #'eshell/rm (directory-files "." t (format "%s\\.\\(out\\|blg\\|aux\\)" filename))))
 
 (defun lt-simple (filename &optional pdfviewer)
   (lt-complex filename
@@ -75,14 +86,25 @@ hit C-a twice:"
                   (funcall (show-it) f))
               pdfviewer))
 
+(defun c ()
+  "clear the eshell buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)))
 
-(defun lt-complex (filename func &optional pdfviewer)
-  "Uses pdf latex in batchmode for the FILENAME and removes
-everything that is created by pdflatex but the log file and the
-pdf. If there is no PDFVIEWER, uses the system default."
-  (unless pdfviewer (setf pdfviewer "evince"))
-  (funcall func filename)
-  (mapc #'eshell/rm (directory-files "." t (format "%s\\.\\(out\\|blg\\|aux\\)" filename))))
+
+(defun git-delete-branch (branch-name)
+  "Deletes the git branch, both locally and on origin. Used to
+clean things up when a project gets too messy."
+  (eval-string-and-wait (format "git push origin :%s" branch-name))
+  (eval-string-and-wait (format "git br -D %s" branch-name)))
+
+(defun git-delete-branches! (&rest branches)
+  "Delete all branches passed in a string list. "
+  (interactive)
+  (dolist (branch branches)
+    (git-delete-branch branch))
+  nil)
 
 (provide 'em-bellani)
 ;;; eshell-functions.el ends here

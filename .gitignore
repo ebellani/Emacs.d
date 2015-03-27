@@ -6,8 +6,10 @@ recentf
 savehist
 saveplace
 eshell
-elpa/*
+elpa*
+elpa/archives/*
 session*
+*elc
 swank
 tramp
 url

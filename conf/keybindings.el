@@ -15,10 +15,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (winner-mode 1)
 (windmove-default-keybindings)
-;; (global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
-;; (global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
-;; (global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
-;; (global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window
+(global-set-key (kbd "C-x <left>")  'windmove-left) ; move to left windnow
+(global-set-key (kbd "C-x <right>") 'windmove-right) ; move to right window
+(global-set-key (kbd "C-x <up>")    'windmove-up)     ; move to upper window
+(global-set-key (kbd "C-x <down>")  'windmove-down)    ; move to downer window
 
 
 ;; highligh symbols
@@ -31,10 +31,13 @@
 ;; Things taken from http://sites.google.com/site/steveyegge2/effective-emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; use smex instead
+
 ;; item #2
-(global-set-key "\C-x\C-m" 'execute-extended-command)
-(global-set-key "\C-xm"    'execute-extended-command)
-(global-set-key "\C-c\C-m" 'execute-extended-command)
+(global-set-key "\C-x\C-m" 'smex)
+(global-set-key "\C-xm"    'smex)
+(global-set-key "\C-c\C-m" 'smex)
+
 
 ;; item #3
 (global-set-key "\C-w"     'backward-kill-word)
@@ -42,7 +45,7 @@
 (global-set-key "\C-c\C-k" 'kill-region)
 
 
-;; spell checking 
+;; spell checking
 (global-set-key (kbd "<f8>") 'fd-switch-dictionary)
 
 
@@ -53,3 +56,8 @@
 (keyboard-translate ?\[ ?\()
 (keyboard-translate ?\) ?\])
 (keyboard-translate ?\] ?\))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 new frame                            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key "\C-cf" 'make-frame)

@@ -1,6 +1,11 @@
 #name : def $1 ... end
 #group : definitions
 # --
+# {Internal|Public|Deprecated}: Purpose
+# arg - description
+# Examples:
+#   xxx
+# Returns yyy
 def ${1:function_name}(${2:parameter_name})
   ${3:body}
 end

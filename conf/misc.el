@@ -7,15 +7,7 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-font 'default "Inconsolata 12")
-
-    ;; (require 'color-theme)
-    ;; (color-theme-initialize)
-    ;; (load-file (concat *my-default-lib* "/color-theme-twilight.el"))
-    ;; (color-theme-twilight)
-    ))
-
-
+    (set-face-font 'default "Dejavu Sans Mono 10")))
 
 ;; hide menus
 (menu-bar-mode 0)
@@ -46,21 +38,21 @@
 (setq inhibit-startup-message 1)
 
 ;; Makes final line always be a return
-;; (setq require-final-newline 1)
+(setq require-final-newline t)
 
 ;; Avoid to make a separate frame
 (setq display-buffer nil)
-(setq display-buffer-reuse-frames 1)
+(setq display-buffer-reuse-frames t)
 (setq pop-up-frames nil)
 
-;; Put scrollbar on the right
-(set-scroll-bar-mode 'right)
+;; disable scrollbar
+(set-scroll-bar-mode nil)
 
 ;; Disable tooltips
-;; (tooltip-mode nil)
+(tooltip-mode nil)
 
 ;; Make copy and paste to work with other programs
-(setq x-select-enable-clipboard 1)
+(setq x-select-enable-clipboard t)
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; we want fontification in all modes
@@ -145,7 +137,7 @@
 
 ;; yasnippet, loads of emacs snippets
 ;; http://code.google.com/p/yasnippet/
-;; (yas/initialize)
+(yas/initialize)
 (yas/load-directory (concat *my-default-lib* "/yasnippet/snippets"))
 
 ;; undo-tree
@@ -156,7 +148,29 @@
 ;; starts the emacs server so I can access it with emacsclient.
 (server-start)
 
-
 ;; help-fns+
 ;; http://www.emacswiki.org/emacs/help-fns%2b.el
 (require 'help-fns+)
+
+;; remove trailing whitespace
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; edit server, a plugin for google chrome
+;; http://www.emacswiki.org/emacs/Edit_with_Emacs
+(edit-server-start)
+
+;; invoice creation utilities
+(autoload 'insert-month-invoices "invoice" "Calls a function to insert entries for invoices.")
+
+(defun un-camelcase-string (s &optional sep start)
+  "Convert CamelCase string S to lower case with word separator SEP.
+Default for SEP is a hyphen \"-\".
+
+If third argument START is non-nil, convert words after that
+index in STRING."
+  (let ((case-fold-search nil))
+    (while (string-match "[A-Z]" s (or start 1))
+      (setq s (replace-match (concat (or sep "-")
+                                             (downcase (match-string 0 s)))
+                                     t nil s)))
+    (downcase s)))

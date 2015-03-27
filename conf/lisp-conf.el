@@ -12,3 +12,9 @@
   (add-hook hook (lambda ()
                    (paredit-mode t)
                    (highlight-parentheses-mode t))))
+
+(setq common-lisp-hyperspec-root "file:/usr/share/doc/hyperspec/")
+
+;; bug in emacs 24?
+(setq apropos-symbol-face nil)
+(setq apropos-label-face nil)

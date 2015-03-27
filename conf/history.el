@@ -1,5 +1,5 @@
 
-(auto-save-mode nil)
+(auto-save-mode t)
 
 (setq savehist-file "~/.emacs.d/tmp/savehist")
 ;; save history in minibuffer
