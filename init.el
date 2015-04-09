@@ -33,7 +33,7 @@
 (load "js-conf.el")
 (load "haskell-conf.el")
 (load "scala-conf.el")
-(load "oz-conf.el")
+(load "mu4e-conf.el")
 (load "w3m-conf.el")
 (load "sql-conf.el")
 (load "yaml.el")

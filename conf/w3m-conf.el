@@ -1,5 +1,3 @@
-;; (setq browse-url-browser-function 'browse-url-generic)
-;; (setq browse-url-generic-program "conkeror")
 (add-to-list 'load-path (concat *my-default-lib* "/emacs-w3m"))
 
 (setq w3m-use-cookies t)
@@ -8,7 +6,12 @@
 (require 'w3m-load)
 (require 'w3m-lnum)
 
-(setq browse-url-browser-function 'w3m-browse-url)
+(setq browse-url-browser-function 'browse-url-generic)
+(setq browse-url-generic-program "google-chrome")
+
+;; or
+
+;; (setq browse-url-browser-function 'w3m-browse-url)
 (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
 ;; optional keyboard short-cut
 ;; (global-set-key "\C-xm" 'browse-url-at-point)

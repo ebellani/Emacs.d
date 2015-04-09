@@ -1,7 +1,7 @@
 
-(auto-save-mode t)
+(auto-save-mode 0)
 
-(setq savehist-file "~/.emacs.d/tmp/savehist")
+(setq savehist-file "~/.emacs.d/savehist")
 ;; save history in minibuffer
 (savehist-mode 1)
 
