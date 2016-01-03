@@ -17,6 +17,7 @@
 (add-to-list 'load-path *my-default-lib*)
 (add-to-list 'load-path *my-conf*)
 
+(load "web.el")
 (load "elisp.el")
 (load "org-conf.el")
 (load "package-manager.el")
@@ -32,13 +33,13 @@
 (load "ruby-conf.el")
 (load "js-conf.el")
 (load "haskell-conf.el")
-(load "scala-conf.el")
 (load "mu4e-conf.el")
 (load "w3m-conf.el")
 (load "sql-conf.el")
 (load "yaml.el")
 (load "clojure.el")
 (load "slime-conf.el")
+(load "ocaml.el")
 
 (setq custom-file (concat *my-conf* "custom.el"))
 (load custom-file 'noerror)

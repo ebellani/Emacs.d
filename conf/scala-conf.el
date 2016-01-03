@@ -1,8 +1,0 @@
-;; (add-to-list 'load-path (concat *my-default-lib* "/ensime/elisp/"))
-;;(require 'ensime)
-;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-;; (add-to-list 'load-path "~/.emacs.d/scala-mode")
-(add-to-list 'load-path (concat *my-default-lib* "/ensime/elisp/"))
-(require 'scala-mode-auto)
-(require 'ensime)
-(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)

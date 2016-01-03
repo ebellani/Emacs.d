@@ -15,24 +15,23 @@
 
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
-      '(("/INBOX" . ?i)
-        ("/sent"  . ?s)
-        ("/trash" . ?t)))
+      '(("/INBOX"          . ?i)
+        ("/sent"           . ?s)
+        ("/trash"          . ?t)
+        ("/racket"         . ?r)
+        ("/ocaml"          . ?o)
+        ("/hackers-neoway" . ?n)))
 
 ;; allow for updating mail using 'U' in the main view:
 (setq mu4e-get-mail-command "offlineimap"
-      ;; mu4e-update-interval  120
-      )
+      mu4e-update-interval  300)
 
 ;; something about ourselves
 ;; I don't use a signature...
 (setq
  user-mail-address "ebellani@gmail.com"
  user-full-name    "Eduardo Bellani"
- mu4e-compose-signature
- (concat
-  "--\n"
-  "Eduardo Bellani"))
+ mu4e-compose-signature "Eduardo Bellani")
 
 (require 'smtpmail)
 
@@ -50,6 +49,9 @@
 (require 'mu4e-contrib)
 (setq mu4e-html2text-command 'mu4e-shr2text)
 
+;; org mode linking support
+(require 'org-mu4e)
+
 (defun offlineimap-get-password (host port login)
   "http://www.emacswiki.org/emacs/OfflineIMAP This sends the
 password back to offlineimap from the encrypted .authinfo file"
@@ -58,3 +60,23 @@ password back to offlineimap from the encrypted .authinfo file"
                             :port port
                             :user login
                             :require (and '(:user :secret)))) :secret)))
+
+;; Tells Gnus to inline the part
+(eval-after-load "mm-decode"
+                 '(add-to-list 'mm-inlined-types "application/pgp$"))
+;; Tells Gnus how to display the part when it is requested
+(eval-after-load "mm-decode"
+                 '(add-to-list 'mm-inline-media-tests '("application/pgp$"
+                                                        mm-inline-text identity)))
+;; Tell Gnus not to wait for a request, just display the thing
+;; straight away.
+(eval-after-load "mm-decode"
+                 '(add-to-list 'mm-automatic-display "application/pgp$"))
+;; But don't display the signatures, please.
+(eval-after-load "mm-decode"
+                 (quote (setq mm-automatic-display (remove "application/pgp-signature"
+                                                           mm-automatic-display))))
+
+(setq epa-file-cache-passphrase-for-symmetric-encryption t)
+
+(require 'jl-encrypt)

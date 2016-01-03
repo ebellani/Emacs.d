@@ -19,6 +19,8 @@
 
 (ispell-change-dictionary "american")
 
+(setq flyspell-issue-message-flag t)
+
 (defun fd-switch-dictionary()
   (interactive)
   (let* ((dic ispell-current-dictionary)

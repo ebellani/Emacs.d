@@ -29,7 +29,7 @@
 ;; (global-whitespace-mode nil)
 
 ;; Keep session
-(desktop-save-mode 1)
+(desktop-save-mode 0)
 
 ;; disable the save mode
 (global-set-key [f5] 'desktop-save-mode)
@@ -104,22 +104,6 @@
 ;; Ignore case when looking for a file
 (setq read-file-name-completion-ignore-case t)
 
-
-;; +------------------------------------------------------------+
-;; |   highlight-symbol                                         |
-;; +------------------------------------------------------------+
-;; (highlight-80+-mode 0)
-(dolist (hook '(lisp-mode-hook
-                emacs-lisp-mode-hook
-                scheme-mode-hook
-                clojure-mode-hook
-                python-mode
-                cc-mode
-                haskell-mode))
-  (add-hook hook (lambda ()
-                   (highlight-symbol-mode))))
-
-
 ;; C style
 (add-hook 'c-mode-hook
           '(lambda () (c-set-style "gnu")))
@@ -162,6 +146,11 @@
 ;; invoice creation utilities
 (autoload 'insert-month-invoices "invoice" "Calls a function to insert entries for invoices.")
 
+;; C source
+
+(setq find-function-C-source-directory
+      "/usr/share/emacs/24.4/src")
+
 (defun un-camelcase-string (s &optional sep start)
   "Convert CamelCase string S to lower case with word separator SEP.
 Default for SEP is a hyphen \"-\".
@@ -174,3 +163,23 @@ index in STRING."
                                              (downcase (match-string 0 s)))
                                      t nil s)))
     (downcase s)))
+
+(defun insert-random-uuid ()
+  (interactive)
+  (shell-command "uuidgen" t))
+
+(defun linum-update-window-scale-fix (win)
+  "fix linum for scaled text. See
+http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unreadable-line-numbers"
+  (set-window-margins win
+                      (ceiling (* (if (boundp 'text-scale-mode-step)
+                                      (expt text-scale-mode-step
+                                            text-scale-mode-amount) 1)
+                                  (if (car (window-margins))
+                                      (car (window-margins)) 1)))))
+(advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
+
+;; initial buffer is agenda
+(add-hook 'after-init-hook (lambda ()
+                             (org-agenda-list)
+                             (delete-other-windows)))

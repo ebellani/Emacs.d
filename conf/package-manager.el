@@ -1,8 +1,6 @@
 (require 'package)
 
-(defvar my-repositories '(("marmalade" . "http://marmalade-repo.org/packages/")
-                          ("ELPA"      . "http://tromey.com/elpa/")
-                          ("melpa"     . "http://melpa.milkbox.net/packages/"))
+(defvar my-repositories '(("melpa" . "http://melpa.milkbox.net/packages/"))
   "Repositories that I'm using to retrieve packages.")
 
 (dolist (rep my-repositories)
@@ -13,8 +11,7 @@
 
 ;; http://batsov.com/articles/2012/02/19/package-management-in-emacs-the-good-the-bad-and-the-ugly/
 (defvar my-packages
-  '(ac-slime
-    slime
+  '(slime
     symon
     highlight-parentheses
     highlight-symbol
@@ -26,26 +23,35 @@
     haml-mode
     smex
     cider
-    ac-cider
     undo-tree
     haskell-mode
     yasnippet
     yasnippet-bundle
     clojure-mode
     zenburn-theme
-    tron-theme
+    ;; tron-theme
     rinari
     magit
     rvm
     yari
     markdown-mode
+    web-mode
     yaml-mode
     geiser
     ;; racket-mode
     noctilux-theme
     edit-server
     smartparens
-    fsharp-mode)
+    fsharp-mode
+    ;; ocaml
+    tuareg
+    ocp-indent
+    merlin
+    utop
+    ;; auto-complete
+    company
+    ;; accounting
+    ledger-mode)
   "A list of packages to ensure are installed at launch.")
 
 (defun my-packages-installed-p ()

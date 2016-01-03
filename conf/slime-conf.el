@@ -19,19 +19,10 @@ common lisp."
   (setq slime-net-coding-system 'utf-8-unix)
   (setq common-lisp-hyperspec-root "file:/usr/share/doc/hyperspec/")
   (global-set-key (kbd "C-c s") 'slime-selector)
-  ;; autocomplete with slime's documentation
-  (add-to-list 'load-path (concat *my-default-lib* "/ac-slime"))
-
-  (require 'ac-slime)
-  (add-hook 'slime-mode-hook 'set-up-slime-ac)
-  (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
-
   ;; http://emacswiki.org/emacs/ParEdit
   (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-
   ;; Stop SLIME's REPL from grabbing DEL,
   ;; which is annoying when backspacing over a '('
-
   (defun override-slime-repl-bindings-with-paredit ()
     (define-key slime-repl-mode-map
       (read-kbd-macro paredit-backward-delete-key) nil))

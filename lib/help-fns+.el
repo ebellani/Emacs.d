@@ -325,7 +325,7 @@ Non-nil optional arg ADD-HELP-BUTTONS does that, adding buttons to key
 descriptions, which link to the key's command help."
     (let ((raw-doc  (documentation function 'RAW)))
       (if raw  raw-doc  (help-substitute-command-keys raw-doc add-help-buttons))))
-    
+
   (defun help-documentation-property (symbol prop &optional raw add-help-buttons)
     "Same as `documentation-property', but optionally adds buttons for help.
 Non-nil optional arg ADD-HELP-BUTTONS does that, adding buttons to key
@@ -575,7 +575,7 @@ MANUALS has the form of `help-cross-reference-manuals'."
         (push (list nodename string (Info-index-occurrences string manuals nomsg)) Info-indexed-nodes)
         (Info-find-node Info-indexed-file nodename))))
 
-  ;; Similar to `Info-apropos-matches', but using exact matches (ignoring case). 
+  ;; Similar to `Info-apropos-matches', but using exact matches (ignoring case).
   (defun Info-index-occurrences (index-entry &optional manuals nomsg)
     "Collect occurrences of INDEX-ENTRY in MANUALS.
 Optional arg MANUALS has the form of `help-cross-reference-manuals'.
@@ -811,7 +811,8 @@ Return the description that was displayed, as a string."
 ;; Fill long lines.  Add `,' before "which".
 ;;
 (when (< emacs-major-version 23)
-  (defun describe-function-1 (function)
+
+      (defun describe-function-1 (function)
     (let* ((def  (if (symbolp function) (symbol-function function) function))
            (beg  (if (commandp def)  "an interactive "  "a "))
            (pt1  (with-current-buffer (help-buffer) (point)))
