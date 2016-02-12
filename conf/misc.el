@@ -24,10 +24,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; global highlight of whitespace
-;; (setq whitespace-style '(face lines-tail))
-;; (global-whitespace-mode nil)
-
 ;; Keep session
 (desktop-save-mode 0)
 
@@ -108,20 +104,8 @@
 (add-hook 'c-mode-hook
           '(lambda () (c-set-style "gnu")))
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Highlight-parentheses, a mode for showing where you are  ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (load-file (concat *my-default-lib* "/highlight-parentheses.el"))
-;; (require 'highlight-parentheses)
-
-(autoload 'highlight-parentheses-mode "highlight-parentheses" nil)
-
-
 ;; yasnippet, loads of emacs snippets
-;; http://code.google.com/p/yasnippet/
-(yas/global-mode 1)
+(yas-global-mode t)
 
 ;; undo-tree
 ;; treats undo as a tree
