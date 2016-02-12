@@ -121,8 +121,7 @@
 
 ;; yasnippet, loads of emacs snippets
 ;; http://code.google.com/p/yasnippet/
-(yas/initialize)
-(yas/load-directory (concat *my-default-lib* "/yasnippet/snippets"))
+(yas/global-mode 1)
 
 ;; undo-tree
 ;; treats undo as a tree
@@ -181,5 +180,5 @@ http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unr
 
 ;; initial buffer is agenda
 (add-hook 'after-init-hook (lambda ()
-                             (org-agenda-list)
+                             (org-agenda t "n")
                              (delete-other-windows)))

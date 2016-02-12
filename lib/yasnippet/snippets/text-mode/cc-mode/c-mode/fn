@@ -1,9 +1,0 @@
-#name : function template
-#contributor : eduardo bellani
-# --
-/* DESCRIBE ME! */
-$1 $2($3)
-{
-  $0 
-}
-

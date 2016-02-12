@@ -1,6 +1,7 @@
 (require 'package)
 
-(defvar my-repositories '(("melpa" . "http://melpa.milkbox.net/packages/"))
+(defvar my-repositories '(("melpa" . "http://melpa.milkbox.net/packages/")
+                          ("marmalade" . "http://marmalade-repo.org/packages/"))
   "Repositories that I'm using to retrieve packages.")
 
 (dolist (rep my-repositories)
@@ -26,7 +27,6 @@
     undo-tree
     haskell-mode
     yasnippet
-    yasnippet-bundle
     clojure-mode
     zenburn-theme
     ;; tron-theme

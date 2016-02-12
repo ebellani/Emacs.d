@@ -17,10 +17,10 @@
 (add-to-list 'load-path *my-default-lib*)
 (add-to-list 'load-path *my-conf*)
 
+(load "package-manager.el")
 (load "web.el")
 (load "elisp.el")
 (load "org-conf.el")
-(load "package-manager.el")
 (load "misc.el")
 (load "history.el")
 (load "keybindings.el")
@@ -30,7 +30,6 @@
 (load "spell-checking.el")
 (load "lisp-conf.el")
 (load "scheme-conf.el")
-(load "ruby-conf.el")
 (load "js-conf.el")
 (load "haskell-conf.el")
 (load "mu4e-conf.el")
@@ -45,9 +44,10 @@
 (load custom-file 'noerror)
 
 ;; find out the time your emacs took to load.
-;; (message "My .emacs loaded in %ds"
-;;          (destructuring-bind (hi lo ms) (current-time)
-;;            (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
+(message "My .emacs loaded in %ds"
+         (destructuring-bind (hi lo ms _) (current-time)
+           (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
+
 (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)

@@ -3,6 +3,9 @@
 
 (require 'mu4e)
 
+;; org mode linking support
+(require 'org-mu4e)
+
 (defvar *authinfo-file-path* (expand-file-name "~/.authinfo.gpg"))
 
 ;; default
@@ -48,9 +51,6 @@
 
 (require 'mu4e-contrib)
 (setq mu4e-html2text-command 'mu4e-shr2text)
-
-;; org mode linking support
-(require 'org-mu4e)
 
 (defun offlineimap-get-password (host port login)
   "http://www.emacswiki.org/emacs/OfflineIMAP This sends the
