@@ -3,8 +3,14 @@
 ;; scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(add-hook 'scheme-mode-hook 'geiser-mode)
+(setq geiser-default-implementation 'racket)
+
 ;; adds *.rkt to scheme-mode
 (setq auto-mode-alist (cons '("\\.rkt$" . scheme-mode) auto-mode-alist))
+
+;; only racket for now
+(setq geiser-active-implementations '(racket))
 
 ;; geiser for racket
 ;; (add-to-list 'load-path (concat *my-default-lib* "/geiser/elisp/"))

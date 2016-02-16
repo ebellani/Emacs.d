@@ -19,10 +19,9 @@
 
 (setq org-agenda-files
       '("~/org/refile.org"
-        ;; "~/org/personal/"
+        "~/org/personal/"
         ;; work vs personal, uncomment/comment
-        "~/Projects/brickabode/org-issues/201602.org"
-        ))
+        "~/Projects/brickabode/org-issues/201602.org"))
 
 (setq org-tag-alist '((:startgroup)
                       ("@neoway" .    ?n)
@@ -78,6 +77,10 @@
 
 ;;; babel
 
+(setq org-src-fontify-natively t)
+
+(add-to-list 'org-src-lang-modes (quote ("racket" . scheme)))
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot    . t)
@@ -85,6 +88,7 @@
    (js     . t)
    (ocaml  . t)
    (java   . t)
+   (scheme . t)
    (C    . t)))
 
 ;;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
@@ -93,61 +97,3 @@
 (setq org-confirm-babel-evaluate nil)
 
 (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot-mode))
-
-
-;; overloads to allow double definitions in table formulas
-
-(defun org-table-get-stored-formulas (&optional noerror)
-  "Return an alist with the stored formulas directly after current table."
-  (interactive) ;; FIXME interactive?
-  (let ((case-fold-search t) scol eq eq-alist strings string seen)
-    (save-excursion
-      (goto-char (org-table-end))
-      (when (looking-at "\\([ \t]*\n\\)*[ \t]*#\\+tblfm: *\\(.*\\)")
-	(setq strings (org-split-string (org-match-string-no-properties 2)
-					" *:: *"))
-	(while (setq string (pop strings))
-	  (when (string-match "\\`\\(@[-+I<>0-9.$@]+\\|@?[0-9]+\\|\\$\\([a-zA-Z0-9]+\\|[<>]+\\)\\) *= *\\(.*[^ \t]\\)" string)
-	    (setq scol (if (match-end 2)
-			   (match-string 2 string)
-			 (match-string 1 string))
-		  scol (if (member (string-to-char scol) '(?< ?>))
-			   (concat "$" scol) scol)
-		  eq (match-string 3 string)
-		  eq-alist (cons (cons scol eq) eq-alist))
-            (push scol seen)))))
-    (nreverse eq-alist)))
-
-(defun org-table-fedit-finish (&optional arg)
-  "Parse the buffer for formula definitions and install them.
-With prefix ARG, apply the new formulas to the table."
-  (interactive "P")
-  (org-table-remove-rectangle-highlight)
-  (if org-table-use-standard-references
-      (progn
-	(org-table-fedit-convert-buffer 'org-table-convert-refs-to-rc)
-	(setq org-table-buffer-is-an nil)))
-  (let ((pos org-pos) (sel-win org-selected-window) eql var form)
-    (goto-char (point-min))
-    (while (re-search-forward
-	    "^\\(@[-+I<>0-9.$@]+\\|@?[0-9]+\\|\\$\\([a-zA-Z0-9]+\\|[<>]+\\)\\) *= *\\(.*\\(\n[ \t]+.*$\\)*\\)"
-	    nil t)
-      (setq var (if (match-end 2) (match-string 2) (match-string 1))
-	    form (match-string 3))
-      (setq form (org-trim form))
-      (when (not (equal form ""))
-	(while (string-match "[ \t]*\n[ \t]*" form)
-	  (setq form (replace-match " " t t form)))
-	(push (cons var form) eql)))
-    (setq org-pos nil)
-    (set-window-configuration org-window-configuration)
-    (select-window sel-win)
-    (goto-char pos)
-    (unless (org-at-table-p)
-      (user-error "Lost table position - cannot install formulas"))
-    (org-table-store-formulas eql)
-    (move-marker pos nil)
-    (kill-buffer "*Edit Formulas*")
-    (if arg
-	(org-table-recalculate 'all)
-      (message "New formulas installed - press C-u C-c C-c to apply."))))
