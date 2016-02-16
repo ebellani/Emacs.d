@@ -17,6 +17,7 @@
 (add-to-list 'load-path *my-default-lib*)
 (add-to-list 'load-path *my-conf*)
 
+(load "backup.el")
 (load "package-manager.el")
 (load "elisp.el")
 (load "org-conf.el")
