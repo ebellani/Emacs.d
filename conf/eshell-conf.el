@@ -28,3 +28,5 @@ from http://www.howardism.org/Technical/Emacs/eshell-fun.html"
   (eshell/exit))
 
 (global-set-key (kbd "C-x !") 'eshell-here)
+
+(add-hook 'eshell-mode-hook (lambda () (company-mode 0)))

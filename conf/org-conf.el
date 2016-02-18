@@ -15,13 +15,19 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-completion-use-ido t)
 
-(setq org-directory "~/org/")
+;; The following, as its dependent on absolute file paths, are commented out
 
-(setq org-agenda-files
-      '("~/org/refile.org"
-        "~/org/personal/"
-        ;; work vs personal, uncomment/comment
-        "~/Projects/brickabode/org-issues/201602.org"))
+;; set the default org directory
+
+;; (setq org-directory "~/org/")
+
+;; add the files here
+;; (setq org-agenda-files
+;;       '("~/org/refile.org"
+;;         "~/org/personal/"
+;;         ;; work vs personal, uncomment/comment
+;;         ;; "~/Projects/brickabode/org-issues/201602.org"
+;;         ))
 
 (setq org-tag-alist '((:startgroup)
                       ("@neoway" .    ?n)
@@ -97,3 +103,9 @@
 (setq org-confirm-babel-evaluate nil)
 
 (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot-mode))
+
+
+;;; subscripts
+
+(setq org-use-sub-superscripts '{})
+(setq org-export-with-sub-superscripts '{})

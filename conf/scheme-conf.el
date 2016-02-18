@@ -12,10 +12,6 @@
 ;; only racket for now
 (setq geiser-active-implementations '(racket))
 
-;; geiser for racket
-;; (add-to-list 'load-path (concat *my-default-lib* "/geiser/elisp/"))
-;; (require 'geiser)
-
 (eval-after-load "geiser"
   '(progn
      (require 'geiser-mode)

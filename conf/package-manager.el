@@ -23,11 +23,15 @@
     ;;; git
     magit
     ;;; web
+    w3m ; a browser
     markdown-mode
     web-mode
     yaml-mode
     haml-mode
     ;;; misc
+    legalese
+    idomenu
+    htmlize
     company
     edit-server
     smartparens
