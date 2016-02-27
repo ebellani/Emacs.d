@@ -5,15 +5,17 @@
 ;; common lisp compatibility
 (require 'cl)
 
-(defvar *emacs-load-start* (current-time))
-
 (defvar *my-default-lib* "~/.emacs.d/lib"
   "Vendor libraries that cannot be installed via the package system")
 (defvar *my-conf* "~/.emacs.d/conf/"
   "My configurations")
 (defvar *elpa-path* "~/.emacs.d/elpa/"
   "Elpa packages")
-
+(defvar *domain-custom* "~/emacs-domain-custom/"
+  "This is supposed to be where files that are specific to a
+  domin should reside. For example, history files. The point of
+  this is to allow a single emacs configuration to be shared
+  easily by multiple VM domains.")
 (add-to-list 'load-path *my-default-lib*)
 (add-to-list 'load-path *my-conf*)
 
@@ -26,24 +28,15 @@
 (load "ido-conf.el")
 (load "autocompletion.el")
 (load "eshell-conf.el")
+(load "smex-conf.el")
 (load "spell-checking.el")
 (load "lisp-conf.el")
 (load "scheme-conf.el")
 (load "js-conf.el")
-(load "mu4e-conf.el")
 (load "w3m-conf.el")
 (load "sql-conf.el")
 (load "clojure.el")
 (load "ocaml.el")
 
-(setq custom-file (concat *my-conf* "custom.el"))
+(setq custom-file (concat *domain-custom* "custom.el"))
 (load custom-file 'noerror)
-
-;; find out the time your emacs took to load.
-(message "My .emacs loaded in %ds"
-         (destructuring-bind (hi lo ms _) (current-time)
-           (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
-
-(put 'narrow-to-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)

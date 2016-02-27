@@ -19,15 +19,8 @@
 
 ;; set the default org directory
 
-;; (setq org-directory "~/org/")
-
-;; add the files here
-;; (setq org-agenda-files
-;;       '("~/org/refile.org"
-;;         "~/org/personal/"
-;;         ;; work vs personal, uncomment/comment
-;;         ;; "~/Projects/brickabode/org-issues/201602.org"
-;;         ))
+(setq org-directory (concat *domain-custom* "org/"))
+(setq refile-path (concat org-directory "refile.org"))
 
 (setq org-tag-alist '((:startgroup)
                       ("@neoway" .    ?n)
@@ -42,7 +35,7 @@
                       (:endgroup)))
 
 (setq org-capture-templates
-      '(("t" "todo" entry (file "~/org/refile.org")
+      `(("t" "todo" entry (file ,refile-path)
          "* TODO %?\n\n")))
 
 (setq org-refile-targets
@@ -54,6 +47,8 @@
         (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
 
 ;;; clocking
+
+(setq org-clock-persist-file (concat *domain-custom* "org-clock-save.el"))
 
 ;; Resume clocking task when emacs is restarted
 (setq org-clock-persist 'history)
@@ -86,6 +81,7 @@
 (setq org-src-fontify-natively t)
 
 (add-to-list 'org-src-lang-modes (quote ("racket" . scheme)))
+(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot-mode))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -95,15 +91,26 @@
    (ocaml  . t)
    (java   . t)
    (scheme . t)
-   (C    . t)))
+   (C      . t)
+   (org    . t)))
 
 ;;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
 ;;; FOREIGN ORG FILES!
 
 (setq org-confirm-babel-evaluate nil)
 
-(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot-mode))
+;;; Listings for src blocks
 
+(setq org-latex-listings t)
+(setq org-latex-packages-alist '(("" "listings")
+                                 ("" "color")))
+
+(setq org-latex-listings-options
+      '(("frame" "single")
+        ("basicstyle" "\\footnotesize")
+        ("numbers" "left")
+        ("numberstyle" "\\tiny")
+        ("breaklines" "true")))
 
 ;;; subscripts
 

@@ -15,17 +15,3 @@
 
 (setq auto-mode-alist (append '(("_oasis" . conf-mode))
                               auto-mode-alist))
-
-;; Setup environment variables using opam
-(dolist (var (car (read-from-string (shell-command-to-string "opam config env --sexp"))))
-  (setenv (car var) (cadr var)))
-
-;; Update the emacs path
-(setq exec-path (append (parse-colon-path (getenv "PATH"))
-                        (list exec-directory)))
-(autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-(add-hook 'tuareg-mode-hook 'utop-minor-mode)
-
-(put 'utop-command 'safe-local-variable 'stringp)
-
-(require 'ocp-indent)

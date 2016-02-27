@@ -161,8 +161,3 @@ http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unr
                                   (if (car (window-margins))
                                       (car (window-margins)) 1)))))
 (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
-
-;; initial buffer is agenda
-(add-hook 'after-init-hook (lambda ()
-                             (org-agenda t "n")
-                             (delete-other-windows)))

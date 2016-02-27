@@ -1,6 +1,6 @@
-(setq eshell-directory-name (concat *my-default-lib* "/eshell/"))
+(setq eshell-directory-name (concat *domain-custom* "/eshell/"))
 (setq eshell-history-size 2048)
-(add-to-list 'load-path eshell-directory-name)
+(add-to-list 'load-path (concat *my-default-lib* "/eshell/"))
 (require 'em-bellani)
 (require 'em-joc)
 
