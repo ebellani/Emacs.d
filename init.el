@@ -30,6 +30,7 @@
 (load "eshell-conf.el")
 (load "smex-conf.el")
 (load "spell-checking.el")
+(load "python-conf.el")
 (load "lisp-conf.el")
 (load "scheme-conf.el")
 (load "js-conf.el")

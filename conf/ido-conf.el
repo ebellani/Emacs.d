@@ -5,6 +5,8 @@
 ;; +-------------------------------------------------------+
 (ido-mode t)
 (ido-ubiquitous-mode t)
+(ido-everywhere t)
+(setq magit-completing-read-function 'magit-ido-completing-read)
 (smex-initialize)
 
 ;; +----------------------------------------------------------------+

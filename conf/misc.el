@@ -7,7 +7,7 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-font 'default "Dejavu Sans Mono 10")))
+    (set-face-font 'default "Dejavu Sans Mono 11")))
 
 ;; hide menus
 (menu-bar-mode 0)
@@ -161,3 +161,9 @@ http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unr
                                   (if (car (window-margins))
                                       (car (window-margins)) 1)))))
 (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
+
+
+;; http://stackoverflow.com/questions/18278310/emacs-ansi-term-not-tab-completing
+;; term not autocompleting
+(add-hook 'term-mode-hook (lambda()
+                (yas-minor-mode -1)))
