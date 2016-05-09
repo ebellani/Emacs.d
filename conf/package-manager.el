@@ -18,6 +18,9 @@
     rainbow-delimiters
     ;;; latex
     auctex
+    ;;; containers
+    dockerfile-mode
+    docker-tramp
     ;;; clojure
     clojure-mode
     cider
@@ -30,6 +33,7 @@
     yaml-mode
     haml-mode
     ;;; misc
+    evil
     legalese
     idomenu
     htmlize

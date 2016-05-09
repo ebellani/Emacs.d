@@ -25,6 +25,7 @@
 (setq org-tag-alist '((:startgroup)
                       ("@neoway" .    ?n)
                       ("@home" .      ?h)
+                      ("@office" . ?o)
                       (:endgroup)
                       (:startgroup)
                       ("WRITING" .    ?w)
@@ -81,16 +82,18 @@
 (setq org-src-fontify-natively t)
 
 (add-to-list 'org-src-lang-modes (quote ("racket" . scheme)))
-(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot-mode))
+(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot    . t)
+   (sh     . t)
    (python . t)
    (js     . t)
    (ocaml  . t)
    (java   . t)
    (scheme . t)
+   (ditaa  . t)
    (C      . t)
    (org    . t)))
 
