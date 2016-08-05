@@ -29,4 +29,6 @@ from http://www.howardism.org/Technical/Emacs/eshell-fun.html"
 
 (global-set-key (kbd "C-x !") 'eshell-here)
 
-(add-hook 'eshell-mode-hook (lambda () (company-mode 0)))
+(add-hook 'eshell-mode-hook (lambda ()
+                              (company-mode 0)
+                              (linum-mode -1)))
