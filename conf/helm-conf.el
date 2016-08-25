@@ -26,19 +26,19 @@
 (global-set-key (kbd "C-x C-m") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "C-x C-r") #'helm-recentf)
-global-set-key (kbd "C-x r l") #'helm-filtered-bookmarks
+(global-set-key (kbd "C-x r l") #'helm-filtered-bookmarks)
 (global-set-key (kbd "M-y")     #'helm-show-kill-ring)
 (global-set-key (kbd "M-i") 'helm-swoop)
 (global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
 (global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
 (global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
-(define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-(define-key helm-map (kbd "C-z") #'helm-select-action)
 
 (require 'helm-config)
 (helm-mode t)
 (helm-adaptive-mode t)
 
+(define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+(define-key helm-map (kbd "C-z") #'helm-select-action)
 (global-set-key (kbd "C-x c!")   #'helm-calcul-expression)
 (global-set-key (kbd "C-x c:")   #'helm-eval-expression-with-eldoc)
 (define-key helm-map (kbd "M-o") #'helm-previous-source)
