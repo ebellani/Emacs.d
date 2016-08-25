@@ -8,12 +8,8 @@
 (setq org-refile-allow-creating-parent-nodes 'confirm)
 
 
-;; Use full outline paths for refile targets - we file directly with
-;; IDO
 (setq org-refile-use-outline-path 'file)
-
 (setq org-outline-path-complete-in-steps nil)
-(setq org-completion-use-ido t)
 
 ;; The following, as its dependent on absolute file paths, are commented out
 
@@ -33,7 +29,8 @@
                       ("SOCIAL" .     ?s)
                       ("RESEARCH" .   ?r)
                       ("INVESTMENT" . ?i)
-                      (:endgroup)))
+                      (:endgroup)
+                      ("BILLABLE")))
 
 (setq org-capture-templates
       `(("t" "todo" entry (file ,refile-path)

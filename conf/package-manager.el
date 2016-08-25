@@ -1,6 +1,6 @@
 (require 'package)
 
-(defvar my-repositories '(("melpa" . "http://melpa.milkbox.net/packages/")
+(defvar my-repositories '(("melpa" . "https://melpa.org/packages/")
                           ("org" . "http://orgmode.org/elpa/"))
   "Repositories that I'm using to retrieve packages.")
 
@@ -21,6 +21,9 @@
     ;;; containers
     dockerfile-mode
     docker-tramp
+    ;;; python
+    pony-mode
+    virtualenvwrapper
     ;;; clojure
     clojure-mode
     cider
@@ -35,15 +38,16 @@
     ;;; misc
     evil
     legalese
-    idomenu
     htmlize
     company
     edit-server
     smartparens
-    smex
-    ido-ubiquitous
     undo-tree
     yasnippet
+    projectile
+    helm
+    helm-projectile
+    helm-swoop
     ;;; racket & scheme
     geiser
     ;;; better help
@@ -55,7 +59,9 @@
     ocp-indent
     merlin
     utop
-    ;; accounting
+    ;;; org
+    org-plus-contrib
+    ;;; accounting
     ledger-mode)
   "A list of packages to ensure are installed at launch.")
 

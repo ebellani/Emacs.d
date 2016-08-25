@@ -31,4 +31,5 @@ from http://www.howardism.org/Technical/Emacs/eshell-fun.html"
 
 (add-hook 'eshell-mode-hook (lambda ()
                               (company-mode 0)
+                              (yas-minor-mode -1)
                               (linum-mode -1)))
