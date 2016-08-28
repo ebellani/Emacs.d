@@ -11,6 +11,3 @@
        (message "SQL history will not be saved because %s is nil"
                (symbol-name rval))))))
 (add-hook 'sql-interactive-mode-hook 'my-sql-save-history-hook)
-
-(add-hook 'sql-mode-hook 'sqlup-mode)
-(add-hook 'sql-interactive-mode-hook 'sqlup-mode)

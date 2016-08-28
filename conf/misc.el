@@ -171,4 +171,7 @@ http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unr
             (linum-mode -1)))
 
 ;; flycheck
-;; (add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; psession, saving the emacs session so we can use helm frequency stuff
+(psession-mode t)

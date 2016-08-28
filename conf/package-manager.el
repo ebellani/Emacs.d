@@ -48,6 +48,8 @@
     helm
     helm-projectile
     helm-swoop
+    psession
+    flycheck
     ;;; racket & scheme
     geiser
     ;;; better help

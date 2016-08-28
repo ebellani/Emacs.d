@@ -13,7 +13,6 @@
 (autoload 'helm-esh-pcomplete  "helm-eshell"    t)
 
 (global-set-key (kbd "C-h a")    #'helm-apropos)
-(global-set-key (kbd "C-h i")    #'helm-info-emacs)
 (global-set-key (kbd "C-h b")    #'helm-descbinds)
 
 (add-hook 'eshell-mode-hook
