@@ -45,6 +45,8 @@
     undo-tree
     yasnippet
     projectile
+    ;; helm
+    helm-mu
     helm
     helm-projectile
     helm-swoop
