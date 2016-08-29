@@ -175,3 +175,15 @@ http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unr
 
 ;; psession, saving the emacs session so we can use helm frequency stuff
 (psession-mode t)
+;; don't save kill-ring, that could expose passwords.
+(psession-object-to-save-alist
+   (quote
+    ((ioccur-history . "ioccur-history.el")
+     (extended-command-history . "extended-command-history.el")
+     (helm-external-command-history . "helm-external-command-history.el")
+     (helm-surfraw-engines-history . "helm-surfraw-engines-history.el")
+     (psession--save-buffers-alist . "psession-save-buffers-alist.el")
+     (helm-ff-history . "helm-ff-history.el")
+     (helm-grep-history . "helm-grep-history.el")
+     (register-alist . "register-alist.el")
+     (psession--winconf-alist . "psession-winconf-alist.el"))))
