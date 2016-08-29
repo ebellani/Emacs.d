@@ -20,7 +20,7 @@
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
       '(("/INBOX"          . ?i)
-        ("/sent"           . ?s)
+        ("/[Gmail].Sent Mail" . ?s)
         ("/hackers-neoway" . ?n)))
 
 
@@ -42,18 +42,12 @@
 (require 'smtpmail)
 
 (setq message-send-mail-function 'smtpmail-send-it
-      starttls-use-gnutls t
       smtpmail-starttls-credentials
-      '(("smtp.gmail.com" 587 nil nil))
-      smtpmail-auth-credentials
-      *authinfo-file-path*
+      '(("mail.example.com" 587 nil nil))
       smtpmail-default-smtp-server "smtp.gmail.com"
       smtpmail-smtp-server "smtp.gmail.com"
       smtpmail-smtp-service 587
       smtpmail-debug-info t)
-
-;; sign before sending..
-(add-hook 'message-send-hook 'mml-secure-message-sign-pgpmime)
 
 ;; Tells Gnus to inline the part
 (eval-after-load "mm-decode"
