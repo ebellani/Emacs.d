@@ -9,35 +9,42 @@
 
 (defvar *authinfo-file-path* (expand-file-name "~/.authinfo.gpg"))
 
-;; default
-(setq mu4e-maildir (expand-file-name "~/Mail/mbsyncmail/"))
-
-;; don't save message to Sent Messages, GMail/IMAP will take care of this
-(setq mu4e-sent-messages-behavior 'delete)
-
-(setq mu4e-attachment-dir  "~/Downloads")
-
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
       '(("/INBOX"          . ?i)
-        ("/[Gmail].Sent Mail" . ?s)
+        ("/sent" . ?s)
+        ("/starred" . ?t)
+        ("/all" . ?a)
         ("/hackers-neoway" . ?n)))
 
-
 (require 'mu4e-contrib)
+
 ;; general config
 (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
+      ;;  "html2text -utf8 -width 72" ?
+      ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
+      ;; stop UID errors
+      mu4e-change-filenames-when-moving t
       mu4e-html2text-command 'mu4e-shr2text
       mu4e-update-interval 120
       mu4e-headers-auto-update t
-      mu4e-compose-signature-auto-include nil)
+      mu4e-compose-signature-auto-include nil
+      mu4e-attachment-dir  "~/Downloads"
+      mu4e-maildir (expand-file-name "~/Mail/mbsyncmail/")
+      ;; don't save message to Sent Messages, GMail/IMAP will take care of this
+      mu4e-sent-messages-behavior 'delete
+      ;; kill buffers on exit
+      message-kill-buffer-on-exit t
+      ;; show fancy chars
+      mu4e-use-fancy-chars t
+      ;; attempt to show images when viewing messages
+      mu4e-view-show-images t)
 
 ;; something about ourselves
-;; I don't use a signature...
 (setq
  user-mail-address "ebellani@gmail.com"
  user-full-name    "Eduardo Bellani"
- mu4e-compose-signature "Eduardo Bellani")
+ mu4e-compose-signature "--\nEduardo Bellani")
 
 (require 'smtpmail)
 
@@ -66,7 +73,6 @@
                                                            mm-automatic-display))))
 
 (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-
 
 ;; set helm support
 (require 'helm-mu)

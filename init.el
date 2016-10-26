@@ -38,6 +38,7 @@
 (load "sql-conf.el")
 (load "clojure.el")
 (load "ocaml.el")
+(load "mu4e-conf.el")
 
 (setq custom-file (concat *domain-custom* "custom.el"))
 (load custom-file 'noerror)
