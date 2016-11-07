@@ -30,15 +30,18 @@
       mu4e-headers-auto-update t
       mu4e-compose-signature-auto-include nil
       mu4e-attachment-dir  "~/Downloads"
-      mu4e-maildir (expand-file-name "~/Mail/mbsyncmail/")
+      mu4e-maildir (expand-file-name "~/Mail/mail/")
       ;; don't save message to Sent Messages, GMail/IMAP will take care of this
       mu4e-sent-messages-behavior 'delete
       ;; kill buffers on exit
       message-kill-buffer-on-exit t
       ;; show fancy chars
       mu4e-use-fancy-chars t
-      ;; attempt to show images when viewing messages
-      mu4e-view-show-images t)
+      ;; attempt to show images when viewing messages sometimes this
+      ;; slows down in the case of big djvu files (they are
+      ;; interpreted as images).
+      mu4e-view-show-images t
+      org-mu4e-convert-to-html t)
 
 ;; something about ourselves
 (setq
