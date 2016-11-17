@@ -1,16 +1,10 @@
 ;; init file tips:
 ;; http://a-nickels-worth.blogspot.com/2007/11/effective-emacs.html
 ;; http://sites.google.com/site/steveyegge2/effective-emacs
-
-;; common lisp compatibility
-(require 'cl)
-
 (defvar *my-default-lib* "~/.emacs.d/lib"
   "Vendor libraries that cannot be installed via the package system")
 (defvar *my-conf* "~/.emacs.d/conf/"
   "My configurations")
-(defvar *elpa-path* "~/.emacs.d/elpa/"
-  "Elpa packages")
 (defvar *domain-custom* "~/emacs-domain-custom/"
   "This is supposed to be where files that are specific to a
   domin should reside. For example, history files. The point of

@@ -1,6 +1,3 @@
-;; automatically sets the global mode for all buffers
-(global-linum-mode t)
-
 ;; flashes the paren close to the cursor.
 (show-paren-mode   t)
 
@@ -24,14 +21,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Keep session
-(desktop-save-mode 0)
-
-;; disable the save mode
-(global-set-key [f5] 'desktop-save-mode)
-
 ;; Inhibit startup window, very annoying
-(setq inhibit-startup-message 1)
+(setq inhibit-startup-message t)
 
 ;; Makes final line always be a return
 (setq require-final-newline t)
@@ -104,9 +95,6 @@
 (add-hook 'c-mode-hook
           '(lambda () (c-set-style "gnu")))
 
-;; yasnippet, loads of emacs snippets
-(yas-global-mode t)
-
 ;; undo-tree
 ;; treats undo as a tree
 (require 'undo-tree)
@@ -122,53 +110,17 @@
 ;; remove trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-;; edit server, a plugin for google chrome
-;; http://www.emacswiki.org/emacs/Edit_with_Emacs
-(edit-server-start)
-
-;; invoice creation utilities
-(autoload 'insert-month-invoices "invoice" "Calls a function to insert entries for invoices.")
-
 ;; C source
 
 (setq find-function-C-source-directory
       "/usr/share/emacs/24.4/src")
-
-(defun un-camelcase-string (s &optional sep start)
-  "Convert CamelCase string S to lower case with word separator SEP.
-Default for SEP is a hyphen \"-\".
-
-If third argument START is non-nil, convert words after that
-index in STRING."
-  (let ((case-fold-search nil))
-    (while (string-match "[A-Z]" s (or start 1))
-      (setq s (replace-match (concat (or sep "-")
-                                             (downcase (match-string 0 s)))
-                                     t nil s)))
-    (downcase s)))
-
-(defun insert-random-uuid ()
-  (interactive)
-  (shell-command "uuidgen" t))
-
-(defun linum-update-window-scale-fix (win)
-  "fix linum for scaled text. See
-http://stackoverflow.com/questions/9304192/emacs-linum-mode-and-size-of-font-unreadable-line-numbers"
-  (set-window-margins win
-                      (ceiling (* (if (boundp 'text-scale-mode-step)
-                                      (expt text-scale-mode-step
-                                            text-scale-mode-amount) 1)
-                                  (if (car (window-margins))
-                                      (car (window-margins)) 1)))))
-(advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
 
 
 ;; http://stackoverflow.com/questions/18278310/emacs-ansi-term-not-tab-completing
 ;; term not autocompleting
 (add-hook 'term-mode-hook
           (lambda()
-            (yas-minor-mode -1)
-            (linum-mode -1)))
+            (yas-minor-mode -1)))
 
 ;; flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)

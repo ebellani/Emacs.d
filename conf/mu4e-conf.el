@@ -7,6 +7,8 @@
 ;; org mode linking support
 (require 'org-mu4e)
 
+(setq org-mu4e-link-query-in-headers-mode nil)
+
 (defvar *authinfo-file-path* (expand-file-name "~/.authinfo.gpg"))
 
 ;; setup some handy shortcuts
