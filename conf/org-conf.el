@@ -41,7 +41,7 @@
         (org-agenda-files :maxlevel . 9)))
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
         (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
 
 ;;; clocking

@@ -17,7 +17,8 @@
         ("/sent" . ?s)
         ("/starred" . ?t)
         ("/all" . ?a)
-        ("/hackers-neoway" . ?n)))
+        ("/hackers-neoway" . ?n)
+        ("/orgmode-list" . ?r)))
 
 (require 'mu4e-contrib)
 

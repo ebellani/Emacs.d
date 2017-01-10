@@ -6,7 +6,8 @@
       helm-yank-symbol-first                 t
       helm-move-to-line-cycle-in-source      t
       helm-buffers-fuzzy-matching            t
-      helm-ff-auto-update-initial-value      t)
+      helm-ff-auto-update-initial-value      t
+      helm-imenu-fuzzy-match                 t)
 
 (autoload 'helm-descbinds      "helm-descbinds" t)
 (autoload 'helm-eshell-history "helm-eshell"    t)
@@ -26,6 +27,7 @@
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "C-x C-r") #'helm-recentf)
 (global-set-key (kbd "C-x r l") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-x i") 'helm-imenu)
 (global-set-key (kbd "M-y")     #'helm-show-kill-ring)
 (global-set-key (kbd "M-i") 'helm-swoop)
 (global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
@@ -56,3 +58,5 @@
       (helm-ag (projectile-project-root))))
 
 (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
+
+(setq projectile-mode-line "Projectile")
