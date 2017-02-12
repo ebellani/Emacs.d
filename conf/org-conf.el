@@ -83,17 +83,18 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((dot     . t)
-   (sh      . t)
-   (python  . t)
-   (js      . t)
-   (ocaml   . t)
-   (java    . t)
-   (scheme  . t)
-   (ditaa   . t)
+ '((dot    . t)
+   (sh     . t)
+   (python . t)
+   (js     . t)
+   (ocaml  . t)
+   (java   . t)
+   (scheme . t)
    (gnuplot . t)
-   (C       . t)
-   (org     . t)))
+   (ditaa  . t)
+   (C      . t)
+   (ledger . t)
+   (org    . t)))
 
 ;;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
 ;;; FOREIGN ORG FILES!
@@ -123,6 +124,18 @@
                              (org-agenda t "n")
                              (delete-other-windows)))
 
+(setq org-babel-default-header-args
+      (cons '(:noweb . "yes")
+            (assq-delete-all :noweb org-babel-default-header-args)))
+
+(setq org-babel-default-header-args
+      (cons '(:tangle . "yes")
+            (assq-delete-all :tangle org-babel-default-header-args)))
+
+(setq org-babel-default-header-args
+      (cons '(:comments . "link")
+            (assq-delete-all :comments org-babel-default-header-args)))
+
 (setq org-id-locations-file (concat org-directory "org-id-locations"))
 
 ;; emacs lisp
@@ -131,3 +144,5 @@
   (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 (add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)
+
+(setq org-src-fontify-natively t)
