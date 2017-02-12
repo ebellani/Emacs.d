@@ -2,7 +2,7 @@
 ;;   (lambda ()
 ;;     (setq indent-tabs-mode t)))
 
-(setq python-shell-interpreter "/usr/bin/python3.5")
+(setq python-shell-interpreter "/usr/bin/python3.4")
 
 ;; https://github.com/gporterjamesj/virtualenvwrapper.el
 

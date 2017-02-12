@@ -83,16 +83,17 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((dot    . t)
-   (sh     . t)
-   (python . t)
-   (js     . t)
-   (ocaml  . t)
-   (java   . t)
-   (scheme . t)
-   (ditaa  . t)
-   (C      . t)
-   (org    . t)))
+ '((dot     . t)
+   (sh      . t)
+   (python  . t)
+   (js      . t)
+   (ocaml   . t)
+   (java    . t)
+   (scheme  . t)
+   (ditaa   . t)
+   (gnuplot . t)
+   (C       . t)
+   (org     . t)))
 
 ;;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
 ;;; FOREIGN ORG FILES!
@@ -116,3 +117,17 @@
 
 (setq org-use-sub-superscripts '{})
 (setq org-export-with-sub-superscripts '{})
+
+;; initial buffer is agenda
+(add-hook 'after-init-hook (lambda ()
+                             (org-agenda t "n")
+                             (delete-other-windows)))
+
+(setq org-id-locations-file (concat org-directory "org-id-locations"))
+
+;; emacs lisp
+
+(defun disable-fylcheck-in-org-src-block ()
+  (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+
+(add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)

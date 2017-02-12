@@ -138,3 +138,6 @@
         (helm-grep-history . "helm-grep-history.el")
         (register-alist . "register-alist.el")
         (psession--winconf-alist . "psession-winconf-alist.el")))
+
+;; set menu as M
+(define-key key-translation-map (kbd "<menu>") (kbd "ESC"))

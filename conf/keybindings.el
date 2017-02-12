@@ -31,13 +31,6 @@
 ;; Things taken from http://sites.google.com/site/steveyegge2/effective-emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; use smex instead
-
-;; item #2
-(global-set-key "\C-x\C-m" 'smex)
-(global-set-key "\C-xm"    'smex)
-(global-set-key "\C-c\C-m" 'smex)
-
 
 ;; item #3
 (global-set-key "\C-w"     'backward-kill-word)

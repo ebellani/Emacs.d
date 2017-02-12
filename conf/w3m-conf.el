@@ -1,4 +1,4 @@
-(setq w3m-use-cookies t)
+(setq w3m-use-cookies nil)
 (setq w3m-key-binding 'info)
 
 (require 'w3m-lnum)

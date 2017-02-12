@@ -9,16 +9,15 @@
 
 (setq org-mu4e-link-query-in-headers-mode nil)
 
-(defvar *authinfo-file-path* (expand-file-name "~/.authinfo.gpg"))
+(defvar *authinfo-fileu-path* (expand-file-name "~/.authinfo.gpg"))
 
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
-      '(("/INBOX"          . ?i)
-        ("/sent" . ?s)
+      '(("/INBOX"   . ?i)
+        ("/sent"    . ?s)
         ("/starred" . ?t)
-        ("/all" . ?a)
-        ("/hackers-neoway" . ?n)
-        ("/orgmode-list" . ?r)))
+        ("/all"     . ?a)
+        ("/hr"      . ?h)))
 
 (require 'mu4e-contrib)
 
@@ -48,7 +47,7 @@
 
 ;; something about ourselves
 (setq
- user-mail-address "ebellani@gmail.com"
+ user-mail-address "emb@brickabode.com"
  user-full-name    "Eduardo Bellani"
  mu4e-compose-signature "--\nEduardo Bellani")
 
