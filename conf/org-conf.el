@@ -1,3 +1,9 @@
+;; this makes my emacs use my local (and constantly updated) orgmode
+(add-to-list 'load-path (concat *my-default-lib* "/org-mode/lisp"))
+(add-to-list 'load-path (concat *my-default-lib* "/org-mode/contrib/lisp") t)
+
+(add-to-list 'Info-directory-list (concat *my-default-lib* "/org-mode/doc"))
+
 ;; a lot of this came from http://doc.norang.ca/org-mode.html
 
 (global-set-key "\C-cl" 'org-store-link)
@@ -18,23 +24,24 @@
 (setq org-directory (concat *domain-custom* "org/"))
 (setq refile-path (concat org-directory "refile.org"))
 
+(setq org-agenda-files
+      `(,refile-path
+        ,(concat org-directory "schedule.org")
+        "~/Code/ba-administration/emb.org"))
+
 (setq org-tag-alist '((:startgroup)
-                      ("@neoway" .    ?n)
-                      ("@home" .      ?h)
-                      ("@office" . ?o)
-                      (:endgroup)
-                      (:startgroup)
-                      ("WRITING" .    ?w)
-                      ("CODE" .       ?c)
-                      ("SOCIAL" .     ?s)
-                      ("RESEARCH" .   ?r)
-                      ("INVESTMENT" . ?i)
+                      ("noexport" . ?n)
+                      ("export" . ?e)
                       (:endgroup)
                       ("BILLABLE")))
 
 (setq org-capture-templates
       `(("t" "todo" entry (file ,refile-path)
-         "* TODO %?\n\n")))
+         "* TODO %?\n\n")
+        ("r" "review" entry (file ,refile-path)
+         "* %?\n")
+        ("s" "schedule" entry (file ,(concat org-directory "schedule.org"))
+         "* %?\n\n %^T" :kill-buffer t)))
 
 (setq org-refile-targets
       '((nil :maxlevel . 9)
@@ -42,7 +49,16 @@
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
-        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
+        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")
+        (type "CONTACT(@/!)"
+              "IQ(@/!)"
+              "SMOKE-TEST(@/!)"
+              "CHALLENGE-SENT-NOT-PAID(@/!)"
+              "CHALLENGE-SENT-PAID(@/!)"
+              "CODE-REVIEW(@/!)")
+        (type "OFFER(@/!)" "REJECTION(@/!)" "DECLINED(@/!)" "HIRED(@/!)" )
+        (type "TBD" "|")
+        (type "Favorecido" "Desfavorecido" "Ignorado")))
 
 ;;; clocking
 
@@ -83,13 +99,15 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((dot    . t)
-   (sh     . t)
-   (python . t)
-   (js     . t)
-   (ocaml  . t)
-   (java   . t)
-   (scheme . t)
+ '((dot     . t)
+   (sh   . t)
+   (python  . t)
+   (js      . t)
+   (ocaml   . t)
+   (java    . t)
+   (scheme  . t)
+   (plantuml . t)
+   (ditaa   . t)
    (gnuplot . t)
    (ditaa  . t)
    (C      . t)
@@ -145,4 +163,51 @@
 
 (add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)
 
-(setq org-src-fontify-natively t)
+(defun org-table-time-seconds-to-string (secs &optional output-format)
+  "Mofifies org function to truncate the seconds"
+  (let* ((secs0 (abs secs))
+         (res
+          (cond ((eq output-format 'days)
+                 (format "%.3f" (/ (float secs0) 86400)))
+                ((eq output-format 'hours)
+                 (format "%.2f" (/ (float secs0) 3600)))
+                ((eq output-format 'minutes)
+                 (format "%.1f" (/ (float secs0) 60)))
+                ((eq output-format 'seconds)
+                 (format "%d" secs0))
+                (t (org-format-seconds "%.2h:%.2m" secs0)))))
+    (if (< secs 0) (concat "-" res) res)))
+
+
+;; see https://github.com/jkitchin/org-ref
+
+(setq reftex-default-bibliography '("~/Code/ac/docs/phase-1/References/core.bib"))
+
+;; see org-ref for use of these variables
+(setq org-ref-bibliography-notes "~/Code/ac/docs/phase-1/References/notes.org"
+      org-ref-default-bibliography '("~/Code/ac/docs/phase-1/References/core.bib")
+      org-ref-pdf-directory "~/Code/ac/docs/phase-1/References/")
+
+
+(setq bibtex-completion-bibliography "~/Code/ac/docs/phase-1/References/core.bib"
+      bibtex-completion-library-path "~/Code/ac/docs/phase-1/References/"
+      bibtex-completion-notes-path "~/Code/ac/docs/phase-1/References/notes.org")
+
+(require 'org-ref)
+
+
+;; better timestamp for export
+;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
+(add-to-list 'org-export-filter-timestamp-functions
+             #'endless/filter-timestamp)
+(setq-default org-display-custom-times t)
+;;; Before you ask: No, removing the <> here doesn't work.
+(setq org-time-stamp-custom-formats
+      '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>"))
+(defun endless/filter-timestamp (trans back _comm)
+  "Remove <> around time-stamps."
+  (pcase back
+    ((or `jekyll `html)
+     (replace-regexp-in-string "&[lg]t;" "" trans))
+    ((or `latex `ascii)
+     (replace-regexp-in-string "[<>]" "" trans))))

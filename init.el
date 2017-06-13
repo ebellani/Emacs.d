@@ -33,6 +33,8 @@
 (load "clojure.el")
 (load "ocaml.el")
 (load "mu4e-conf.el")
+(load "calendar-conf.el")
 
 (setq custom-file (concat *domain-custom* "custom.el"))
 (load custom-file 'noerror)
+(put 'upcase-region 'disabled nil)

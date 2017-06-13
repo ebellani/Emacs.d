@@ -9,8 +9,6 @@
 
 (setq org-mu4e-link-query-in-headers-mode nil)
 
-(defvar *authinfo-fileu-path* (expand-file-name "~/.authinfo.gpg"))
-
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
       '(("/INBOX"   . ?i)
