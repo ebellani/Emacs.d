@@ -37,7 +37,7 @@
 
 (setq org-capture-templates
       `(("t" "todo" entry (file ,refile-path)
-         "* TODO %?\n\n")
+         "* TODO %?" :empty-lines 1)
         ("r" "review" entry (file ,refile-path)
          "* %?\n")
         ("s" "schedule" entry (file ,(concat org-directory "schedule.org"))
