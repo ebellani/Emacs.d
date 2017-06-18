@@ -65,7 +65,7 @@
     (with-temp-buffer
       (byte-compile-file filename t))))
 
-(defvar elisp-extra-keys 
+(defvar elisp-extra-keys
   '(((kbd "C-c d")   'elisp-disassemble)
     ((kbd "C-c m")   'elisp-macroexpand)
     ((kbd "C-c M")   'elisp-macroexpand-all)
@@ -81,3 +81,6 @@
   (let ((key (eval (car binding))) (val (eval (cadr binding))))
     (define-key emacs-lisp-mode-map key val)
     (define-key lisp-interaction-mode-map key val)))
+
+(require 'ht)
+(require 'dash)

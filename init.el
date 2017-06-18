@@ -32,6 +32,7 @@
 (load "sql-conf.el")
 (load "clojure.el")
 (load "ocaml.el")
+(load "ledger-conf.el")
 (load "mu4e-conf.el")
 (load "calendar-conf.el")
 
