@@ -17,17 +17,17 @@
 (setq org-refile-use-outline-path 'file)
 (setq org-outline-path-complete-in-steps nil)
 
-;; The following, as its dependent on absolute file paths, are commented out
-
 ;; set the default org directory
 
 (setq org-directory (concat *domain-custom* "org/"))
-(setq refile-path (concat org-directory "refile.org"))
+(setq refile-file-path (concat org-directory "refile.org"))
+(setq schedule-file-path (concat org-directory "schedule.org"))
+(setq main-org-agenda-file "~/Code/ba-administration/emb.org")
 
 (setq org-agenda-files
-      `(,refile-path
-        ,(concat org-directory "schedule.org")
-        "~/Code/ba-administration/emb.org"))
+      (list refile-file-path
+            schedule-file-path
+            main-org-agenda-file))
 
 (setq org-tag-alist '((:startgroup)
                       ("noexport" . ?n)
@@ -36,11 +36,11 @@
                       ("BILLABLE")))
 
 (setq org-capture-templates
-      `(("t" "todo" entry (file ,refile-path)
+      `(("t" "todo" entry (file ,refile-file-path)
          "* TODO %?" :empty-lines 1)
-        ("r" "review" entry (file ,refile-path)
+        ("r" "review" entry (file ,refile-file-path)
          "* %?\n")
-        ("s" "schedule" entry (file ,(concat org-directory "schedule.org"))
+        ("s" "schedule" entry (file ,schedule-file-path)
          "* %?\n\n %^T" :kill-buffer t)))
 
 (setq org-refile-targets
@@ -49,29 +49,7 @@
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
-        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")
-        (type "CONTACT(@/!)"
-              "IQ(@/!)"
-              "SMOKE-TEST(@/!)"
-              "CHALLENGE-SENT-NOT-PAID(@/!)"
-              "CHALLENGE-SENT-PAID(@/!)"
-              "CODE-REVIEW(@/!)")
-        (type "OFFER(@/!)" "REJECTION(@/!)" "DECLINED(@/!)" "HIRED(@/!)" )
-        (type "TBD" "|")
-        (type "Favorecido" "Desfavorecido" "Ignorado")))
-
-;;; clocking
-
-(setq org-clock-persist-file (concat *domain-custom* "org-clock-save.el"))
-
-;; Resume clocking task when emacs is restarted
-(setq org-clock-persist 'history)
-(org-clock-persistence-insinuate)
-;;
-;; Show lot of clocking history so it's easy to pick items off the C-F11 list
-(setq org-clock-history-length 23)
-;; Resume clocking task on clock-in if the clock is open
-(setq org-clock-in-resume t)
+        (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")))
 
 ;;; navigation
 
@@ -100,7 +78,7 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot     . t)
-   (sh   . t)
+   (shell   . t)
    (python  . t)
    (js      . t)
    (ocaml   . t)
@@ -108,6 +86,7 @@
    (scheme  . t)
    (plantuml . t)
    (ditaa   . t)
+   (sqlite  . t)
    (gnuplot . t)
    (ditaa  . t)
    (C      . t)
@@ -153,8 +132,6 @@
 (setq org-babel-default-header-args
       (cons '(:comments . "link")
             (assq-delete-all :comments org-babel-default-header-args)))
-
-(setq org-id-locations-file (concat org-directory "org-id-locations"))
 
 ;; emacs lisp
 

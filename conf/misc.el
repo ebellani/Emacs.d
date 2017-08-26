@@ -141,3 +141,13 @@
 
 ;; set menu as M
 (define-key key-translation-map (kbd "<menu>") (kbd "ESC"))
+
+(require 'taskjuggler-mode)
+
+
+;;; smart mode line
+;; get rid of asking for confirmation
+;; https://github.com/Malabarba/smart-mode-line/issues/100
+
+(setq sml/no-confirm-load-theme t)
+(smart-mode-line-enable)
