@@ -1,9 +1,3 @@
-;; this makes my emacs use my local (and constantly updated) orgmode
-(add-to-list 'load-path (concat *my-default-lib* "/org-mode/lisp"))
-(add-to-list 'load-path (concat *my-default-lib* "/org-mode/contrib/lisp") t)
-
-(add-to-list 'Info-directory-list (concat *my-default-lib* "/org-mode/doc"))
-
 ;; a lot of this came from http://doc.norang.ca/org-mode.html
 
 (global-set-key "\C-cl" 'org-store-link)
@@ -151,24 +145,6 @@
                  (format "%d" secs0))
                 (t (org-format-seconds "%.2h:%.2m" secs0)))))
     (if (< secs 0) (concat "-" res) res)))
-
-
-;; see https://github.com/jkitchin/org-ref
-
-(setq reftex-default-bibliography '("~/Code/ac/docs/phase-1/References/core.bib"))
-
-;; see org-ref for use of these variables
-(setq org-ref-bibliography-notes "~/Code/ac/docs/phase-1/References/notes.org"
-      org-ref-default-bibliography '("~/Code/ac/docs/phase-1/References/core.bib")
-      org-ref-pdf-directory "~/Code/ac/docs/phase-1/References/")
-
-
-(setq bibtex-completion-bibliography "~/Code/ac/docs/phase-1/References/core.bib"
-      bibtex-completion-library-path "~/Code/ac/docs/phase-1/References/"
-      bibtex-completion-notes-path "~/Code/ac/docs/phase-1/References/notes.org")
-
-(require 'org-ref)
-
 
 ;; better timestamp for export
 ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
