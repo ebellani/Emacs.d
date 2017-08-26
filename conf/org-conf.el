@@ -21,13 +21,10 @@
 
 (setq org-directory (concat *domain-custom* "org/"))
 (setq refile-file-path (concat org-directory "refile.org"))
-(setq schedule-file-path (concat org-directory "schedule.org"))
-(setq main-org-agenda-file "~/Code/ba-administration/emb.org")
 
 (setq org-agenda-files
-      (list refile-file-path
-            schedule-file-path
-            main-org-agenda-file))
+      `(,refile-file-path
+        ,(concat org-directory "personal.org")))
 
 (setq org-tag-alist '((:startgroup)
                       ("noexport" . ?n)

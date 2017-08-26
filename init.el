@@ -32,9 +32,9 @@
 (load "sql-conf.el")
 (load "clojure.el")
 (load "ocaml.el")
+(load "haskell-conf.el")
 (load "ledger-conf.el")
 (load "mu4e-conf.el")
-(load "calendar-conf.el")
 
 (setq custom-file (concat *domain-custom* "custom.el"))
 (load custom-file 'noerror)
