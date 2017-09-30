@@ -4,7 +4,7 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-font 'default "Dejavu Sans Mono 12")))
+    (set-face-font 'default "Dejavu Sans Mono 13")))
 
 ;; hide menus
 (menu-bar-mode 0)
@@ -112,15 +112,13 @@
 
 ;; C source
 
-(setq find-function-C-source-directory
-      "/usr/share/emacs/24.4/src")
-
+(setq find-function-C-source-directory "/home/user/Code/emacs/src/")
 
 ;; http://stackoverflow.com/questions/18278310/emacs-ansi-term-not-tab-completing
 ;; term not autocompleting
-(add-hook 'term-mode-hook
-          (lambda()
-            (yas-minor-mode -1)))
+;; (add-hook 'term-mode-hook
+;;           (lambda()
+;;             (yas-minor-mode -1)))
 
 ;; flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)

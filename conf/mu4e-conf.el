@@ -11,11 +11,11 @@
 
 ;; setup some handy shortcuts
 (setq mu4e-maildir-shortcuts
-      '(("/INBOX"   . ?i)
-        ("/sent"    . ?s)
-        ("/starred" . ?t)
-        ("/all"     . ?a)
-        ("/hr"      . ?h)))
+      '(("/INBOX"                  . ?i)
+        ("/sent"                   . ?s)
+        ("/starred"                . ?t)
+        ("/all"                    . ?a)
+        ("/projects-notifications" . ?n)))
 
 (require 'mu4e-contrib)
 
@@ -28,7 +28,6 @@
       mu4e-html2text-command 'mu4e-shr2text
       mu4e-update-interval 120
       mu4e-headers-auto-update t
-      mu4e-compose-signature-auto-include nil
       mu4e-attachment-dir  "~/Downloads"
       mu4e-maildir (expand-file-name "~/Mail/mail/")
       ;; don't save message to Sent Messages, GMail/IMAP will take care of this
@@ -47,7 +46,7 @@
 (setq
  user-mail-address "emb@brickabode.com"
  user-full-name    "Eduardo Bellani"
- mu4e-compose-signature "--\nEduardo Bellani")
+ mu4e-compose-signature "Eduardo Bellani - Head of Technology - brickabode.com")
 
 (require 'smtpmail)
 

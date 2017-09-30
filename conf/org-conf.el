@@ -63,8 +63,8 @@
 
 (setq org-src-fontify-natively t)
 
-(add-to-list 'org-src-lang-modes (quote ("racket" . scheme)))
-(add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+;; (add-to-list 'org-src-lang-modes (quote ("racket" . scheme)))
+;; (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -72,6 +72,7 @@
    (shell   . t)
    (python  . t)
    (js      . t)
+   (ditaa   . t)
    (ocaml   . t)
    (java    . t)
    (scheme  . t)
@@ -146,10 +147,26 @@
                 (t (org-format-seconds "%.2h:%.2m" secs0)))))
     (if (< secs 0) (concat "-" res) res)))
 
+
+;; see https://github.com/jkitchin/org-ref
+
+(setq reftex-default-bibliography '("/home/user/Code/fee/YEAR/phase-1/doc/references.bib"))
+
+;; see org-ref for use of these variables
+(setq org-ref-default-bibliography '("/home/user/Code/fee/YEAR/phase-1/doc/references.bib"))
+
+
+(setq bibtex-completion-bibliography "/home/user/Code/fee/YEAR/phase-1/doc/references.bib"
+      bibtex-completion-library-path "/home/user/Code/fee/YEAR/phase-1/doc/")
+
+(require 'org-ref)
+
+
 ;; better timestamp for export
 ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
-(add-to-list 'org-export-filter-timestamp-functions
-             #'endless/filter-timestamp)
+;; (add-to-list 'org-export-filter-timestamp-functions
+;;              #'endless/filter-timestamp)
+
 (setq-default org-display-custom-times t)
 ;;; Before you ask: No, removing the <> here doesn't work.
 (setq org-time-stamp-custom-formats
@@ -161,3 +178,30 @@
      (replace-regexp-in-string "&[lg]t;" "" trans))
     ((or `latex `ascii)
      (replace-regexp-in-string "[<>]" "" trans))))
+
+
+;;; see https://writequit.org/articles/emacs-org-mode-generate-ids.html
+(defun eos/org-custom-id-get (&optional pom create prefix)
+  "Get the CUSTOM_ID property of the entry at point-or-marker POM.
+   If POM is nil, refer to the entry at point. If the entry does
+   not have an CUSTOM_ID, the function returns nil. However, when
+   CREATE is non nil, create a CUSTOM_ID if none is present
+   already. PREFIX will be passed through to `org-id-new'. In any
+   case, the CUSTOM_ID of the entry is returned."
+  (interactive)
+  (org-with-point-at pom
+    (let ((id (org-entry-get nil "CUSTOM_ID")))
+      (cond
+       ((and id (stringp id) (string-match "\\S-" id))
+        id)
+       (create
+        (setq id (org-id-new (concat prefix "fee")))
+        (org-entry-put pom "CUSTOM_ID" id)
+        (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
+        id)))))
+
+(defun eos/org-add-ids-to-headlines-in-file ()
+  "Add CUSTOM_ID properties to all headlines in the
+   current file which do not already have one."
+  (interactive)
+  (org-map-entries (lambda () (eos/org-custom-id-get (point) 'create))))
