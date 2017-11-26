@@ -35,6 +35,7 @@
 (load "haskell-conf.el")
 (load "ledger-conf.el")
 (load "mu4e-conf.el")
+(load "comint-conf.el")
 
 (setq custom-file (concat *domain-custom* "custom.el"))
 (load custom-file 'noerror)

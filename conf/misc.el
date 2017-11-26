@@ -149,3 +149,5 @@
 
 (setq sml/no-confirm-load-theme t)
 (smart-mode-line-enable)
+
+(edit-server-start)
