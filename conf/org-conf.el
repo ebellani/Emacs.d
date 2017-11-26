@@ -149,18 +149,17 @@
 
 
 ;; see https://github.com/jkitchin/org-ref
-
-(setq reftex-default-bibliography '("/home/user/Code/fee/YEAR/phase-1/doc/references.bib"))
-
-;; see org-ref for use of these variables
-(setq org-ref-default-bibliography '("/home/user/Code/fee/YEAR/phase-1/doc/references.bib"))
-
-
-(setq bibtex-completion-bibliography "/home/user/Code/fee/YEAR/phase-1/doc/references.bib"
-      bibtex-completion-library-path "/home/user/Code/fee/YEAR/phase-1/doc/")
+(setq reftex-default-bibliography '("/home/user/Code/maui/research/references.bib")
+      ;; see org-ref for use of these variables
+      org-ref-default-bibliography '("/home/user/Code/maui/research/references.bib")
+      bibtex-completion-bibliography "/home/user/Code/maui/research/references.bib"
+      bibtex-completion-library-path "/home/user/Code/maui/research/")
 
 (require 'org-ref)
 
+;;; this is needed in order to make the approach found on
+;;; http://gongzhitaao.org/orgcss/ work
+(require 'ox-bibtex)
 
 ;; better timestamp for export
 ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
@@ -205,3 +204,7 @@
    current file which do not already have one."
   (interactive)
   (org-map-entries (lambda () (eos/org-custom-id-get (point) 'create))))
+
+(defun time-to-seconds (time-string)
+  "Takes an org time string and returns the number of seconds it represents."
+  (string-to-number (org-table-time-string-to-seconds time-string)))
