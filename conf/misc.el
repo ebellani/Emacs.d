@@ -151,3 +151,5 @@
 (smart-mode-line-enable)
 
 (edit-server-start)
+;;; dired
+(setq dired-listing-switches "-alh")

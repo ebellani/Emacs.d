@@ -61,3 +61,8 @@
 (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
 
 (setq projectile-mode-line "Projectile")
+
+(eval-after-load 'company
+  '(progn
+     (define-key company-mode-map (kbd "C-:") 'helm-company)
+     (define-key company-active-map (kbd "C-:") 'helm-company)))
