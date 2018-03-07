@@ -4,7 +4,7 @@
 ;; styling. Check if not in terminal to set the nice colors and fonts.
 (unless (string= 'nil window-system)
   (progn
-    (set-face-font 'default "Dejavu Sans Mono 13")))
+    (set-face-font 'default "Dejavu Sans Mono 12")))
 
 ;; hide menus
 (menu-bar-mode 0)
@@ -140,9 +140,6 @@
 ;; set menu as M
 (define-key key-translation-map (kbd "<menu>") (kbd "ESC"))
 
-(require 'taskjuggler-mode)
-
-
 ;;; smart mode line
 ;; get rid of asking for confirmation
 ;; https://github.com/Malabarba/smart-mode-line/issues/100
@@ -151,5 +148,20 @@
 (smart-mode-line-enable)
 
 (edit-server-start)
+
 ;;; dired
 (setq dired-listing-switches "-alh")
+
+;;; see https://github.com/dimitri/switch-window
+(global-set-key (kbd "C-x o") 'switch-window)
+(global-set-key (kbd "C-x 1") 'switch-window-then-maximize)
+(global-set-key (kbd "C-x 2") 'switch-window-then-split-below)
+(global-set-key (kbd "C-x 3") 'switch-window-then-split-right)
+(global-set-key (kbd "C-x 0") 'switch-window-then-delete)
+
+;;; mode line
+
+(require 'spaceline-config)
+(spaceline-emacs-theme)
+(spaceline-helm-mode)
+(spaceline-info-mode)

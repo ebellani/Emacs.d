@@ -15,10 +15,10 @@
 
 (setq org-directory (concat *domain-custom* "org/"))
 (setq refile-file-path (concat org-directory "refile.org"))
-
-(setq org-agenda-files
-      `(,refile-file-path
-        ,(concat org-directory "personal.org")))
+(setq schedule-file-path (concat org-directory "schedule.org"))
+(setq org-agenda-files `(,refile-file-path
+                         ,schedule-file-path
+                         "/home/user/Code/ba-administration/emb.org"))
 
 (setq org-tag-alist '((:startgroup)
                       ("noexport" . ?n)
@@ -159,7 +159,7 @@
 
 ;;; this is needed in order to make the approach found on
 ;;; http://gongzhitaao.org/orgcss/ work
-(require 'ox-bibtex)
+;; (require 'ox-bibtex)
 
 ;; better timestamp for export
 ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
@@ -208,3 +208,7 @@
 (defun time-to-seconds (time-string)
   "Takes an org time string and returns the number of seconds it represents."
   (string-to-number (org-table-time-string-to-seconds time-string)))
+
+;;; ediff
+;; https://emacs.stackexchange.com/a/21336/16861
+(add-hook 'ediff-prepare-buffer-hook #'show-all)
