@@ -23,3 +23,13 @@ smex-items
 conf/custom.el
 mbsyncrc
 .cask/*
+custom.el
+elscreen
+*-history
+lib/mu
+org-gcal/
+refile.org
+.emacs.desktop*
+projectile-bookmarks.eld
+*.cache
+conf/calendar-conf.el
