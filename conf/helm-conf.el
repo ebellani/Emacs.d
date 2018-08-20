@@ -67,6 +67,9 @@
      (define-key company-mode-map (kbd "C-:") 'helm-company)
      (define-key company-active-map (kbd "C-:") 'helm-company)))
 
-(setq helm-display-function 'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame t
-        helm-use-undecorated-frame-option t)
+(setq helm-display-function
+      'helm-default-display-buffer
+      ;; this is a big slow, sometimes now showing all options
+      ;; 'helm-display-buffer-in-own-frame
+      helm-display-buffer-reuse-frame t
+      helm-use-undecorated-frame-option t)

@@ -57,7 +57,7 @@
        (reftex-parse-all))
   (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
 
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+(remove-hook 'org-mode-hook 'org-mode-reftex-setup)
 
 ;;; babel
 
@@ -69,6 +69,7 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot     . t)
+   (latex   . t)
    (shell   . t)
    (python  . t)
    (js      . t)
@@ -212,3 +213,7 @@
 ;;; ediff
 ;; https://emacs.stackexchange.com/a/21336/16861
 (add-hook 'ediff-prepare-buffer-hook #'show-all)
+
+;; get images to reload after execution. Useful for things such as
+;; gnuplot. See https://emacs.stackexchange.com/q/3302
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
