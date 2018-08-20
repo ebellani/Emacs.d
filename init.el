@@ -56,10 +56,11 @@
 ;; install use-package
 ;; see http://cachestocaches.com/2015/8/getting-started-use-package/
 ;; and http://cestlaz.github.io/posts/using-emacs-1-setup/
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (require 'package)
 (setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -157,12 +158,7 @@
   ("C-x 4 C-o" . 'switch-window-then-display-buffer)
   ("C-x 4 0"   . 'switch-window-then-kill-buffer))
 
-(eval-and-compile
-  (setq pdf-tools-load-path
-        (concat *my-default-lib* "/pdf-tools/lisp")))
-
 (use-package pdf-tools
-  :load-path (lambda () pdf-tools-load-path)
   :magic ("%PDF" . pdf-view-mode)
   :config
   (pdf-tools-install))
