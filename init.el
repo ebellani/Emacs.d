@@ -14,8 +14,6 @@
 (load custom-file)
 
 ;;; old libraries 
-
-;; (load "package-manager.el")
 ;; (load "web-conf.el")
 ;; (load "backup.el")
 ;; (load "elisp.el")
@@ -162,3 +160,6 @@
   :magic ("%PDF" . pdf-view-mode)
   :config
   (pdf-tools-install))
+
+(use-package web-mode
+  :mode "\\.html?\\'")
