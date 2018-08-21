@@ -663,12 +663,12 @@ hit C-a twice:"
   :config
   (setq helm-ff-transformer-show-only-basename nil
         helm-yank-symbol-first                 t
-        helm-adaptive-history-file             "~/.emacs.d/helm-adaptative"
         helm-move-to-line-cycle-in-source      t
         helm-buffers-fuzzy-matching            t
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t)
-  (helm-mode 1))
+  (helm-mode 1)
+  (helm-adaptive-mode 1))
 
 (use-package helm-descbinds
   :bind ("C-h b" . helm-descbinds))
