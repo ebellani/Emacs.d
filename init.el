@@ -60,12 +60,12 @@
 
 (setq use-package-always-ensure nil)
 
-(eval-and-compile
-  (setq mu-path (concat *my-default-lib* "/mu/mu/mu"))
-  (setq mu4e-path (concat *my-default-lib* "/mu/")))
+(use-package browse-url
+  :config
+  (setq browse-url-browser-function 'browse-url-firefox))
 
 (use-package mu4e
-  :load-path "~/.emacs.d/lib/mu/mu4e/"
+  :load-path "/opt/mu/mu4e/"
   :config
   (require 'mu4e-contrib)
   ;; general config
@@ -84,15 +84,45 @@
         ;; kill buffers on exit
         message-kill-buffer-on-exit t
         ;; show fancy chars
-        mu4e-use-fancy-chars t
+        mu4e-use-fancy-chars nil
         ;; attempt to show images when viewing messages sometimes this
         ;; slows down in the case of big djvu files (they are
         ;; interpreted as images).
         mu4e-view-show-images t
         org-mu4e-convert-to-html t
-        mu4e-mu-binary mu-path))
+        mu4e-mu-binary "/opt/mu/mu/mu"))
+
+(use-package org-mu4e)
+
+(use-package smtpmail-async
+  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
+  ;; multiple values.
+  :after mu4e
+  :config
+  (setq message-send-mail-function 'async-smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        smtpmail-debug-info t))
+
+(use-package mm-decode
+  :config
+  (add-to-list 'mm-inlined-types "application/pgp$")
+  (add-to-list 'mm-inline-media-tests
+               '("application/pgp$" mm-inline-text identity))
+  (add-to-list 'mm-automatic-display "application/pgp$")
+  (setq mm-automatic-display
+        (remove "application/pgp-signature" mm-automatic-display)))
 
 (use-package jl-encrypt)
+
+(use-package taskjuggler-mode)
+
+(use-package term
+  ;; trying out powershell
+  :config
+  (setq explicit-shell-file-name "/usr/bin/pwsh-preview"
+        term-ansi-buffer-base-name "powershell"))
 
 (use-package windmove
   :bind
@@ -111,6 +141,8 @@
          ("C-c c" . 'org-capture)
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
+  :init
+  (setq org-export-backends '(ascii html icalendar latex md odt org))
   :config
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path 'file
@@ -150,7 +182,12 @@
         org-babel-default-header-args
         (cons '(:comments . "link")
               (assq-delete-all :comments org-babel-default-header-args))
-        org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>"))
+        org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>")
+        org-duration-format '((special . h:mm))
+        org-file-apps
+        '((auto-mode . emacs)
+          ("\\.x?html?\\'" . "x-www-browser %s"))
+        org-goto-interface 'outline-path-completion)
   ;; get images to reload after execution. Useful for things such as
   ;; gnuplot. See https://emacs.stackexchange.com/q/3302
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
@@ -323,7 +360,8 @@ hit C-a twice:"
          ("C-x C-k" . 'kill-region))
   :hook ((before-save . delete-trailing-whitespace))
   :config
-  (column-number-mode t))
+  (column-number-mode t)
+  (auto-fill-mode 1))
 
 (use-package hl-line
   :config
@@ -394,7 +432,7 @@ hit C-a twice:"
           (register-alist                . "register-alist.el")
           (psession--winconf-alist       . "psession-winconf-alist.el")))
   :config
-  (setq psession-mode t))
+  (psession-mode 1))
 
 (use-package magit
   :bind (("C-x g" . magit-status)))
@@ -701,36 +739,7 @@ hit C-a twice:"
   :config
   (setq elscreen-tab-display-control nil  ; hide control tab at the left side
         elscreen-tab-display-kill-screen nil ; hide kill button
-        elscreen-display-tab t
-        elscreen-storage-file "~/.emacs.d/elscreen") ; The file where the elscreen tab configuration is stored.
-  ;; elcreen persistance. See https://stackoverflow.com/a/22451791
-  (defun elscreen-store ()
-    "Store the elscreen tab configuration."
-    (interactive)
-    (if (desktop-save "~/.emacs.d")
-        (with-temp-file elscreen-storage-file
-          (insert (prin1-to-string (elscreen-get-screen-to-name-alist))))))
-  (defun elscreen-restore ()
-    "Restore the elscreen tab configuration."
-    (interactive)
-    (if (desktop-read)
-        (let ((screens (reverse
-                        (read
-                         (with-temp-buffer
-                           (insert-file-contents elscreen-storage-file)
-                           (buffer-string))))))
-          (while screens
-            (setq screen (car (car screens)))
-            (setq buffers (split-string (cdr (car screens)) ":"))
-            (if (eq screen 0)
-                (switch-to-buffer (car buffers))
-              (elscreen-find-and-goto-by-buffer (car buffers) t t))
-            (while (cdr buffers)
-              (switch-to-buffer-other-window (car (cdr buffers)))
-              (setq buffers (cdr buffers)))
-            (setq screens (cdr screens))))))
-  (add-hook 'kill-emacs-hook 'elscreen-store)
-  (add-hook 'emacs-startup-hook 'elscreen-restore)
+        elscreen-display-tab t)
   (elscreen-start))
 
 (use-package helm-mu
