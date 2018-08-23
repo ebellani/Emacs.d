@@ -356,6 +356,7 @@ hit C-a twice:"
   (global-auto-revert-mode t))
 
 (use-package simple
+  :defer 5
   :bind (("C-w" . 'backward-kill-word)
          ("C-x C-k" . 'kill-region))
   :hook ((before-save . delete-trailing-whitespace))
@@ -744,3 +745,23 @@ hit C-a twice:"
 
 (use-package helm-mu
   :after mu4e)
+
+(use-package spacemacs-theme
+  :no-require t
+  :config
+  (progn
+    (load-theme 'spacemacs-dark t)))
+
+(use-package smart-mode-line
+  :config
+  ;; See https://github.com/Malabarba/smart-mode-line/issues/217
+  (setq mode-line-format (delq 'mode-line-position mode-line-format))
+  (sml/setup)
+  (sml/apply-theme 'dark)
+  (remove-hook 'display-time-hook 'sml/propertize-time-string))
+
+(use-package smart-mode-line-powerline-theme
+  :disabled t
+  :after smart-mode-line
+  :config
+  (sml/apply-theme 'dark-powerline))
