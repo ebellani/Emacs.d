@@ -13,8 +13,14 @@
 (add-to-list 'load-path *my-default-lib*)
 
 ;; add the custom file inside the emacs folder
-(setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(defvar custom-file-path "~/.emacs.d/custom.el"
+  "Place where I store my local customizations. This file is not ")
+(if (file-readable-p custom-file-path)
+    (progn
+      (setq custom-file custom-file-path)
+      (load custom-file))
+  (warn "Custom file not found at expected path %s" custom-file-path))
+
 ;;; old libraries
 ;; (load "calendar-conf.el")
 
@@ -48,7 +54,7 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-;; (package-initialize)
+(package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -311,6 +317,7 @@ hit C-a twice:"
   :config (show-paren-mode 1))
 
 (use-package elisp-mode
+  :after elisp-slime-nav-mode
   :bind
   (("C-c d"   . 'elisp-disassemble)
    ("C-c m"   . 'elisp-macroexpand)
