@@ -4,6 +4,15 @@
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
 ;; https://github.com/cqql/dotfiles/blob/master/home/.emacs.d/init.org
 
+
+(if init-file-debug
+    (setq use-package-verbose t
+          use-package-expand-minimally nil
+          use-package-compute-statistics t
+          debug-on-error t)
+  (setq use-package-verbose nil
+        use-package-expand-minimally t))
+
 ;;; path setup
 
 ;; prepare a folder for custom libraries
@@ -54,7 +63,7 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-(package-initialize)
+(unless package--initialized (package-initialize t))
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -69,6 +78,10 @@
 (use-package browse-url
   :config
   (setq browse-url-browser-function 'browse-url-firefox))
+
+(use-package server
+  :config
+  (server-start))
 
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
