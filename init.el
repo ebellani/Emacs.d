@@ -137,12 +137,6 @@
 
 (use-package taskjuggler-mode)
 
-(use-package term
-  ;; trying out powershell
-  :config
-  (setq explicit-shell-file-name "/usr/bin/pwsh-preview"
-        term-ansi-buffer-base-name "powershell"))
-
 (use-package windmove
   :bind
   (("C-x <left>"  . 'windmove-left)     ; move to left windnow
@@ -766,22 +760,25 @@ hit C-a twice:"
 (use-package helm-mu
   :after mu4e)
 
+(use-package powershell
+  :mode (("\.ps1$" . powershell-mode)))
+
 (use-package spacemacs-theme
   :no-require t
   :config
   (progn
-    (load-theme 'spacemacs-dark t)))
+    (load-theme 'spacemacs-light t)))
 
 (use-package smart-mode-line
   :config
   ;; See https://github.com/Malabarba/smart-mode-line/issues/217
   (setq mode-line-format (delq 'mode-line-position mode-line-format))
   (sml/setup)
-  (sml/apply-theme 'dark)
+  (sml/apply-theme 'light)
   (remove-hook 'display-time-hook 'sml/propertize-time-string))
 
 (use-package smart-mode-line-powerline-theme
   :disabled t
   :after smart-mode-line
   :config
-  (sml/apply-theme 'dark-powerline))
+  (sml/apply-theme 'light-powerline))
