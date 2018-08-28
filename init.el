@@ -766,19 +766,17 @@ hit C-a twice:"
 (use-package spacemacs-theme
   :no-require t
   :config
-  (progn
-    (load-theme 'spacemacs-light t)))
+  (load-theme 'spacemacs-dark t))
 
 (use-package smart-mode-line
   :config
   ;; See https://github.com/Malabarba/smart-mode-line/issues/217
   (setq mode-line-format (delq 'mode-line-position mode-line-format))
   (sml/setup)
-  (sml/apply-theme 'light)
+  (sml/apply-theme 'dark)
   (remove-hook 'display-time-hook 'sml/propertize-time-string))
 
 (use-package smart-mode-line-powerline-theme
-  :disabled t
   :after smart-mode-line
   :config
-  (sml/apply-theme 'light-powerline))
+  (sml/apply-theme 'smart-mode-line-powerline))
