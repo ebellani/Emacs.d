@@ -706,7 +706,7 @@ hit C-a twice:"
          ("C-x r l" . helm-filtered-bookmarks)
          ("C-x i"   . helm-imenu)
          ("M-y"     . helm-show-kill-ring)
-         ("M-i"     . helm-swoop)
+         ("M-i"     . helm-swoop-without-pre-input)
          ("M-I"     . helm-swoop-back-to-last-point)
          ("C-c M-i" . helm-multi-swoop)
          ("C-x M-i" . helm-multi-swoop-all))
