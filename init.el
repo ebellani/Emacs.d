@@ -30,13 +30,7 @@
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-;;; old libraries
-;; (load "calendar-conf.el")
-
 ;;; things that I don't know how to do with use-package
-
-;; set menu as M, this helps to turn that key into something useful.
-(define-key key-translation-map (kbd "<menu>") (kbd "ESC"))
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -109,7 +103,14 @@
         ;; interpreted as images).
         mu4e-view-show-images t
         org-mu4e-convert-to-html t
-        mu4e-mu-binary "/opt/mu/mu/mu"))
+        mu4e-mu-binary "/opt/mu/mu/mu"
+        mu4e-headers-fields '((:human-date   . 12)
+                              (:flags        . 6)
+                              (:mailing-list . 10)
+                              (:from-or-to   . 22)
+                              (:subject)))
+  ;; add info folder
+  (add-to-list 'Info-directory-list "/opt/mu/mu4e/"))
 
 (use-package org-mu4e)
 
@@ -719,7 +720,12 @@ hit C-a twice:"
         helm-move-to-line-cycle-in-source      t
         helm-buffers-fuzzy-matching            t
         helm-ff-auto-update-initial-value      t
-        helm-imenu-fuzzy-match                 t)
+        helm-imenu-fuzzy-match                 t
+        ;; the following would enable a separate frame. This is buggy ATM
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-buffer-reuse-frame        t
+        ;; helm-use-undecorated-frame-option      t
+        )
   (helm-mode 1)
   (helm-adaptive-mode 1))
 
@@ -732,12 +738,15 @@ hit C-a twice:"
   :init
   (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
 
-(use-package helm-ag
-  :ensure helm-ag
-  :bind ("M-p" . helm-projectile-ag)
-  :commands (helm-ag helm-projectile-ag)
-  :init (setq helm-ag-insert-at-point 'symbol
-	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
+(use-package helm-wordnet
+  :after helm)
+
+;; (use-package helm-ag
+;;   :ensure helm-ag
+;;   :bind ("M-p" . helm-projectile-ag)
+;;   :commands (helm-ag helm-projectile-ag)
+;;   :init (setq helm-ag-insert-at-point 'symbol
+;; 	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
 
 (use-package projectile
   :defer 5
@@ -763,20 +772,23 @@ hit C-a twice:"
 (use-package powershell
   :mode (("\.ps1$" . powershell-mode)))
 
+(use-package markdown-mode
+  :mode (("\.md$" . markdown-mode)))
+
 (use-package spacemacs-theme
   :no-require t
   :config
-  (load-theme 'spacemacs-dark t))
+  (load-theme 'spacemacs-light t))
 
 (use-package smart-mode-line
   :config
   ;; See https://github.com/Malabarba/smart-mode-line/issues/217
   (setq mode-line-format (delq 'mode-line-position mode-line-format))
   (sml/setup)
-  (sml/apply-theme 'dark)
+  (sml/apply-theme 'light)
   (remove-hook 'display-time-hook 'sml/propertize-time-string))
 
 (use-package smart-mode-line-powerline-theme
   :after smart-mode-line
   :config
-  (sml/apply-theme 'smart-mode-line-powerline))
+  (sml/apply-theme 'smart-mode-line-light-powerline))
