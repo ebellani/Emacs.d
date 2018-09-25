@@ -21,6 +21,9 @@
 
 (add-to-list 'load-path *my-default-lib*)
 
+(defvar org-refile-file-path "~/.emacs.d/refile.org"
+  "A place to hold temporary refile information.")
+
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -161,17 +164,14 @@
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
-        refile-file-path "~/.emacs.d/refile.org"
-        org-agenda-files `(,refile-file-path
-                           "/home/user/Code/ba-administration/emb.org")
         org-tag-alist '((:startgroup)
                         ("noexport" . ?n)
                         ("export" . ?e)
                         (:endgroup))
         org-capture-templates
-        `(("t" "todo" entry (file ,refile-file-path)
+        `(("t" "todo" entry (file ,org-refile-file-path)
            "* TODO %?" :empty-lines 1)
-          ("r" "review" entry (file ,refile-file-path)
+          ("r" "review" entry (file ,org-refile-file-path)
            "* %?\n"))
         org-refile-targets
         '((nil :maxlevel . 9)
@@ -192,7 +192,6 @@
         org-babel-default-header-args
         (cons '(:tangle . "yes")
               (assq-delete-all :tangle org-babel-default-header-args))
-
         org-babel-default-header-args
         (cons '(:comments . "link")
               (assq-delete-all :comments org-babel-default-header-args))
@@ -201,7 +200,12 @@
         org-file-apps
         '((auto-mode . emacs)
           ("\\.x?html?\\'" . "x-www-browser %s"))
-        org-goto-interface 'outline-path-completion)
+        org-goto-interface 'outline-path-completion
+        ;; allows multiple agenda views to coexist
+        org-agenda-sticky t)
+  (add-to-list 'org-structure-template-alist '("n" "#+NAME: ?") )
+  ;; format timestamps. See
+  ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
   ;; get images to reload after execution. Useful for things such as
   ;; gnuplot. See https://emacs.stackexchange.com/q/3302
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
@@ -225,6 +229,18 @@
      (C      . t)
      (ledger . t)
      (org    . t))))
+
+(use-package ox
+  :after org
+  :config   (add-to-list 'org-export-filter-timestamp-functions
+                         (lambda
+                           (trans back _comm)
+                           "Remove <> around time-stamps."
+                           (pcase back
+                             (`html
+                              (replace-regexp-in-string "&[lg]t;" "" trans))
+                             ((or `ascii `latex)
+                              (replace-regexp-in-string "[<>]" "" trans))))))
 
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
@@ -386,10 +402,6 @@ hit C-a twice:"
 (use-package files
   :config
   (setq require-final-newline t))
-
-(use-package scroll-bar
-  :config
-  (set-scroll-bar-mode nil))
 
 (use-package tool-bar
   :config
@@ -673,7 +685,8 @@ hit C-a twice:"
          ("C-h k" . helpful-key)))
 
 (use-package plantuml-mode
-  :mode "\\.plantuml\\'")
+  :mode "\\.plantuml\\'"
+  :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"))
 
 (use-package docker
   :bind ("C-c d" . docker))
