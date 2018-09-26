@@ -516,7 +516,7 @@ hit C-a twice:"
 
 (use-package paredit
   :diminish
-  :hook ((lisp-mode emacs-lisp-mode) . paredit-mode)
+  :hook ((lisp-mode emacs-lisp-mode clojure-mode) . paredit-mode)
   :bind (:map paredit-mode-map
               ("C-c ( n"   . paredit-add-to-next-list)
               ("C-c ( p"   . paredit-add-to-previous-list)
@@ -528,6 +528,10 @@ hit C-a twice:"
   (require 'eldoc)
   (eldoc-add-command 'paredit-backward-delete
                      'paredit-close-round))
+
+(use-package clojure-mode)
+
+(use-package cider)
 
 (use-package visual-regexp
   :bind (("C-c r"   . vr/replace)
