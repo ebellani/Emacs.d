@@ -76,16 +76,34 @@
   :config
   (setq browse-url-browser-function 'browse-url-firefox))
 
+(use-package scroll-bar
+  :config
+  (scroll-bar-mode 0))
+
 (use-package server
   :config
   (server-start))
 
+(defun filter-bad-contacts (contact)
+  "This is used to filter the bad contacts that mu4e is
+accumulating."
+  (let ((name (or (plist-get contact :name) ""))
+        (mail (plist-get contact :mail)))
+    (if (or (and (string= "Mateus Costa" name)
+                 (string= "yurialbuquerque@brickabode.com" mail))
+            (string-match-p "bickabode" mail)
+            (string-match-p "brickabode.con" mail))
+        nil
+      contact)))
+
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
   :config
+  (setq)
   (require 'mu4e-contrib)
   ;; general config
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
+        mu4e-contact-rewrite-function 'filter-bad-contacts
         ;;  "html2text -utf8 -width 72" ?
         ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
         ;; stop UID errors
@@ -109,7 +127,6 @@
         mu4e-mu-binary "/opt/mu/mu/mu"
         mu4e-headers-fields '((:human-date   . 12)
                               (:flags        . 6)
-                              (:mailing-list . 10)
                               (:from-or-to   . 22)
                               (:subject)))
   ;; add info folder
@@ -202,7 +219,8 @@
           ("\\.x?html?\\'" . "x-www-browser %s"))
         org-goto-interface 'outline-path-completion
         ;; allows multiple agenda views to coexist
-        org-agenda-sticky t)
+        org-agenda-sticky t
+        org-latex-pdf-process (list "latexmk -f -pdf %f"))
   (add-to-list 'org-structure-template-alist '("n" "#+NAME: ?") )
   ;; format timestamps. See
   ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
@@ -232,15 +250,18 @@
 
 (use-package ox
   :after org
-  :config   (add-to-list 'org-export-filter-timestamp-functions
-                         (lambda
-                           (trans back _comm)
-                           "Remove <> around time-stamps."
-                           (pcase back
-                             (`html
-                              (replace-regexp-in-string "&[lg]t;" "" trans))
-                             ((or `ascii `latex)
-                              (replace-regexp-in-string "[<>]" "" trans))))))
+  :config
+  (add-to-list 'org-export-filter-timestamp-functions
+               (lambda
+                 (trans back _comm)
+                 "Remove <> around time-stamps."
+                 (pcase back
+                   (`html
+                    (replace-regexp-in-string "[][]"
+                                              ""
+                                              (replace-regexp-in-string "&[lg]t;" "" trans)))
+                   ((or `ascii `latex)
+                    (replace-regexp-in-string "[][<>]" "" trans))))))
 
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
@@ -465,7 +486,12 @@ hit C-a twice:"
 (use-package magit
   :bind (("C-x g" . magit-status)))
 
+;; (use-package forge
+;;   :after magit)
+
 (use-package switch-window
+  :config
+  (setq switch-window-threshold 3)
   :bind
   ("C-x o"     . 'switch-window)
   ("C-x 1"     . 'switch-window-then-maximize)
@@ -788,20 +814,11 @@ hit C-a twice:"
 (use-package markdown-mode
   :mode (("\.md$" . markdown-mode)))
 
-(use-package spacemacs-theme
-  :no-require t
-  :config
-  (load-theme 'spacemacs-light t))
+(use-package elfeed
+  :bind (("C-x w" . 'elfeed)))
 
-(use-package smart-mode-line
+(use-package elfeed-org
+  :after elfeed
+  :init (elfeed-org)
   :config
-  ;; See https://github.com/Malabarba/smart-mode-line/issues/217
-  (setq mode-line-format (delq 'mode-line-position mode-line-format))
-  (sml/setup)
-  (sml/apply-theme 'light)
-  (remove-hook 'display-time-hook 'sml/propertize-time-string))
-
-(use-package smart-mode-line-powerline-theme
-  :after smart-mode-line
-  :config
-  (sml/apply-theme 'smart-mode-line-light-powerline))
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
