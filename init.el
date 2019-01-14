@@ -744,6 +744,7 @@ hit C-a twice:"
          ("C-x C-f" . helm-find-files)
          ("C-x C-r" . helm-recentf)
          ("C-x r l" . helm-filtered-bookmarks)
+         ("C-x r b" . helm-filtered-bookmarks)
          ("C-x i"   . helm-imenu)
          ("M-y"     . helm-show-kill-ring)
          ("M-i"     . helm-swoop-without-pre-input)
