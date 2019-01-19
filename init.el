@@ -132,8 +132,6 @@ accumulating."
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/"))
 
-(use-package org-mu4e)
-
 (use-package smtpmail-async
   ;; this is fixed for gmail for now. Mu4e contexts could be used to set
   ;; multiple values.
@@ -144,6 +142,8 @@ accumulating."
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587
         smtpmail-debug-info t))
+
+(use-package org-mu4e)
 
 (use-package mm-decode
   :config
@@ -827,3 +827,5 @@ hit C-a twice:"
   :init (elfeed-org)
   :config
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+
+(use-package async)
