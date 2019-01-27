@@ -486,8 +486,8 @@ hit C-a twice:"
 (use-package magit
   :bind (("C-x g" . magit-status)))
 
-;; (use-package forge
-;;   :after magit)
+(use-package forge
+  :after magit)
 
 (use-package switch-window
   :config
