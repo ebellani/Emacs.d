@@ -220,6 +220,7 @@ accumulating."
         org-goto-interface 'outline-path-completion
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
+        org-agenda-span 'day
         org-latex-pdf-process (list "latexmk -f -pdf %f"))
   (add-to-list 'org-structure-template-alist '("n" "#+NAME: ?") )
   ;; format timestamps. See
@@ -765,6 +766,7 @@ hit C-a twice:"
         helm-buffers-fuzzy-matching            t
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t
+        helm-buffer-max-length                 nil
         ;; the following would enable a separate frame. This is buggy ATM
         ;; helm-display-function                  'helm-display-buffer-in-own-frame
         ;; helm-display-buffer-reuse-frame        t
@@ -829,3 +831,4 @@ hit C-a twice:"
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
 
 (use-package async)
+(put 'scroll-left 'disabled nil)
