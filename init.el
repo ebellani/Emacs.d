@@ -787,19 +787,16 @@ hit C-a twice:"
 (use-package helm-wordnet
   :after helm)
 
-;; (use-package helm-ag
-;;   :ensure helm-ag
-;;   :bind ("M-p" . helm-projectile-ag)
-;;   :commands (helm-ag helm-projectile-ag)
-;;   :init (setq helm-ag-insert-at-point 'symbol
-;; 	      helm-ag-command-option "--path-to-ignore ~/.agignore"))
-
 (use-package projectile
   :defer 5
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map))
   :diminish
   :config
   (projectile-global-mode)
-  (setq projectile-enable-caching t))
+  (setq projectile-enable-caching t
+        projectile-indexing-method 'alien
+        projectile-mode-line "Projectile"))
 
 (use-package helm-projectile
   :config
@@ -822,7 +819,8 @@ hit C-a twice:"
   :mode (("\.md$" . markdown-mode)))
 
 (use-package elfeed
-  :bind (("C-x w" . 'elfeed)))
+  :bind (("C-x w" . 'elfeed))
+  :config (setq elfeed-search-filter "@1-day-ago +unread"))
 
 (use-package elfeed-org
   :after elfeed
