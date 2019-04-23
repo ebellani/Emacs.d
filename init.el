@@ -51,6 +51,8 @@
 (keyboard-translate ?\) ?\])
 (keyboard-translate ?\] ?\))
 
+(define-key key-translation-map (kbd "<menu>") (kbd "ESC"))
+
 ;;; use-package config way
 
 ;; install use-package
@@ -118,7 +120,7 @@ accumulating."
         ;; kill buffers on exit
         message-kill-buffer-on-exit t
         ;; show fancy chars
-        mu4e-use-fancy-chars nil
+        mu4e-use-fancy-chars t
         ;; attempt to show images when viewing messages sometimes this
         ;; slows down in the case of big djvu files (they are
         ;; interpreted as images).
@@ -130,7 +132,9 @@ accumulating."
                               (:from-or-to   . 22)
                               (:subject)))
   ;; add info folder
-  (add-to-list 'Info-directory-list "/opt/mu/mu4e/"))
+  (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
+  (add-to-list 'mu4e-view-actions '("Decrypt inline PGP" . epa-mail-decrypt)))
+
 
 (use-package smtpmail-async
   ;; this is fixed for gmail for now. Mu4e contexts could be used to set
@@ -490,6 +494,9 @@ hit C-a twice:"
 (use-package forge
   :after magit)
 
+(use-package git-timemachine
+  :after magit)
+
 (use-package switch-window
   :config
   (setq switch-window-threshold 3)
@@ -820,7 +827,7 @@ hit C-a twice:"
 
 (use-package elfeed
   :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-filter "@1-day-ago +unread"))
+  :config (setq elfeed-search-filter "@1-day-ago +unread -brazil -blockchain -hn -reddit"))
 
 (use-package elfeed-org
   :after elfeed
@@ -829,4 +836,11 @@ hit C-a twice:"
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
 
 (use-package async)
+
+(use-package fsharp-mode)
+
+(use-package zenburn-theme :ensure t :defer t)
+
+(use-package gnuplot-mode)
+
 (put 'scroll-left 'disabled nil)
