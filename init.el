@@ -130,7 +130,12 @@ accumulating."
         mu4e-headers-fields '((:human-date   . 12)
                               (:flags        . 6)
                               (:from-or-to   . 22)
-                              (:subject)))
+                              (:subject))
+        mu4e-maildir-shortcuts
+        '(("/INBOX" . 105)
+          ("/sent" . 115)
+          ("/starred" . 116)
+          ("/all" . 97)))
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("Decrypt inline PGP" . epa-mail-decrypt)))
