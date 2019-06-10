@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/alphapapa/org-ql.git
+	branch = master
+	commit = 9b5004b436d8358cf4901a2abafcebc0302fd388
+	parent = 1b51c301673ce0814a57117a827fb0233972f21d
+	cmdver = 0.3.1
