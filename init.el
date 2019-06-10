@@ -196,9 +196,7 @@ accumulating."
                         (:endgroup))
         org-capture-templates
         `(("t" "todo" entry (file ,org-refile-file-path)
-           "* TODO %?" :empty-lines 1)
-          ("r" "review" entry (file ,org-refile-file-path)
-           "* %?\n"))
+           "* TODO %?" :empty-lines 1))
         org-refile-targets
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 9))
