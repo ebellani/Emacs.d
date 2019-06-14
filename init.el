@@ -846,4 +846,7 @@ hit C-a twice:"
 
 (use-package gnuplot-mode)
 
+(use-package org-super-agenda
+  :after org)
+
 (put 'scroll-left 'disabled nil)
