@@ -816,6 +816,17 @@ hit C-a twice:"
 
 (use-package pcomplete-extension)
 
+(use-package helm-company
+  :after helm company
+  :bind ((:map company-mode-map ("C-;" . 'helm-company))
+         (:map company-active-map ("C-;" . 'helm-company))))
+
+(use-package helm-flx
+  :after helm
+  :config (setq helm-flx-for-helm-find-files t ;; t by default
+                helm-flx-for-helm-locate t) ;; nil by default
+ )
+
 (use-package helm-descbinds
   :bind ("C-h b" . helm-descbinds))
 
