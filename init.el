@@ -849,4 +849,16 @@ hit C-a twice:"
 (use-package org-super-agenda
   :after org)
 
+
+(use-package org-gcal
+  :ensure t
+  ;; need to custom some things:
+  ;; see https://github.com/kidd/org-gcal.el
+  ;; (setq org-gcal-client-id "oauth 2.0 client ID"
+  ;;       org-gcal-client-secret "client secret"
+  ;;       org-gcal-file-alist '(("zamansky@gmail.com" .  "~/Dropbox/orgfiles/gcal.org")))
+  :config
+  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+  (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-post-at-point))))
+
 (put 'scroll-left 'disabled nil)
