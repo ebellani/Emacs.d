@@ -24,6 +24,14 @@
 (defvar org-refile-file-path "~/.emacs.d/refile.org"
   "A place to hold temporary refile information.")
 
+(defcustom shared-agenda-file "~/.emacs.d/shared-agenda.org"
+  "This is the shared agenda (in the 'cloud'). Usually this means
+  something shared with google calendar."
+  :type 'file)
+
+(defvar shared-capture-key "g"
+  "Key to use to capture shared entries")
+
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -190,13 +198,18 @@ accumulating."
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
+        org-capture-templates
+        `((,shared-capture-key "Shared Calendar " entry
+                               (file ,shared-agenda-file)
+                               "* %?
+%^T")
+          ("t" "todo" entry
+           (file ,org-refile-file-path)
+           "* TODO %?"))
         org-tag-alist '((:startgroup)
                         ("noexport" . ?n)
                         ("export" . ?e)
                         (:endgroup))
-        org-capture-templates
-        `(("t" "todo" entry (file ,org-refile-file-path)
-           "* TODO %?" :empty-lines 1))
         org-refile-targets
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 9))
@@ -859,6 +872,10 @@ hit C-a twice:"
   ;;       org-gcal-file-alist '(("zamansky@gmail.com" .  "~/Dropbox/orgfiles/gcal.org")))
   :config
   (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
-  (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-post-at-point))))
+  (add-hook 'org-capture-after-finalize-hook
+            (lambda ()
+              (when (equal (plist-get org-capture-plist :key)
+                           shared-capture-key)
+                (org-gcal-post-at-point)))))
 
 (put 'scroll-left 'disabled nil)
