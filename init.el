@@ -548,30 +548,33 @@ hit C-a twice:"
           try-expand-line
           try-complete-lisp-symbol)))
 
-;; uses helm as a completion tool
-;; see https://www.reddit.com/r/emacs/comments/c61oio/helm_instead_of_with_company/
 (use-package company
-  :defer t
+  :diminish
+  :commands (company-mode company-indent-or-complete-common)
+  :init
+  (dolist (hook '(emacs-lisp-mode-hook
+                  c-mode-common-hook))
+    (add-hook hook
+              #'(lambda ()
+                  (local-set-key (kbd "<tab>")
+                                 #'my:code::helm-company-complete))))
   :config
-  (setq company-frontends nil)
+  (setf company-idle-delay nil
+        company-selection-wrap-around t)
   (global-company-mode t))
 
 (use-package helm-company
   :after helm company
+  :bind (:map
+         company-mode-map ("C-;" . 'helm-company)
+         :map
+         company-active-map ("C-;" . 'helm-company))
   :init (progn
           (defun my:code::helm-company-complete ()
             (interactive)
             (when (company-complete) (helm-company)))
           (add-to-list 'completion-at-point-functions
-                       #'comint-dynamic-complete-filename))
-  :bind (:map
-         company-mode-map
-         ("TAB" . #'my:code::helm-company-complete)
-         ("<tab>" . #'my:code::helm-company-complete)
-         :map
-         company-active-map
-         ("TAB" . #'my:code::helm-company-complete)
-         ("<tab>" . #'my:code::helm-company-complete)))
+                       #'comint-dynamic-complete-filename)))
 
 (use-package paredit
   :diminish
