@@ -548,21 +548,30 @@ hit C-a twice:"
           try-expand-line
           try-complete-lisp-symbol)))
 
+;; uses helm as a completion tool
+;; see https://www.reddit.com/r/emacs/comments/c61oio/helm_instead_of_with_company/
 (use-package company
-  :bind ("C-M-SPC" . company-complete)
-  :diminish
-  :commands (company-mode company-indent-or-complete-common)
-  :init
-  (dolist (hook '(emacs-lisp-mode-hook
-                  c-mode-common-hook))
-    (add-hook hook
-              #'(lambda ()
-                  (local-set-key (kbd "<tab>")
-                                 #'company-indent-or-complete-common))))
-  (setf company-idle-delay 0
-        company-selection-wrap-around t)
+  :defer t
   :config
+  (setq company-frontends nil)
   (global-company-mode t))
+
+(use-package helm-company
+  :after helm company
+  :init (progn
+          (defun my:code::helm-company-complete ()
+            (interactive)
+            (when (company-complete) (helm-company)))
+          (add-to-list 'completion-at-point-functions
+                       #'comint-dynamic-complete-filename))
+  :bind (:map
+         company-mode-map
+         ("TAB" . #'my:code::helm-company-complete)
+         ("<tab>" . #'my:code::helm-company-complete)
+         :map
+         company-active-map
+         ("TAB" . #'my:code::helm-company-complete)
+         ("<tab>" . #'my:code::helm-company-complete)))
 
 (use-package paredit
   :diminish
@@ -790,13 +799,19 @@ hit C-a twice:"
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
-        ;; the following would enable a separate frame. This is buggy ATM
-        ;; helm-display-function                  'helm-display-buffer-in-own-frame
-        ;; helm-display-buffer-reuse-frame        t
-        ;; helm-use-undecorated-frame-option      t
-        )
+        ;; the following would enable a separate frame.
+        helm-display-function                  'helm-display-buffer-in-own-frame
+        helm-display-buffer-reuse-frame        t
+        helm-use-undecorated-frame-option      t)
   (helm-mode 1)
-  (helm-adaptive-mode 1))
+  (helm-adaptive-mode 1)
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (eshell-cmpl-initialize)
+              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))  )
+
+(use-package pcomplete-extension)
 
 (use-package helm-descbinds
   :bind ("C-h b" . helm-descbinds))
