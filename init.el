@@ -812,7 +812,7 @@ hit C-a twice:"
             (lambda ()
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))  )
+              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history))))
 
 (use-package pcomplete-extension)
 
