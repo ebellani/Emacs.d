@@ -267,7 +267,10 @@ accumulating."
      (ditaa  . t)
      (C      . t)
      (ledger . t)
-     (org    . t))))
+     (org    . t)))
+  ;; org-ql
+  (require 'org-ql)
+  (require 'org-ql-agenda))
 
 (use-package ox
   :after org
