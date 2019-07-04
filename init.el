@@ -267,10 +267,12 @@ accumulating."
      (ditaa  . t)
      (C      . t)
      (ledger . t)
-     (org    . t)))
-  ;; org-ql
-  (require 'org-ql)
-  (require 'org-ql-agenda))
+     (org    . t))))
+
+(add-to-list 'load-path (concat *my-default-lib* "/org-ql"))
+;; org-ql
+(require 'org-ql)
+(require 'org-ql-agenda)
 
 (use-package ox
   :after org
@@ -909,7 +911,5 @@ hit C-a twice:"
               (when (equal (plist-get org-capture-plist :key)
                            shared-capture-key)
                 (org-gcal-post-at-point)))))
-
-(prefer-coding-system 'raw-text)
 
 (put 'scroll-left 'disabled nil)
