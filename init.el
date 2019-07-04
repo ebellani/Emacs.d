@@ -910,4 +910,6 @@ hit C-a twice:"
                            shared-capture-key)
                 (org-gcal-post-at-point)))))
 
+(prefer-coding-system 'raw-text)
+
 (put 'scroll-left 'disabled nil)
