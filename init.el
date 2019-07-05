@@ -564,22 +564,22 @@ hit C-a twice:"
                   (local-set-key (kbd "<tab>")
                                  #'my:code::helm-company-complete))))
   :config
-  (setf company-idle-delay nil
+  (setf company-idle-delay 0
         company-selection-wrap-around t)
   (global-company-mode t))
 
-(use-package helm-company
-  :after helm company
-  :bind (:map
-         company-mode-map ("C-;" . 'helm-company)
-         :map
-         company-active-map ("C-;" . 'helm-company))
-  :init (progn
-          (defun my:code::helm-company-complete ()
-            (interactive)
-            (when (company-complete) (helm-company)))
-          (add-to-list 'completion-at-point-functions
-                       #'comint-dynamic-complete-filename)))
+;; (use-package helm-company
+;;   :after helm company
+;;   :bind (:map
+;;          company-mode-map ("C-;" . 'helm-company)
+;;          :map
+;;          company-active-map ("C-;" . 'helm-company))
+;;   :init (progn
+;;           (defun my:code::helm-company-complete ()
+;;             (interactive)
+;;             (when (company-complete) (helm-company)))
+;;           (add-to-list 'completion-at-point-functions
+;;                        #'comint-dynamic-complete-filename)))
 
 (use-package paredit
   :diminish
@@ -905,7 +905,7 @@ hit C-a twice:"
   ;;       org-gcal-client-secret "client secret"
   ;;       org-gcal-file-alist '(("zamansky@gmail.com" .  "~/Dropbox/orgfiles/gcal.org")))
   :config
-  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-fetch)))
   (add-hook 'org-capture-after-finalize-hook
             (lambda ()
               (when (equal (plist-get org-capture-plist :key)
