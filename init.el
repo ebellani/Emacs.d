@@ -562,24 +562,25 @@ hit C-a twice:"
     (add-hook hook
               #'(lambda ()
                   (local-set-key (kbd "<tab>")
-                                 #'my:code::helm-company-complete))))
+                                 #'helm-company))))
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
   (global-company-mode t))
 
-;; (use-package helm-company
-;;   :after helm company
-;;   :bind (:map
-;;          company-mode-map ("C-;" . 'helm-company)
-;;          :map
-;;          company-active-map ("C-;" . 'helm-company))
-;;   :init (progn
-;;           (defun my:code::helm-company-complete ()
-;;             (interactive)
-;;             (when (company-complete) (helm-company)))
-;;           (add-to-list 'completion-at-point-functions
-;;                        #'comint-dynamic-complete-filename)))
+(use-package helm-company
+  :after helm company
+  :bind (:map
+         company-mode-map ("C-;" . 'helm-company)
+         :map
+         company-active-map ("C-;" . 'helm-company))
+  ;; :init (progn
+  ;;         (defun my:code::helm-company-complete ()
+  ;;           (interactive)
+  ;;           (when (company-complete) (helm-company)))
+  ;;         (add-to-list 'completion-at-point-functions
+  ;;                      #'comint-dynamic-complete-filename))
+  )
 
 (use-package paredit
   :diminish
@@ -774,7 +775,12 @@ hit C-a twice:"
 
 (use-package ledger-mode
   :mode (("\.dat$" . ledger-mode)
-         ("\.ledger$" . ledger-mode)))
+         ("\.ledger$" . ledger-mode))
+  :config
+  (add-hook 'ledger-mode-hook (lambda () (company-mode -1)))
+  (defun ledger-pcomplete (&optional interactively)
+    (interactive "p")
+    (completion-at-point)))
 
 (use-package winner
   :config (winner-mode 1))
