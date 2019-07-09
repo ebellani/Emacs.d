@@ -562,7 +562,7 @@ hit C-a twice:"
     (add-hook hook
               #'(lambda ()
                   (local-set-key (kbd "<tab>")
-                                 #'helm-company))))
+                                 #'company-indent-or-complete-common))))
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
@@ -573,14 +573,7 @@ hit C-a twice:"
   :bind (:map
          company-mode-map ("C-;" . 'helm-company)
          :map
-         company-active-map ("C-;" . 'helm-company))
-  ;; :init (progn
-  ;;         (defun my:code::helm-company-complete ()
-  ;;           (interactive)
-  ;;           (when (company-complete) (helm-company)))
-  ;;         (add-to-list 'completion-at-point-functions
-  ;;                      #'comint-dynamic-complete-filename))
-  )
+         company-active-map ("C-;" . 'helm-company)))
 
 (use-package paredit
   :diminish
