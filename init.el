@@ -875,14 +875,16 @@ hit C-a twice:"
   :mode (("\.md$" . markdown-mode)))
 
 (use-package elfeed
-  :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-filter "@1-day-ago +unread -brazil -blockchain -hn -reddit"))
+  :bind (("C-x w" . 'elfeed)))
 
 (use-package elfeed-org
   :after elfeed
   :init (elfeed-org)
   :config
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+
+(use-package org-pomodoro
+  :after org)
 
 (use-package async)
 
