@@ -370,6 +370,9 @@ hit C-a twice:"
       (eshell-bol)
       (if (= p (point))
           (beginning-of-line))))
+  :config
+  (setq eshell-visual-commands
+        '("htop" "ncdu" "nmon" "vi" "screen" "top" "less" "more" "lynx" "ncftp" "pine" "tin" "trn" "elm"))
   :bind  (("C-a"   . 'eshell-maybe-bol)
           ("C-x !" . 'eshell-here)))
 
