@@ -810,9 +810,10 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
         ;; the following would enable a separate frame.
-        helm-display-function                  'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame        t
-        helm-use-undecorated-frame-option      t)
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-buffer-reuse-frame        t
+        ;; helm-use-undecorated-frame-option      t
+        )
   (helm-mode 1)
   (helm-adaptive-mode 1)
   (add-hook 'eshell-mode-hook
