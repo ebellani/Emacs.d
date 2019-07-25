@@ -483,6 +483,9 @@ hit C-a twice:"
 (use-package s
   :defer t)
 
+(use-package shadchen
+  :defer t)
+
 (use-package dash
   :defer t)
 
@@ -559,13 +562,6 @@ hit C-a twice:"
 (use-package company
   :diminish
   :commands (company-mode company-indent-or-complete-common)
-  :init
-  (dolist (hook '(emacs-lisp-mode-hook
-                  c-mode-common-hook))
-    (add-hook hook
-              #'(lambda ()
-                  (local-set-key (kbd "<tab>")
-                                 #'company-indent-or-complete-common))))
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
@@ -894,13 +890,14 @@ hit C-a twice:"
 
 (use-package fsharp-mode)
 
+(use-package htmlize)
+
 (use-package zenburn-theme :ensure t :defer t)
 
 (use-package gnuplot-mode)
 
 (use-package org-super-agenda
   :after org)
-
 
 (use-package org-gcal
   :ensure t
