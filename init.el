@@ -894,6 +894,8 @@ hit C-a twice:"
 
 (use-package zenburn-theme :ensure t :defer t)
 
+(use-package solarized-theme :ensure t :defer t)
+
 (use-package gnuplot-mode)
 
 (use-package org-super-agenda
