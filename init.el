@@ -916,4 +916,7 @@ hit C-a twice:"
                            shared-capture-key)
                 (org-gcal-post-at-point)))))
 
+(use-package ox-gfm
+  :after ox)
+
 (put 'scroll-left 'disabled nil)
