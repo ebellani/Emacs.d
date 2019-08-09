@@ -41,6 +41,12 @@
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
+;; font family & size
+
+(set-face-attribute 'default nil
+                    :family "DejaVu Sans Mono"
+                    :height 100)
+
 ;;; things that I don't know how to do with use-package
 
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -112,6 +118,7 @@ accumulating."
   (setq)
   (require 'mu4e-contrib)
   ;; general config
+  (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         mu4e-contact-rewrite-function 'filter-bad-contacts
         ;;  "html2text -utf8 -width 72" ?
@@ -161,6 +168,11 @@ accumulating."
         smtpmail-debug-info t))
 
 (use-package org-mu4e)
+
+(use-package mml-sec
+  :config
+  (setq mml-secure-openpgp-encrypt-to-self t
+        mml-secure-openpgp-sign-with-sender t))
 
 (use-package mm-decode
   :config
