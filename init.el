@@ -150,7 +150,12 @@ accumulating."
         '(("/INBOX" . 105)
           ("/sent" . 115)
           ("/starred" . 116)
-          ("/all" . 97)))
+          ("/all" . 97))
+        ;; There is a new message-view for mu4e, based on the Gnus'
+        ;; article-view. This bring a lot of (but not all) of the very rich Gnus
+        ;; article-mode feature-set to mu4e, such as S/MIME-support,
+        ;; syntax-highlighting,
+        mu4e-view-use-gnus t)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("Decrypt inline PGP" . epa-mail-decrypt)))
