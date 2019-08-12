@@ -158,7 +158,8 @@ accumulating."
         mu4e-view-use-gnus t)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
-  (add-to-list 'mu4e-view-actions '("Decrypt inline PGP" . epa-mail-decrypt)))
+  (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
+  (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
 
 
 (use-package smtpmail-async
