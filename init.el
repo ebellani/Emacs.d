@@ -917,7 +917,34 @@ hit C-a twice:"
 (use-package gnuplot-mode)
 
 (use-package org-super-agenda
-  :after org)
+  :ensure t
+  :demand t
+  :config
+  (org-super-agenda-mode 1)
+  (add-to-list
+   'org-agenda-custom-commands
+   '("u" "Super view"
+     ((agenda "" ((org-super-agenda-groups
+                   '((:order-multi
+                      (0 (:name "Today"
+                                :time-grid t
+                                :date today
+                                :deadline  today
+                                :scheduled today)
+                         (:name "Late"
+                                :deadline  past
+                                :scheduled past)))))))
+      (todo "" ((org-agenda-overriding-header "Overall")
+                (org-super-agenda-groups
+                 '((:name "Personal"
+                          :tag "personal"
+                          :order 2)
+                   (:name "Brick Abode"
+                          :tag "brickabode"
+                          :order 3)
+                   (:name "Green Eye"
+                          :tag "green_eye"
+                          :order 4)))))))))
 
 (use-package org-gcal
   :ensure t
