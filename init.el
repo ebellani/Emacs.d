@@ -919,7 +919,7 @@ hit C-a twice:"
 (use-package org-super-agenda
   :ensure t
   :demand t
-  :config
+  :init
   (org-super-agenda-mode 1)
   (add-to-list
    'org-agenda-custom-commands
