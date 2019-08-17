@@ -918,10 +918,8 @@ hit C-a twice:"
 
 (use-package org-super-agenda
   :ensure t
-  :demand t
   :config
   (org-super-agenda-mode 1)
-  :preface
   (add-to-list
    'org-agenda-custom-commands
    '("u" "Super view"
