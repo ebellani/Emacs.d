@@ -41,11 +41,12 @@
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-;; font family & size
+;;; font family & size
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 100)
+                    :height 110)
+
 
 ;;; things that I don't know how to do with use-package
 
