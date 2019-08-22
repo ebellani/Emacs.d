@@ -921,30 +921,19 @@ hit C-a twice:"
   :ensure t
   :config
   (org-super-agenda-mode 1)
-  (add-to-list
-   'org-agenda-custom-commands
-   '("u" "Super view"
-     ((agenda "" ((org-super-agenda-groups
-                   '((:order-multi
-                      (0 (:name "Today"
-                                :time-grid t
-                                :date today
-                                :deadline  today
-                                :scheduled today)
-                         (:name "Late"
-                                :deadline  past
-                                :scheduled past)))))))
-      (todo "" ((org-agenda-overriding-header "Overall")
-                (org-super-agenda-groups
-                 '((:name "Personal"
-                          :tag "personal"
-                          :order 2)
-                   (:name "Brick Abode"
-                          :tag "brickabode"
-                          :order 3)
-                   (:name "Green Eye"
-                          :tag "green_eye"
-                          :order 4)))))))))
+  (setq
+   org-agenda-custom-commands
+   '(("u" "Super view"
+      ((agenda "" ((org-super-agenda-grousp
+                    '((:order-multi
+                       (0 (:name "Today"
+                                 :time-grid t
+                                 :date today
+                                 :deadline  today
+                                 :scheduled today)
+                          (:name "Late"
+                                 :deadline  past
+                                 :scheduled past))))))))))))
 
 (use-package org-gcal
   :ensure t
@@ -963,5 +952,26 @@ hit C-a twice:"
 
 (use-package ox-gfm
   :after ox)
+
+;;; js
+
+(use-package js2-mode
+  :hook ((js2-mode . js2-imenu-extras-mode))
+  :mode "\\.js\\'"
+  :custom (js-indent-level 2))
+
+(use-package js2-refactor
+  :bind (:map js2-mode-map
+              ("C-k" . js2r-kill))
+  :hook ((js2-mode . js2-refactor-mode)
+         (js2-mode . (lambda ()
+                       (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
+  :config (js2r-add-keybindings-with-prefix "C-c C-r"))
+
+(use-package xref-js2
+  :after js2-mode
+  :bind (:map js2-mode-map ("M-." . nil))
+  :hook ((js2-mode . (lambda ()
+                       (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))  )
 
 (put 'scroll-left 'disabled nil)
