@@ -924,7 +924,7 @@ hit C-a twice:"
   (setq
    org-agenda-custom-commands
    '(("u" "Super view"
-      ((agenda "" ((org-super-agenda-grousp
+      ((agenda "" ((org-super-agenda-groups
                     '((:order-multi
                        (0 (:name "Today"
                                  :time-grid t
@@ -959,14 +959,6 @@ hit C-a twice:"
   :hook ((js2-mode . js2-imenu-extras-mode))
   :mode "\\.js\\'"
   :custom (js-indent-level 2))
-
-(use-package js2-refactor
-  :bind (:map js2-mode-map
-              ("C-k" . js2r-kill))
-  :hook ((js2-mode . js2-refactor-mode)
-         (js2-mode . (lambda ()
-                       (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
-  :config (js2r-add-keybindings-with-prefix "C-c C-r"))
 
 (use-package xref-js2
   :after js2-mode
