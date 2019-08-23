@@ -926,12 +926,12 @@ hit C-a twice:"
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
                     '((:order-multi
-                       (0 (:name "Today"
+                       (0 (:name "Day's tasks"
                                  :time-grid t
                                  :date today
                                  :deadline  today
                                  :scheduled today)
-                          (:name "Late"
+                          (:name "Late tasks"
                                  :deadline  past
                                  :scheduled past))))))))))))
 
