@@ -45,8 +45,7 @@
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 110)
-
+                    :height 120)
 
 ;;; things that I don't know how to do with use-package
 
