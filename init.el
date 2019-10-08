@@ -24,11 +24,6 @@
 (defvar org-refile-file-path "~/.emacs.d/refile.org"
   "A place to hold temporary refile information.")
 
-(defcustom shared-agenda-file "~/.emacs.d/shared-agenda.org"
-  "This is the shared agenda (in the 'cloud'). Usually this means
-  something shared with google calendar."
-  :type 'file)
-
 (defvar shared-capture-key "g"
   "Key to use to capture shared entries")
 
@@ -45,7 +40,7 @@
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120)
+                    :height 130)
 
 ;;; things that I don't know how to do with use-package
 
@@ -155,7 +150,10 @@ accumulating."
         ;; article-view. This bring a lot of (but not all) of the very rich Gnus
         ;; article-mode feature-set to mu4e, such as S/MIME-support,
         ;; syntax-highlighting,
-        mu4e-view-use-gnus t)
+        mu4e-view-use-gnus t
+        mu4e-date-format-long "%F"
+        mu4e-headers-date-format "%F"
+        mu4e-headers-time-format "%T")
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
@@ -838,6 +836,8 @@ hit C-a twice:"
 
 (use-package pcomplete-extension)
 
+(use-package pcmpl-args)
+
 (use-package helm-company
   :after helm company
   :bind ((:map company-mode-map ("C-;" . 'helm-company))
@@ -936,18 +936,30 @@ hit C-a twice:"
 
 (use-package org-gcal
   :ensure t
-  ;; need to custom some things:
-  ;; see https://github.com/kidd/org-gcal.el
-  ;; (setq org-gcal-client-id "oauth 2.0 client ID"
-  ;;       org-gcal-client-secret "client secret"
-  ;;       org-gcal-file-alist '(("zamansky@gmail.com" .  "~/Dropbox/orgfiles/gcal.org")))
   :config
-  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-fetch)))
+  (defun setup-org-gcal ()
+    (let* ((gcal-plist (car (auth-source-search :host "gcal")))
+           (gcal-username (plist-get gcal-plist :user))
+           (gcal-secret (funcall (plist-get gcal-plist :secret)))
+           (agenda-folder (car org-agenda-files)))
+      (setq org-gcal-client-id gcal-username
+            org-gcal-client-secret gcal-secret)
+      (org-gcal-fetch)))
+  (add-hook 'org-agenda-mode-hook #'setup-org-gcal)
   (add-hook 'org-capture-after-finalize-hook
             (lambda ()
               (when (equal (plist-get org-capture-plist :key)
                            shared-capture-key)
                 (org-gcal-post-at-point)))))
+
+(use-package calfw
+  :ensure t
+  :config
+  (setq cfw:org-overwrite-default-keybinding t))
+
+(use-package calfw-org
+  :ensure t
+  :after calfw)
 
 (use-package ox-gfm
   :after ox)
