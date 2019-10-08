@@ -458,8 +458,10 @@ hit C-a twice:"
          ("C-x C-k" . 'kill-region))
   :hook ((before-save . delete-trailing-whitespace))
   :config
-  (column-number-mode t)
-  (auto-fill-mode 1))
+  (setq
+   column-number-mode t
+   auto-fill-mode 1
+   async-shell-command-buffer 'new-buffer))
 
 (use-package hl-line
   :config
