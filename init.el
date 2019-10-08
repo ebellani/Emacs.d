@@ -940,8 +940,7 @@ hit C-a twice:"
   (defun setup-org-gcal ()
     (let* ((gcal-plist (car (auth-source-search :host "gcal")))
            (gcal-username (plist-get gcal-plist :user))
-           (gcal-secret (funcall (plist-get gcal-plist :secret)))
-           (agenda-folder (car org-agenda-files)))
+           (gcal-secret (funcall (plist-get gcal-plist :secret))))
       (setq org-gcal-client-id gcal-username
             org-gcal-client-secret gcal-secret)
       (org-gcal-fetch)))
