@@ -24,9 +24,6 @@
 (defvar org-refile-file-path "~/.emacs.d/refile.org"
   "A place to hold temporary refile information.")
 
-(defvar shared-capture-key "g"
-  "Key to use to capture shared entries")
-
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -68,10 +65,15 @@
 ;; see http://cachestocaches.com/2015/8/getting-started-use-package/
 ;; and http://cestlaz.github.io/posts/using-emacs-1-setup/
 (require 'package)
+
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+
+(add-to-list 'package-archives '("melpa"     . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("org"       . "https://orgmode.org/elpa/") t)
+
 (unless package--initialized (package-initialize t))
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -209,17 +211,26 @@ accumulating."
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
   :init
-  (setq org-export-backends '(ascii html icalendar latex md odt org))
+  (setq org-export-backends '(ascii taskjuggler html icalendar latex md odt org))
   :config
+  (defun replace-in-string (what with in)
+    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
+
+  (defun org-html--format-image (source attributes info)
+    (progn
+      (setq source (replace-in-string "%20" " " source))
+      (format "<img src=\"data:image/%s;base64,%s\"%s />"
+              (or (file-name-extension source) "")
+              (base64-encode-string
+               (with-temp-buffer
+                 (insert-file-contents-literally source)
+                 (buffer-string)))
+              (file-name-nondirectory source))))
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
         org-capture-templates
-        `((,shared-capture-key "Shared Calendar " entry
-                               (file ,shared-agenda-file)
-                               "* %?
-%^T")
-          ("t" "todo" entry
+        `(("t" "todo" entry
            (file ,org-refile-file-path)
            "* TODO %?"))
         org-tag-alist '((:startgroup)
@@ -258,7 +269,6 @@ accumulating."
         org-agenda-sticky t
         org-agenda-span 'day
         org-latex-pdf-process (list "latexmk -f -pdf %f"))
-  (add-to-list 'org-structure-template-alist '("n" "#+NAME: ?") )
   ;; format timestamps. See
   ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
   ;; get images to reload after execution. Useful for things such as
@@ -289,6 +299,9 @@ accumulating."
 ;; org-ql
 (require 'org-ql)
 (require 'org-ql-agenda)
+
+(use-package org-tempo
+  :after org)
 
 (use-package ox
   :after org
@@ -441,6 +454,11 @@ hit C-a twice:"
   (setq uniquify-after-kill-buffer-p 1)
   (setq uniquify-ignore-buffers-re "^\\*"))
 
+(use-package time
+  :config
+  (setq display-time-format "%F %R %z"
+        display-time-mode 1))
+
 (use-package dired
   :config
   (setq dired-listing-switches "-alh"))
@@ -565,7 +583,7 @@ hit C-a twice:"
   (pdf-tools-install))
 
 (use-package web-mode
-  :mode "\\.html?\\'")
+  :mode "\\.html?\\'\\|\\.fsproj$\\'")
 
 (use-package hippie-exp
   :bind ("M-/" . hippie-expand)
@@ -946,12 +964,7 @@ hit C-a twice:"
       (setq org-gcal-client-id gcal-username
             org-gcal-client-secret gcal-secret)
       (org-gcal-fetch)))
-  (add-hook 'org-agenda-mode-hook #'setup-org-gcal)
-  (add-hook 'org-capture-after-finalize-hook
-            (lambda ()
-              (when (equal (plist-get org-capture-plist :key)
-                           shared-capture-key)
-                (org-gcal-post-at-point)))))
+  (add-hook 'org-agenda-mode-hook #'setup-org-gcal))
 
 (use-package calfw
   :ensure t
@@ -978,4 +991,17 @@ hit C-a twice:"
   :hook ((js2-mode . (lambda ()
                        (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))  )
 
+(use-package spaceline)
+
+(use-package spaceline-config
+  :ensure spaceline
+  :config
+  (require 'spaceline-config)
+  (spaceline-emacs-theme)
+  (spaceline-helm-mode)
+  (spaceline-info-mode)
+  (spaceline-toggle-buffer-encoding-abbrev-off)
+  (spaceline-toggle-buffer-size-off))
+
 (put 'scroll-left 'disabled nil)
+(put 'list-threads 'disabled nil)
