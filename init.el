@@ -213,6 +213,7 @@ accumulating."
   :init
   (setq org-export-backends '(ascii taskjuggler html icalendar latex md odt org))
   :config
+  (require 'org-tempo)
   (defun replace-in-string (what with in)
     (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
 
@@ -295,13 +296,11 @@ accumulating."
      (ledger . t)
      (org    . t))))
 
+
 (add-to-list 'load-path (concat *my-default-lib* "/org-ql"))
 ;; org-ql
 (require 'org-ql)
 (require 'org-ql-agenda)
-
-(use-package org-tempo
-  :after org)
 
 (use-package ox
   :after org
@@ -1002,6 +1001,8 @@ hit C-a twice:"
   (spaceline-info-mode)
   (spaceline-toggle-buffer-encoding-abbrev-off)
   (spaceline-toggle-buffer-size-off))
+
+(use-package hercules)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
