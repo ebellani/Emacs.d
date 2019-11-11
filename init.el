@@ -161,20 +161,6 @@ accumulating."
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
 
-
-(use-package smtpmail-async
-  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
-  ;; multiple values.
-  :after mu4e
-  :config
-  (setq message-send-mail-function 'async-smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-debug-info t))
-
-(use-package org-mu4e)
-
 (use-package mml-sec
   :config
   (setq mml-secure-openpgp-encrypt-to-self t
@@ -1008,6 +994,19 @@ hit C-a twice:"
   :after org)
 
 (use-package hercules)
+
+(use-package smtpmail-async
+  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
+  ;; multiple values.
+  :after mu4e
+  :config
+  (setq message-send-mail-function 'async-smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        smtpmail-debug-info t))
+
+(use-package org-mu4e)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
