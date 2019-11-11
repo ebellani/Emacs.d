@@ -161,6 +161,20 @@ accumulating."
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
 
+(use-package smtpmail-async
+  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
+  ;; multiple values.
+  :after mu4e
+  :config
+  (setq message-send-mail-function 'async-smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        smtpmail-debug-info t))
+
+(use-package org-mu4e
+  :ensure nil)
+
 (use-package mml-sec
   :config
   (setq mml-secure-openpgp-encrypt-to-self t
@@ -847,9 +861,6 @@ hit C-a twice:"
   :ensure t
   :after calfw)
 
-(use-package ox-gfm
-  :after ox)
-
 ;;; js
 
 (use-package js2-mode
@@ -973,6 +984,7 @@ hit C-a twice:"
 (require 'org-ql-agenda)
 
 (use-package ox
+  :ensure nil
   :after org
   :config
   (add-to-list 'org-export-filter-timestamp-functions
@@ -987,26 +999,18 @@ hit C-a twice:"
                    ((or `ascii `latex)
                     (replace-regexp-in-string "[][<>]" "" trans))))))
 
+
+(use-package ox-gfm
+  :after ox)
+
 (use-package org-tempo
+  :ensure nil
   :after org)
 
 (use-package org-pomodoro
   :after org)
 
 (use-package hercules)
-
-(use-package smtpmail-async
-  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
-  ;; multiple values.
-  :after mu4e
-  :config
-  (setq message-send-mail-function 'async-smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-debug-info t))
-
-(use-package org-mu4e)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
