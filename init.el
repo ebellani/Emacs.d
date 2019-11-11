@@ -152,7 +152,7 @@ accumulating."
         ;; article-view. This bring a lot of (but not all) of the very rich Gnus
         ;; article-mode feature-set to mu4e, such as S/MIME-support,
         ;; syntax-highlighting,
-        mu4e-view-use-gnus t
+        mu4e-view-use-gnus nil
         mu4e-date-format-long "%F"
         mu4e-headers-date-format "%F"
         mu4e-headers-time-format "%T")
@@ -205,117 +205,6 @@ accumulating."
   :config
   (setq epa-file-cache-passphrase-for-symmetric-encryption t))
 
-(use-package org
-  :bind (("C-c l" . 'org-store-link)
-         ("C-c c" . 'org-capture)
-         ("C-c a" . 'org-agenda)
-         ("C-c b" . 'org-iswitchb))
-  :init
-  (setq org-export-backends '(ascii taskjuggler html icalendar latex md odt org))
-  :config
-  (require 'org-tempo)
-  (defun replace-in-string (what with in)
-    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
-
-  (defun org-html--format-image (source attributes info)
-    (progn
-      (setq source (replace-in-string "%20" " " source))
-      (format "<img src=\"data:image/%s;base64,%s\"%s />"
-              (or (file-name-extension source) "")
-              (base64-encode-string
-               (with-temp-buffer
-                 (insert-file-contents-literally source)
-                 (buffer-string)))
-              (file-name-nondirectory source))))
-  (setq org-refile-allow-creating-parent-nodes 'confirm
-        org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil
-        org-capture-templates
-        `(("t" "todo" entry
-           (file ,org-refile-file-path)
-           "* TODO %?"))
-        org-tag-alist '((:startgroup)
-                        ("noexport" . ?n)
-                        ("export" . ?e)
-                        (:endgroup))
-        org-refile-targets
-        '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 9))
-        org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
-          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
-        org-imenu-depth 6
-        org-src-fontify-natively t
-        ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
-        ;; FOREIGN ORG FILES!
-        org-confirm-babel-evaluate nil
-        org-use-sub-superscripts '{}
-        org-export-with-sub-superscripts '{}
-        org-babel-default-header-args
-        (cons '(:noweb . "yes")
-              (assq-delete-all :noweb org-babel-default-header-args))
-        org-babel-default-header-args
-        (cons '(:tangle . "yes")
-              (assq-delete-all :tangle org-babel-default-header-args))
-        org-babel-default-header-args
-        (cons '(:comments . "link")
-              (assq-delete-all :comments org-babel-default-header-args))
-        org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>")
-        org-duration-format '((special . h:mm))
-        org-file-apps
-        '((auto-mode . emacs)
-          ("\\.x?html?\\'" . "x-www-browser %s"))
-        org-goto-interface 'outline-path-completion
-        ;; allows multiple agenda views to coexist
-        org-agenda-sticky t
-        org-agenda-span 'day
-        org-latex-pdf-process (list "latexmk -f -pdf %f"))
-  ;; format timestamps. See
-  ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
-  ;; get images to reload after execution. Useful for things such as
-  ;; gnuplot. See https://emacs.stackexchange.com/q/3302
-  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
-  (setq-default org-display-custom-times t)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((dot     . t)
-     (latex   . t)
-     (shell   . t)
-     (python  . t)
-     (js      . t)
-     (ditaa   . t)
-     (ocaml   . t)
-     (java    . t)
-     (scheme  . t)
-     (plantuml . t)
-     (ditaa   . t)
-     (sqlite  . t)
-     (gnuplot . t)
-     (ditaa  . t)
-     (C      . t)
-     (ledger . t)
-     (org    . t))))
-
-
-(add-to-list 'load-path (concat *my-default-lib* "/org-ql"))
-;; org-ql
-(require 'org-ql)
-(require 'org-ql-agenda)
-
-(use-package ox
-  :after org
-  :config
-  (add-to-list 'org-export-filter-timestamp-functions
-               (lambda
-                 (trans back _comm)
-                 "Remove <> around time-stamps."
-                 (pcase back
-                   (`html
-                    (replace-regexp-in-string "[][]"
-                                              ""
-                                              (replace-regexp-in-string "&[lg]t;" "" trans)))
-                   ((or `ascii `latex)
-                    (replace-regexp-in-string "[][<>]" "" trans))))))
 
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
@@ -912,16 +801,14 @@ hit C-a twice:"
   :mode (("\.md$" . markdown-mode)))
 
 (use-package elfeed
-  :bind (("C-x w" . 'elfeed)))
+  :bind (("C-x w" . 'elfeed))
+  :config (setq elfeed-search-title-max-width 140))
 
 (use-package elfeed-org
   :after elfeed
   :init (elfeed-org)
   :config
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
-
-(use-package org-pomodoro
-  :after org)
 
 (use-package async)
 
@@ -1001,6 +888,124 @@ hit C-a twice:"
   (spaceline-info-mode)
   (spaceline-toggle-buffer-encoding-abbrev-off)
   (spaceline-toggle-buffer-size-off))
+
+(use-package org
+  :bind (("C-c l" . 'org-store-link)
+         ("C-c c" . 'org-capture)
+         ("C-c a" . 'org-agenda)
+         ("C-c b" . 'org-iswitchb))
+  :ensure org-plus-contrib
+  :init
+  (setq org-export-backends '(ascii taskjuggler html icalendar latex md odt org))
+  :config
+  (require 'org-tempo)
+  (defun replace-in-string (what with in)
+    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
+
+  (defun org-html--format-image (source attributes info)
+    (progn
+      (setq source (replace-in-string "%20" " " source))
+      (format "<img src=\"data:image/%s;base64,%s\"%s />"
+              (or (file-name-extension source) "")
+              (base64-encode-string
+               (with-temp-buffer
+                 (insert-file-contents-literally source)
+                 (buffer-string)))
+              (file-name-nondirectory source))))
+  (setq org-refile-allow-creating-parent-nodes 'confirm
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil
+        org-capture-templates
+        `(("t" "todo" entry
+           (file ,org-refile-file-path)
+           "* TODO %?"))
+        org-tag-alist '((:startgroup)
+                        ("noexport" . ?n)
+                        ("export" . ?e)
+                        (:endgroup))
+        org-refile-targets
+        '((nil :maxlevel . 9)
+          (org-agenda-files :maxlevel . 9))
+        org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
+          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
+        org-imenu-depth 6
+        org-src-fontify-natively t
+        ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
+        ;; FOREIGN ORG FILES!
+        org-confirm-babel-evaluate nil
+        org-use-sub-superscripts '{}
+        org-export-with-sub-superscripts '{}
+        org-babel-default-header-args
+        (cons '(:noweb . "yes")
+              (assq-delete-all :noweb org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:tangle . "yes")
+              (assq-delete-all :tangle org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:comments . "link")
+              (assq-delete-all :comments org-babel-default-header-args))
+        org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>")
+        org-duration-format '((special . h:mm))
+        org-file-apps
+        '((auto-mode . emacs)
+          ("\\.x?html?\\'" . "x-www-browser %s"))
+        org-goto-interface 'outline-path-completion
+        ;; allows multiple agenda views to coexist
+        org-agenda-sticky t
+        org-agenda-span 'day
+        org-latex-pdf-process (list "latexmk -f -pdf %f"))
+  ;; format timestamps. See
+  ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
+  ;; get images to reload after execution. Useful for things such as
+  ;; gnuplot. See https://emacs.stackexchange.com/q/3302
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+  (setq-default org-display-custom-times t)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot     . t)
+     (latex   . t)
+     (shell   . t)
+     (python  . t)
+     (js      . t)
+     (ditaa   . t)
+     (ocaml   . t)
+     (java    . t)
+     (scheme  . t)
+     (plantuml . t)
+     (ditaa   . t)
+     (sqlite  . t)
+     (gnuplot . t)
+     (ditaa  . t)
+     (C      . t)
+     (ledger . t)
+     (org    . t))))
+
+(add-to-list 'load-path (concat *my-default-lib* "/org-ql"))
+;; org-ql
+(require 'org-ql)
+(require 'org-ql-agenda)
+
+(use-package ox
+  :after org
+  :config
+  (add-to-list 'org-export-filter-timestamp-functions
+               (lambda
+                 (trans back _comm)
+                 "Remove <> around time-stamps."
+                 (pcase back
+                   (`html
+                    (replace-regexp-in-string "[][]"
+                                              ""
+                                              (replace-regexp-in-string "&[lg]t;" "" trans)))
+                   ((or `ascii `latex)
+                    (replace-regexp-in-string "[][<>]" "" trans))))))
+
+(use-package org-tempo
+  :after org)
+
+(use-package org-pomodoro
+  :after org)
 
 (use-package hercules)
 
