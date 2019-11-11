@@ -83,8 +83,6 @@
 
 ;;; packages that come with emacs
 
-(setq use-package-always-ensure nil)
-
 (use-package browse-url
   :config
   (setq browse-url-browser-function 'browse-url-firefox))
@@ -161,19 +159,7 @@ accumulating."
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
 
-(use-package smtpmail-async
-  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
-  ;; multiple values.
-  :after mu4e
-  :config
-  (setq message-send-mail-function 'async-smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-debug-info t))
-
-(use-package org-mu4e
-  :ensure nil)
+(use-package org-mu4e)
 
 (use-package mml-sec
   :config
@@ -396,13 +382,10 @@ hit C-a twice:"
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t))))
 
-;;; external packages, need to ensure that they are downloaded
-
-(setq use-package-always-ensure t)
-
 ;;; Libraries
 
-(use-package diminish :demand t)
+(use-package diminish
+  :demand t)
 
 (use-package s
   :defer t)
@@ -418,13 +401,26 @@ hit C-a twice:"
 
 ;;; packages
 
+(use-package async
+  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
+  ;; multiple values.
+  :ensure t
+  :config
+  (setq message-send-mail-function 'async-smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        smtpmail-debug-info t))
+
 (use-package undo-tree
+  :ensure t
   :config
   (global-undo-tree-mode)
   (setq undo-tree-visualizer-diff t)
   (setq undo-tree-visualizer-timestamps t))
 
 (use-package psession
+  :ensure t
   :init
   (setq psession-object-to-save-alist
         '((ioccur-history                . "ioccur-history.el")
@@ -440,15 +436,19 @@ hit C-a twice:"
   (psession-mode 1))
 
 (use-package magit
+  :ensure t
   :bind (("C-x g" . magit-status)))
 
 (use-package forge
+  :ensure t
   :after magit)
 
 (use-package git-timemachine
+  :ensure t
   :after magit)
 
 (use-package switch-window
+  :ensure t
   :config
   (setq switch-window-threshold 3)
   :bind
@@ -466,14 +466,17 @@ hit C-a twice:"
   ("C-x 4 0"   . 'switch-window-then-kill-buffer))
 
 (use-package pdf-tools
+  :ensure t
   :magic ("%PDF" . pdf-view-mode)
   :config
   (pdf-tools-install))
 
 (use-package web-mode
+  :ensure t
   :mode "\\.html?\\'\\|\\.fsproj$\\'")
 
 (use-package hippie-exp
+  :ensure t
   :bind ("M-/" . hippie-expand)
   :init
   (setf hippie-expand-try-functions-list
@@ -484,6 +487,7 @@ hit C-a twice:"
           try-complete-lisp-symbol)))
 
 (use-package company
+  :ensure t
   :diminish
   :commands (company-mode company-indent-or-complete-common)
   :config
@@ -492,6 +496,7 @@ hit C-a twice:"
   (global-company-mode t))
 
 (use-package helm-company
+  :ensure t
   :after helm company
   :bind (:map
          company-mode-map ("C-;" . 'helm-company)
@@ -499,6 +504,7 @@ hit C-a twice:"
          company-active-map ("C-;" . 'helm-company)))
 
 (use-package paredit
+  :ensure t
   :diminish
   :hook ((lisp-mode emacs-lisp-mode clojure-mode) . paredit-mode)
   :bind (:map paredit-mode-map
@@ -513,23 +519,28 @@ hit C-a twice:"
   (eldoc-add-command 'paredit-backward-delete
                      'paredit-close-round))
 
-(use-package clojure-mode)
+(use-package clojure-mode
+  :ensure t)
 
-(use-package cider)
+(use-package cider
+  :ensure t)
 
 (use-package visual-regexp
+  :ensure t
   :bind (("C-c r"   . vr/replace)
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
 
 
 (use-package slime
+  :ensure t
   :commands slime
   :init
   (setq inferior-lisp-program "sbcl"
         slime-contribs '(slime-fancy)))
 
 (use-package smartparens
+  :ensure t
   :config
   (require 'smartparens-config)
   (bind-keys :map smartparens-mode-map
@@ -563,7 +574,8 @@ hit C-a twice:"
   (sp-local-pair sp--html-modes "{#" "#}"))
 
 (use-package eldoc
-  :diminish
+  :ensure t
+  :diminish t
   :hook ((c-mode-common
           emacs-lisp-mode
           lisp-interaction-mode
@@ -571,6 +583,7 @@ hit C-a twice:"
          . eldoc-mode))
 
 (use-package elint
+  :ensure t
   :commands (elint-initialize elint-current-buffer)
   :bind ("C-c e E" . my-elint-current-buffer)
   :preface
@@ -586,84 +599,26 @@ hit C-a twice:"
   (add-to-list 'elint-standard-variables 'window-system))
 
 (use-package elisp-depend
+  :ensure t
   :commands elisp-depend-print-dependencies)
 
 (use-package elisp-docstring-mode
+  :ensure t
   :commands elisp-docstring-mode)
 
 (use-package elisp-slime-nav
+  :ensure t
   :diminish
   :hook ((emacs-lisp-mode) . elisp-slime-nav-mode)
   :commands (elisp-slime-nav-mode
              elisp-slime-nav-find-elisp-thing-at-point))
 
-;; (use-package phi-search
-;;   :defer 5)
-
-;; (use-package phi-search-mc
-;;   :after (phi-search multiple-cursors)
-;;   :config
-;;   (phi-search-mc/setup-keys)
-;;   (add-hook 'isearch-mode-mode #'phi-search-from-isearch-mc/setup-keys))
-
-;; (use-package multiple-cursors
-;;   :after phi-search
-;;   :defer 5
-;;   ;; - Sometimes you end up with cursors outside of your view. You can scroll
-;;   ;;   the screen to center on each cursor with `C-v` and `M-v`.
-;;   ;;
-;;   ;; - If you get out of multiple-cursors-mode and yank - it will yank only
-;;   ;;   from the kill-ring of main cursor. To yank from the kill-rings of every
-;;   ;;   cursor use yank-rectangle, normally found at C-x r y.
-;;   :bind (("<C-m> ^"     . mc/edit-beginnings-of-lines)
-;;          ("<C-m> `"     . mc/edit-beginnings-of-lines)
-;;          ("<C-m> $"     . mc/edit-ends-of-lines)
-;;          ("<C-m> '"     . mc/edit-ends-of-lines)
-;;          ("<C-m> R"     . mc/reverse-regions)
-;;          ("<C-m> S"     . mc/sort-regions)
-;;          ("<C-m> W"     . mc/mark-all-words-like-this)
-;;          ("<C-m> Y"     . mc/mark-all-symbols-like-this)
-;;          ("<C-m> a"     . mc/mark-all-like-this-dwim)
-;;          ("<C-m> c"     . mc/mark-all-dwim)
-;;          ("<C-m> l"     . mc/insert-letters)
-;;          ("<C-m> n"     . mc/insert-numbers)
-;;          ("<C-m> r"     . mc/mark-all-in-region)
-;;          ("<C-m> s"     . set-rectangular-region-anchor)
-;;          ("<C-m> %"     . mc/mark-all-in-region-regexp)
-;;          ("<C-m> t"     . mc/mark-sgml-tag-pair)
-;;          ("<C-m> w"     . mc/mark-next-like-this-word)
-;;          ("<C-m> x"     . mc/mark-more-like-this-extended)
-;;          ("<C-m> y"     . mc/mark-next-like-this-symbol)
-;;          ("<C-m> C-x"   . reactivate-mark)
-;;          ("<C-m> C-SPC" . mc/mark-pop)
-;;          ("<C-m> ("     . mc/mark-all-symbols-like-this-in-defun)
-;;          ("<C-m> C-("   . mc/mark-all-words-like-this-in-defun)
-;;          ("<C-m> M-("   . mc/mark-all-like-this-in-defun)
-;;          ("<C-m> ["     . mc/vertical-align-with-space)
-;;          ("<C-m> {"     . mc/vertical-align)
-;;          ("S-<down-mouse-1>")
-;;          ("S-<mouse-1>" . mc/add-cursor-on-click))
-;;   :bind (:map selected-keymap
-;;               ("c"   . mc/edit-lines)
-;;               ("."   . mc/mark-next-like-this)
-;;               ("<"   . mc/unmark-next-like-this)
-;;               ("C->" . mc/skip-to-next-like-this)
-;;               (","   . mc/mark-previous-like-this)
-;;               (">"   . mc/unmark-previous-like-this)
-;;               ("C-<" . mc/skip-to-previous-like-this)
-;;               ("y"   . mc/mark-next-symbol-like-this)
-;;               ("Y"   . mc/mark-previous-symbol-like-this)
-;;               ("w"   . mc/mark-next-word-like-this)
-;;               ("W"   . mc/mark-previous-word-like-this))
-;;   :preface
-;;   (defun reactivate-mark ()
-;;     (interactive)
-;;     (activate-mark)))
-
 (use-package json-mode
+  :ensure t
   :mode "\\.json\\'")
 
 (use-package helpful
+  :ensure t
   :bind (("C-h C" . helpful-command)
          ("C-h M" . helpful-macro)
          ("C-h f" . helpful-callable)
@@ -673,23 +628,29 @@ hit C-a twice:"
          ("C-h k" . helpful-key)))
 
 (use-package plantuml-mode
+  :ensure t
   :mode "\\.plantuml\\'"
   :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"))
 
 (use-package docker
+  :ensure t
   :bind ("C-c d" . docker))
 
 (use-package docker-compose-mode
+  :ensure t
   :mode "docker-compose.*\.yml\\'")
 
 (use-package docker-tramp
+  :ensure t
   :after tramp
   :defer 5)
 
 (use-package dockerfile-mode
+  :ensure t
   :mode "Dockerfile[a-zA-Z.-]*\\'")
 
 (use-package ledger-mode
+  :ensure t
   :mode (("\.dat$" . ledger-mode)
          ("\.ledger$" . ledger-mode))
   :config
@@ -699,9 +660,11 @@ hit C-a twice:"
     (completion-at-point)))
 
 (use-package winner
+  :ensure t
   :config (winner-mode 1))
 
 (use-package helm
+  :ensure t
   :diminish
   :bind (("C-h a"   . helm-apropos)
          ("C-x b"   . helm-mini)
@@ -742,34 +705,42 @@ hit C-a twice:"
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
               (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history))))
 
-(use-package pcomplete-extension)
+(use-package pcomplete-extension
+  :ensure t)
 
-(use-package pcmpl-args)
+(use-package pcmpl-args
+  :ensure t)
 
 (use-package helm-company
+  :ensure t
   :after helm company
   :bind ((:map company-mode-map ("C-;" . 'helm-company))
          (:map company-active-map ("C-;" . 'helm-company))))
 
 (use-package helm-flx
+  :ensure t
   :after helm
   :config (setq helm-flx-for-helm-find-files t ;; t by default
                 helm-flx-for-helm-locate t) ;; nil by default
- )
+  )
 
 (use-package helm-descbinds
+  :ensure t
   :bind ("C-h b" . helm-descbinds))
 
 (use-package helm-swoop
+  :ensure t
   :bind (("M-m" . helm-swoop)
 	 ("M-M" . helm-swoop-back-to-last-point))
   :init
   (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
 
 (use-package helm-wordnet
+  :ensure t
   :after helm)
 
 (use-package projectile
+  :ensure t
   :defer 5
   :bind (:map projectile-mode-map
               ("C-c p" . projectile-command-map))
@@ -781,10 +752,12 @@ hit C-a twice:"
         projectile-mode-line "Projectile"))
 
 (use-package helm-projectile
+  :ensure t
   :config
   (helm-projectile-on))
 
 (use-package elscreen
+  :ensure t
   :config
   (setq elscreen-tab-display-control nil  ; hide control tab at the left side
         elscreen-tab-display-kill-screen nil ; hide kill button
@@ -792,19 +765,24 @@ hit C-a twice:"
   (elscreen-start))
 
 (use-package helm-mu
+  :ensure t
   :after mu4e)
 
 (use-package powershell
+  :ensure t
   :mode (("\.ps1$" . powershell-mode)))
 
 (use-package markdown-mode
+  :ensure t
   :mode (("\.md$" . markdown-mode)))
 
 (use-package elfeed
+  :ensure t
   :bind (("C-x w" . 'elfeed))
   :config (setq elfeed-search-title-max-width 140))
 
 (use-package elfeed-org
+  :ensure t
   :after elfeed
   :init (elfeed-org)
   :config
@@ -812,15 +790,19 @@ hit C-a twice:"
 
 (use-package async)
 
-(use-package fsharp-mode)
+(use-package htmlize
+  :ensure t)
 
-(use-package htmlize)
+(use-package zenburn-theme
+  :ensure t
+  :defer t)
 
-(use-package zenburn-theme :ensure t :defer t)
+(use-package solarized-theme
+  :ensure t
+  :defer t)
 
-(use-package solarized-theme :ensure t :defer t)
-
-(use-package gnuplot-mode)
+(use-package gnuplot-mode
+  :ensure t)
 
 (use-package org-super-agenda
   :ensure t
@@ -861,20 +843,21 @@ hit C-a twice:"
   :ensure t
   :after calfw)
 
-;;; js
-
 (use-package js2-mode
+  :ensure t
   :hook ((js2-mode . js2-imenu-extras-mode))
   :mode "\\.js\\'"
   :custom (js-indent-level 2))
 
 (use-package xref-js2
+  :ensure t
   :after js2-mode
   :bind (:map js2-mode-map ("M-." . nil))
   :hook ((js2-mode . (lambda ()
                        (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))  )
 
-(use-package spaceline)
+(use-package spaceline
+  :ensure t)
 
 (use-package spaceline-config
   :ensure spaceline
@@ -978,13 +961,11 @@ hit C-a twice:"
      (ledger . t)
      (org    . t))))
 
-(add-to-list 'load-path (concat *my-default-lib* "/org-ql"))
-;; org-ql
-(require 'org-ql)
-(require 'org-ql-agenda)
+(use-package org-ql
+  :ensure t
+  :after org)
 
 (use-package ox
-  :ensure nil
   :after org
   :config
   (add-to-list 'org-export-filter-timestamp-functions
@@ -999,8 +980,8 @@ hit C-a twice:"
                    ((or `ascii `latex)
                     (replace-regexp-in-string "[][<>]" "" trans))))))
 
-
 (use-package ox-gfm
+  :ensure t
   :after ox)
 
 (use-package org-tempo
@@ -1008,9 +989,14 @@ hit C-a twice:"
   :after org)
 
 (use-package org-pomodoro
+  :ensure t
   :after org)
 
-(use-package hercules)
+(use-package hercules
+  :ensure t)
+
+(use-package gnu-elpa-keyring-update
+  :ensure t)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
