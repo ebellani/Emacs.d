@@ -508,6 +508,10 @@ hit C-a twice:"
          :map
          company-active-map ("C-;" . 'helm-company)))
 
+(use-package helm-org
+  :ensure t
+  :after helm org)
+
 (use-package paredit
   :ensure t
   :diminish
