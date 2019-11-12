@@ -402,15 +402,20 @@ hit C-a twice:"
 ;;; packages
 
 (use-package async
+  :ensure t)
+
+(use-package smtpmail-async
   ;; this is fixed for gmail for now. Mu4e contexts could be used to set
   ;; multiple values.
-  :ensure t
+  :after async
+  :ensure async
   :config
   (setq message-send-mail-function 'async-smtpmail-send-it
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587
         smtpmail-debug-info t))
+
 
 (use-package undo-tree
   :ensure t
