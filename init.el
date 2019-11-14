@@ -474,6 +474,8 @@ hit C-a twice:"
   :ensure t
   :magic ("%PDF" . pdf-view-mode)
   :config
+  ;; fix space next page problem. No idea why
+  (setq pdf-view-have-image-mode-pixel-vscroll nil)
   (pdf-tools-install))
 
 (use-package web-mode
