@@ -110,7 +110,6 @@ accumulating."
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
   :config
-  (setq)
   (require 'mu4e-contrib)
   ;; general config
   (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
