@@ -385,18 +385,23 @@ hit C-a twice:"
 ;;; Libraries
 
 (use-package diminish
+  :ensure t
   :demand t)
 
 (use-package s
+  :ensure t
   :defer t)
 
 (use-package shadchen
+  :ensure t
   :defer t)
 
 (use-package dash
+  :ensure t
   :defer t)
 
 (use-package ht
+  :ensure t
   :defer t)
 
 ;;; packages
@@ -530,25 +535,11 @@ hit C-a twice:"
   (eldoc-add-command 'paredit-backward-delete
                      'paredit-close-round))
 
-(use-package clojure-mode
-  :ensure t)
-
-(use-package cider
-  :ensure t)
-
 (use-package visual-regexp
   :ensure t
   :bind (("C-c r"   . vr/replace)
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
-
-
-(use-package slime
-  :ensure t
-  :commands slime
-  :init
-  (setq inferior-lisp-program "sbcl"
-        slime-contribs '(slime-fancy)))
 
 (use-package smartparens
   :ensure t
@@ -704,10 +695,9 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
         ;; the following would enable a separate frame.
-        ;; helm-display-function                  'helm-display-buffer-in-own-frame
-        ;; helm-display-buffer-reuse-frame        t
-        ;; helm-use-undecorated-frame-option      t
-        )
+        helm-display-function                  'helm-display-buffer-in-own-frame
+        helm-display-buffer-reuse-frame        t
+        helm-use-undecorated-frame-option      t)
   (helm-mode 1)
   (helm-adaptive-mode 1)
   (add-hook 'eshell-mode-hook
@@ -853,19 +843,6 @@ hit C-a twice:"
 (use-package calfw-org
   :ensure t
   :after calfw)
-
-(use-package js2-mode
-  :ensure t
-  :hook ((js2-mode . js2-imenu-extras-mode))
-  :mode "\\.js\\'"
-  :custom (js-indent-level 2))
-
-(use-package xref-js2
-  :ensure t
-  :after js2-mode
-  :bind (:map js2-mode-map ("M-." . nil))
-  :hook ((js2-mode . (lambda ()
-                       (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))  )
 
 (use-package spaceline
   :ensure t)
