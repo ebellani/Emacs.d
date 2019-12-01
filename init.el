@@ -767,10 +767,6 @@ hit C-a twice:"
         elscreen-display-tab t)
   (elscreen-start))
 
-(use-package helm-mu
-  :ensure t
-  :after mu4e)
-
 (use-package powershell
   :ensure t
   :mode (("\.ps1$" . powershell-mode)))
@@ -990,3 +986,7 @@ hit C-a twice:"
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
+
+(use-package helm-mu
+  :ensure t
+  :after mu4e)
