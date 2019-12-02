@@ -112,7 +112,8 @@ accumulating."
   :config
   (require 'mu4e-contrib)
   ;; general config
-  (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
+  ;; add encryption to all messages
+  ;; (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         mu4e-contact-rewrite-function 'filter-bad-contacts
         ;;  "html2text -utf8 -width 72" ?
@@ -694,9 +695,10 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
         ;; the following would enable a separate frame.
-        helm-display-function                  'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame        t
-        helm-use-undecorated-frame-option      t)
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-buffer-reuse-frame        t
+        ;; helm-use-undecorated-frame-option      t
+        )
   (helm-mode 1)
   (helm-adaptive-mode 1)
   (add-hook 'eshell-mode-hook
