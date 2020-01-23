@@ -113,7 +113,7 @@ accumulating."
   (require 'mu4e-contrib)
   ;; general config
   ;; add encryption to all messages
-  ;; (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
+  (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         mu4e-headers-show-threads t
         mu4e-contact-rewrite-function 'filter-bad-contacts
