@@ -769,7 +769,8 @@ hit C-a twice:"
 
 (use-package powershell
   :ensure t
-  :mode (("\.ps1$" . powershell-mode)))
+  :mode (("\.ps1$" . powershell-mode))
+  :config (setq powershell-location-of-exe "pwsh-preview"))
 
 (use-package markdown-mode
   :ensure t
