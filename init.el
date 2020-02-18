@@ -24,6 +24,11 @@
 (defvar org-refile-file-path "~/.emacs.d/refile.org"
   "A place to hold temporary refile information.")
 
+(defcustom filter-bad-contacts
+  #'identity
+  "This is used to filter the bad contacts that mu4e is
+accumulating.")
+
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -85,7 +90,7 @@
 
 (use-package browse-url
   :config
-  (setq browse-url-browser-function 'browse-url-firefox))
+  (setq browse-url-browser-function 'browse-url-chrome))
 
 (use-package scroll-bar
   :config
@@ -94,18 +99,6 @@
 (use-package server
   :config
   (server-start))
-
-(defun filter-bad-contacts (contact)
-  "This is used to filter the bad contacts that mu4e is
-accumulating."
-  (let ((name (or (plist-get contact :name) ""))
-        (mail (plist-get contact :mail)))
-    (if (or (and (string= "Mateus Costa" name)
-                 (string= "yurialbuquerque@brickabode.com" mail))
-            (string-match-p "bickabode" mail)
-            (string-match-p "brickabode.con" mail))
-        nil
-      contact)))
 
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
