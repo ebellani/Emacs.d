@@ -197,7 +197,6 @@ accumulating.")
   ;; reading/writing of command history in, say, inferior-haskell-mode buffers,
   ;; simply add turn-on-comint-history to inferior-haskell-mode-hook by adding
   ;; it to the :hook directive
-  :hook (inferior-python-mode sql-interactive-mode)
   :config
   (defun comint-write-history-on-exit (process event)
     (comint-write-input-ring)
@@ -227,6 +226,16 @@ accumulating.")
 
   (add-hook 'kill-emacs-hook 'comint-write-input-ring-all-buffers)
   (add-hook 'kill-buffer-hook 'comint-write-input-ring))
+
+(use-package sql
+  :after comint
+  :config
+  (add-hook 'sql-interactive-mode-hook 'turn-on-comint-history))
+
+(use-package python
+  :after comint
+  :config
+  (add-hook 'inferior-python-mode-hook 'turn-on-comint-history))
 
 (use-package eshell
   :init
