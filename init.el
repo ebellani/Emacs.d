@@ -227,6 +227,9 @@ accumulating.")
   (add-hook 'kill-emacs-hook 'comint-write-input-ring-all-buffers)
   (add-hook 'kill-buffer-hook 'comint-write-input-ring))
 
+
+;;; save history of some modes
+
 (use-package sql
   :after comint
   :config
@@ -631,6 +634,10 @@ hit C-a twice:"
          ("C-h v" . helpful-variable)
          ("C-h F" . helpful-function)
          ("C-h k" . helpful-key)))
+
+(use-package info-rename-buffer
+  :ensure t
+  :config (info-rename-buffer-mode 1))
 
 (use-package plantuml-mode
   :ensure t
