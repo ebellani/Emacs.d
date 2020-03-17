@@ -923,9 +923,6 @@ hit C-a twice:"
               (assq-delete-all :comments org-babel-default-header-args))
         org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>")
         org-duration-format '((special . h:mm))
-        org-file-apps
-        '((auto-mode . emacs)
-          ("\\.x?html?\\'" . "x-www-browser %s"))
         org-goto-interface 'outline-path-completion
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
