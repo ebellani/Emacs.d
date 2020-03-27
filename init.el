@@ -972,7 +972,9 @@ hit C-a twice:"
 
 (use-package ox-gfm
   :ensure t
-  :after ox)
+  :after ox
+  :config
+  (add-to-list 'org-export-backends 'gfm))
 
 (use-package org-tempo
   :ensure nil
