@@ -834,14 +834,11 @@ hit C-a twice:"
 (use-package org-gcal
   :ensure t
   :config
-  (defun setup-org-gcal ()
-    (let* ((gcal-plist (car (auth-source-search :host "gcal")))
-           (gcal-username (plist-get gcal-plist :user))
-           (gcal-secret (funcall (plist-get gcal-plist :secret))))
-      (setq org-gcal-client-id gcal-username
-            org-gcal-client-secret gcal-secret)
-      (org-gcal-fetch)))
-  (add-hook 'org-agenda-mode-hook #'setup-org-gcal))
+  (let* ((gcal-plist (car (auth-source-search :host "gcal")))
+         (gcal-username (plist-get gcal-plist :user))
+         (gcal-secret (funcall (plist-get gcal-plist :secret))))
+    (setq org-gcal-client-id     gcal-username
+          org-gcal-client-secret gcal-secret)))
 
 (use-package calfw
   :ensure t
