@@ -822,14 +822,16 @@ hit C-a twice:"
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
                     '((:order-multi
-                       (0 (:name "Day's tasks"
+                       (0 (:name "Important"
+                                 :priority "A")
+                          (:name "Late tasks"
+                                 :deadline  past
+                                 :scheduled past)
+                          (:name "Day's tasks"
                                  :time-grid t
                                  :date today
                                  :deadline  today
-                                 :scheduled today)
-                          (:name "Late tasks"
-                                 :deadline  past
-                                 :scheduled past))))))))))))
+                                 :scheduled today))))))))))))
 
 (use-package org-gcal
   :ensure t
@@ -869,7 +871,7 @@ hit C-a twice:"
          ("C-c b" . 'org-iswitchb))
   :ensure org-plus-contrib
   :init
-  (setq org-export-backends '(ascii taskjuggler html icalendar latex md odt org))
+  (setq org-export-backends '(gfm ascii taskjuggler html icalendar latex md odt org))
   :config
   (require 'org-tempo)
   (defun replace-in-string (what with in)
@@ -972,9 +974,7 @@ hit C-a twice:"
 
 (use-package ox-gfm
   :ensure t
-  :after ox
-  :config
-  (add-to-list 'org-export-backends 'gfm))
+  :after ox)
 
 (use-package org-tempo
   :ensure nil
@@ -996,3 +996,7 @@ hit C-a twice:"
 (use-package helm-mu
   :ensure t
   :after mu4e)
+
+(use-package w3m
+  :ensure t
+  :config (setq w3m-key-binding 'info))
