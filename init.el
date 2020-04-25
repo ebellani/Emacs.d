@@ -437,17 +437,6 @@ hit C-a twice:"
 
 (use-package psession
   :ensure t
-  :init
-  (setq psession-object-to-save-alist
-        '((ioccur-history                . "ioccur-history.el")
-          (extended-command-history      . "extended-command-history.el")
-          (helm-external-command-history . "helm-external-command-history.el")
-          (helm-surfraw-engines-history  . "helm-surfraw-engines-history.el")
-          (psession--save-buffers-alist  . "psession-save-buffers-alist.el")
-          (helm-ff-history               . "helm-ff-history.el")
-          (helm-grep-history             . "helm-grep-history.el")
-          (register-alist                . "register-alist.el")
-          (psession--winconf-alist       . "psession-winconf-alist.el")))
   :config
   (psession-mode 1))
 
@@ -823,7 +812,7 @@ hit C-a twice:"
       ((agenda "" ((org-super-agenda-groups
                     '((:order-multi
                        (0 (:name "Important"
-                                 :priority "A")
+                                 :priority>= "B")
                           (:name "Late tasks"
                                  :deadline  past
                                  :scheduled past)
@@ -870,8 +859,8 @@ hit C-a twice:"
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
   :ensure org-plus-contrib
-  :init
-  (setq org-export-backends '(gfm ascii taskjuggler html icalendar latex md odt org))
+  :preface
+  (setq org-export-backends '(md gfm ascii taskjuggler html latex odt org))
   :config
   (require 'org-tempo)
   (defun replace-in-string (what with in)
@@ -951,11 +940,11 @@ hit C-a twice:"
      (ditaa  . t)
      (C      . t)
      (ledger . t)
-     (org    . t))))
+     (org    . t)))
 
-(use-package org-ql
-  :ensure t
-  :after org)
+  (use-package org-ql
+    :ensure t
+    :after org))
 
 (use-package ox
   :after org
@@ -999,4 +988,18 @@ hit C-a twice:"
 
 (use-package w3m
   :ensure t
-  :config (setq w3m-key-binding 'info))
+  :init (setq w3m-key-binding 'info))
+
+(use-package erlang
+  :ensure t
+  :mode (("\\.erl?$" . erlang-mode)
+	 ("rebar\\.config$" . erlang-mode)
+	 ("relx\\.config$" . erlang-mode)
+	 ("sys\\.config\\.src$" . erlang-mode)
+	 ("sys\\.config$" . erlang-mode)
+	 ("\\.config\\.src?$" . erlang-mode)
+	 ("\\.config\\.script?$" . erlang-mode)
+	 ("\\.hrl?$" . erlang-mode)
+	 ("\\.app?$" . erlang-mode)
+	 ("\\.app.src?$" . erlang-mode)
+	 ("\\Emakefile" . erlang-mode)))
