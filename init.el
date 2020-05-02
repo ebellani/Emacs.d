@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 110)
 
 ;;; things that I don't know how to do with use-package
 
@@ -96,9 +96,7 @@ accumulating.")
   :config
   (scroll-bar-mode 0))
 
-(use-package server
-  :config
-  (server-start))
+;;; end
 
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
@@ -438,7 +436,12 @@ hit C-a twice:"
 (use-package psession
   :ensure t
   :config
-  (psession-mode 1))
+  (psession-savehist-mode 1)
+  (psession-mode 1)
+  (psession-autosave-mode 1)
+  (bind-key "C-x p s" 'psession-save-winconf)
+  (bind-key "C-x p d" 'psession-delete-winconf)
+  (bind-key "C-x p j" 'psession-restore-winconf))
 
 (use-package magit
   :ensure t
@@ -630,8 +633,11 @@ hit C-a twice:"
 
 (use-package plantuml-mode
   :ensure t
-  :mode "\\.plantuml\\'"
-  :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"))
+  :mode (("\\.plantuml$" . plantuml-mode)
+         ("\\.puml$" . plantuml-mode
+          ))
+  :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
+                plantuml-default-exec-mode 'jar))
 
 (use-package docker
   :ensure t
@@ -940,11 +946,11 @@ hit C-a twice:"
      (ditaa  . t)
      (C      . t)
      (ledger . t)
-     (org    . t)))
+     (org    . t))))
 
-  (use-package org-ql
-    :ensure t
-    :after org))
+(use-package org-ql
+  :ensure t
+  :after org)
 
 (use-package ox
   :after org
