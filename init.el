@@ -829,11 +829,6 @@ hit C-a twice:"
                              :scheduled today)
                       (:discard (:anything t)))))))))))
 
-(let ((org-agenda-show-inherited-tags t)
-      (org-super-agenda-groups '((:name "With tag" :and (:scheduled nil :tag "booking"))
-                                 (:discard (:anything t)))))
-  (org-agenda-list nil "t"))
-
 (use-package org-gcal
   :ensure t
   :config
