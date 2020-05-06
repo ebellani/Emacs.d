@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 110)
+                    :height 100)
 
 ;;; things that I don't know how to do with use-package
 
@@ -815,18 +815,24 @@ hit C-a twice:"
   (setq
    org-agenda-custom-commands
    '(("u" "Super view"
-      ((agenda "" ((org-super-agenda-groups
-                    '((:order-multi
-                       (0 (:name "Important"
-                                 :priority>= "B")
-                          (:name "Late tasks"
-                                 :deadline  past
-                                 :scheduled past)
-                          (:name "Day's tasks"
-                                 :time-grid t
-                                 :date today
-                                 :deadline  today
-                                 :scheduled today))))))))))))
+      ((tags ":booking:")
+       (agenda "" ((org-super-agenda-groups
+                    '((:name "Important"
+                             :priority>= "B")
+                      (:name "Late tasks"
+                             :deadline  past
+                             :scheduled past)
+                      (:name "Day's tasks"
+                             :time-grid t
+                             :date today
+                             :deadline  today
+                             :scheduled today)
+                      (:discard (:anything t)))))))))))
+
+(let ((org-agenda-show-inherited-tags t)
+      (org-super-agenda-groups '((:name "With tag" :and (:scheduled nil :tag "booking"))
+                                 (:discard (:anything t)))))
+  (org-agenda-list nil "t"))
 
 (use-package org-gcal
   :ensure t
