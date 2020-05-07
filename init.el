@@ -145,7 +145,8 @@ accumulating.")
         mu4e-view-use-gnus nil
         mu4e-date-format-long "%F"
         mu4e-headers-date-format "%F"
-        mu4e-headers-time-format "%T")
+        mu4e-headers-time-format "%T"
+        mu4e-split-view 'single-window)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
