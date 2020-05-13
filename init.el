@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 100)
+                    :height 90)
 
 ;;; things that I don't know how to do with use-package
 
@@ -816,7 +816,7 @@ hit C-a twice:"
   (setq
    org-agenda-custom-commands
    '(("u" "Super view"
-      ((tags ":booking:")
+      ((tags "booking/!TODO-DONE")
        (agenda "" ((org-super-agenda-groups
                     '((:name "Important"
                              :priority>= "B")
