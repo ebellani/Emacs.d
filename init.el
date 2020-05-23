@@ -96,7 +96,8 @@ accumulating.")
   :config
   (scroll-bar-mode 0))
 
-;;; end
+(use-package gnu-elpa-keyring-update
+  :ensure t)
 
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
@@ -387,480 +388,6 @@ hit C-a twice:"
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t))))
 
-;;; Libraries
-
-(use-package diminish
-  :ensure t
-  :demand t)
-
-(use-package s
-  :ensure t
-  :defer t)
-
-(use-package shadchen
-  :ensure t
-  :defer t)
-
-(use-package dash
-  :ensure t
-  :defer t)
-
-(use-package ht
-  :ensure t
-  :defer t)
-
-;;; packages
-
-(use-package async
-  :ensure t)
-
-(use-package smtpmail-async
-  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
-  ;; multiple values.
-  :after async
-  :ensure async
-  :config
-  (setq message-send-mail-function 'async-smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-debug-info t))
-
-
-(use-package undo-tree
-  :ensure t
-  :config
-  (global-undo-tree-mode)
-  (setq undo-tree-visualizer-diff t)
-  (setq undo-tree-visualizer-timestamps t))
-
-(use-package psession
-  :ensure t
-  :config
-  (psession-savehist-mode 1)
-  (psession-mode 1)
-  (psession-autosave-mode 1)
-  (bind-key "C-x p s" 'psession-save-winconf)
-  (bind-key "C-x p d" 'psession-delete-winconf)
-  (bind-key "C-x p j" 'psession-restore-winconf))
-
-(use-package magit
-  :ensure t
-  :bind (("C-x g" . magit-status)))
-
-(use-package forge
-  :ensure t
-  :after magit)
-
-(use-package git-timemachine
-  :ensure t
-  :after magit)
-
-(use-package switch-window
-  :ensure t
-  :config
-  (setq switch-window-threshold 3)
-  :bind
-  ("C-x o"     . 'switch-window)
-  ("C-x 1"     . 'switch-window-then-maximize)
-  ("C-x 2"     . 'switch-window-then-split-below)
-  ("C-x 3"     . 'switch-window-then-split-right)
-  ("C-x 0"     . 'switch-window-then-delete)
-  ("C-x 4 d"   . 'switch-window-then-dired)
-  ("C-x 4 f"   . 'switch-window-then-find-file)
-  ("C-x 4 m"   . 'switch-window-then-compose-mail)
-  ("C-x 4 r"   . 'switch-window-then-find-file-read-only)
-  ("C-x 4 C-f" . 'switch-window-then-find-file)
-  ("C-x 4 C-o" . 'switch-window-then-display-buffer)
-  ("C-x 4 0"   . 'switch-window-then-kill-buffer))
-
-(use-package pdf-tools
-  :ensure t
-  :magic ("%PDF" . pdf-view-mode)
-  :config
-  ;; fix space next page problem. No idea why
-  (setq pdf-view-have-image-mode-pixel-vscroll nil)
-  (pdf-tools-install))
-
-(use-package web-mode
-  :ensure t
-  :mode "\\.html?\\'\\|\\.fsproj$\\'")
-
-(use-package hippie-exp
-  :ensure t
-  :bind ("M-/" . hippie-expand)
-  :init
-  (setf hippie-expand-try-functions-list
-        '(try-expand-dabbrev-visible
-          try-expand-dabbrev
-          try-expand-dabbrev-all-buffers
-          try-expand-line
-          try-complete-lisp-symbol)))
-
-(use-package company
-  :ensure t
-  :diminish
-  :commands (company-mode company-indent-or-complete-common)
-  :config
-  (setf company-idle-delay 0
-        company-selection-wrap-around t)
-  (global-company-mode t))
-
-(use-package helm-company
-  :ensure t
-  :after helm company
-  :bind (:map
-         company-mode-map ("C-;" . 'helm-company)
-         :map
-         company-active-map ("C-;" . 'helm-company)))
-
-(use-package helm-org
-  :ensure t
-  :after helm org)
-
-(use-package paredit
-  :ensure t
-  :diminish
-  :hook ((lisp-mode emacs-lisp-mode clojure-mode) . paredit-mode)
-  :bind (:map paredit-mode-map
-              ("C-c ( n"   . paredit-add-to-next-list)
-              ("C-c ( p"   . paredit-add-to-previous-list)
-              ("C-c ( j"   . paredit-join-with-next-list)
-              ("C-c ( J"   . paredit-join-with-previous-list))
-  :bind (:map lisp-mode-map       ("<return>" . paredit-newline))
-  :bind (:map emacs-lisp-mode-map ("<return>" . paredit-newline))
-  :config
-  (require 'eldoc)
-  (eldoc-add-command 'paredit-backward-delete
-                     'paredit-close-round))
-
-(use-package visual-regexp
-  :ensure t
-  :bind (("C-c r"   . vr/replace)
-         ("C-c %"   . vr/query-replace)
-         ("<C-m> /" . vr/mc-mark)))
-
-(use-package smartparens
-  :ensure t
-  :config
-  (require 'smartparens-config)
-  (bind-keys :map smartparens-mode-map
-             ("C-M-f" . sp-forward-sexp)
-             ("C-M-S-f" . sp-next-sexp)
-             ("C-M-b" . sp-backward-sexp)
-             ("C-M-S-b" . sp-previous-sexp)
-             ("C-M-n" . sp-down-sexp)
-             ("C-M-S-n" . sp-backward-down-sexp)
-             ("C-M-p" . sp-up-sexp)
-             ("C-M-S-p" . sp-backward-up-sexp)
-             ("C-M-a" . sp-beginning-of-sexp)
-             ("C-M-e" . sp-end-of-sexp)
-             ("C-M-k" . sp-kill-sexp)
-             ("C-M-S-k" . sp-backward-kill-sexp)
-             ("C-M-w" . sp-copy-sexp)
-             ("C-M-t" . sp-transpose-sexp)
-             ("C-M-h" . sp-backward-slurp-sexp)
-             ("C-M-S-h" . sp-backward-barf-sexp)
-             ("C-M-l" . sp-forward-slurp-sexp)
-             ("C-M-S-l" . sp-forward-barf-sexp)
-             ("C-M-j" . sp-splice-sexp)
-             ("C-M-S-j" . sp-raise-sexp))
-  (smartparens-global-mode t)
-  (smartparens-strict-mode t)
-  (show-smartparens-global-mode t)
-  ;; We write it the verbose way instead of with sp-with-modes because
-  ;; use-package does not properly expand the macro somehow during compilation
-  (sp-local-pair sp--html-modes "{{" "}}")
-  (sp-local-pair sp--html-modes "{%" "%}")
-  (sp-local-pair sp--html-modes "{#" "#}"))
-
-(use-package eldoc
-  :ensure t
-  :diminish t
-  :hook ((c-mode-common
-          emacs-lisp-mode
-          lisp-interaction-mode
-          eval-expression-minibuffer-setup)
-         . eldoc-mode))
-
-(use-package elint
-  :ensure t
-  :commands (elint-initialize elint-current-buffer)
-  :bind ("C-c e E" . my-elint-current-buffer)
-  :preface
-  (defun my-elint-current-buffer ()
-    (interactive)
-    (elint-initialize)
-    (elint-current-buffer))
-  :config
-  (add-to-list 'elint-standard-variables 'current-prefix-arg)
-  (add-to-list 'elint-standard-variables 'command-line-args-left)
-  (add-to-list 'elint-standard-variables 'buffer-file-coding-system)
-  (add-to-list 'elint-standard-variables 'emacs-major-version)
-  (add-to-list 'elint-standard-variables 'window-system))
-
-(use-package elisp-depend
-  :ensure t
-  :commands elisp-depend-print-dependencies)
-
-(use-package elisp-docstring-mode
-  :ensure t
-  :commands elisp-docstring-mode)
-
-(use-package elisp-slime-nav
-  :ensure t
-  :diminish
-  :hook ((emacs-lisp-mode) . elisp-slime-nav-mode)
-  :commands (elisp-slime-nav-mode
-             elisp-slime-nav-find-elisp-thing-at-point))
-
-(use-package json-mode
-  :ensure t
-  :mode "\\.json\\'")
-
-(use-package helpful
-  :ensure t
-  :bind (("C-h C" . helpful-command)
-         ("C-h M" . helpful-macro)
-         ("C-h f" . helpful-callable)
-         ("C-c C-d" . helpful-at-point)
-         ("C-h v" . helpful-variable)
-         ("C-h F" . helpful-function)
-         ("C-h k" . helpful-key)))
-
-(use-package info-rename-buffer
-  :ensure t
-  :config (info-rename-buffer-mode 1))
-
-(use-package plantuml-mode
-  :ensure t
-  :mode (("\\.plantuml$" . plantuml-mode)
-         ("\\.puml$" . plantuml-mode
-          ))
-  :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
-                plantuml-default-exec-mode 'jar))
-
-(use-package docker
-  :ensure t
-  :bind ("C-c d" . docker))
-
-(use-package docker-compose-mode
-  :ensure t
-  :mode "docker-compose.*\.yml\\'")
-
-(use-package docker-tramp
-  :ensure t
-  :after tramp
-  :defer 5)
-
-(use-package dockerfile-mode
-  :ensure t
-  :mode "Dockerfile[a-zA-Z.-]*\\'")
-
-(use-package ledger-mode
-  :ensure t
-  :mode (("\.dat$" . ledger-mode)
-         ("\.ledger$" . ledger-mode))
-  :config
-  (add-hook 'ledger-mode-hook (lambda () (company-mode -1)))
-  (defun ledger-pcomplete (&optional interactively)
-    (interactive "p")
-    (completion-at-point)))
-
-(use-package winner
-  :ensure t
-  :config (winner-mode 1))
-
-(use-package helm
-  :ensure t
-  :diminish
-  :bind (("C-h a"   . helm-apropos)
-         ("C-x b"   . helm-mini)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x C-m" . helm-M-x)
-         ("C-x m"   . helm-M-x)
-         ("C-x C-f" . helm-find-files)
-         ("C-x C-r" . helm-recentf)
-         ("C-x r l" . helm-filtered-bookmarks)
-         ("C-x r b" . helm-filtered-bookmarks)
-         ("C-x i"   . helm-imenu)
-         ("M-y"     . helm-show-kill-ring)
-         ("M-i"     . helm-swoop-without-pre-input)
-         ("M-I"     . helm-swoop-back-to-last-point)
-         ("C-c M-i" . helm-multi-swoop)
-         ("C-x M-i" . helm-multi-swoop-all))
-  :bind (:map helm-map
-              ("<tab>" . helm-execute-persistent-action)
-              ("C-z"   . helm-select-action))
-  :config
-  (setq helm-ff-transformer-show-only-basename nil
-        helm-yank-symbol-first                 t
-        helm-move-to-line-cycle-in-source      t
-        helm-buffers-fuzzy-matching            t
-        helm-ff-auto-update-initial-value      t
-        helm-imenu-fuzzy-match                 t
-        helm-buffer-max-length                 nil
-        ;; the following would enable a separate frame.
-        ;; helm-display-function                  'helm-display-buffer-in-own-frame
-        ;; helm-display-buffer-reuse-frame        t
-        ;; helm-use-undecorated-frame-option      t
-        )
-  (helm-mode 1)
-  (helm-adaptive-mode 1)
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (eshell-cmpl-initialize)
-              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history))))
-
-(use-package pcomplete-extension
-  :ensure t)
-
-(use-package pcmpl-args
-  :ensure t)
-
-(use-package helm-company
-  :ensure t
-  :after helm company
-  :bind ((:map company-mode-map ("C-;" . 'helm-company))
-         (:map company-active-map ("C-;" . 'helm-company))))
-
-(use-package helm-flx
-  :ensure t
-  :after helm
-  :config (setq helm-flx-for-helm-find-files t ;; t by default
-                helm-flx-for-helm-locate t) ;; nil by default
-  )
-
-(use-package helm-descbinds
-  :ensure t
-  :bind ("C-h b" . helm-descbinds))
-
-(use-package helm-swoop
-  :ensure t
-  :bind (("M-m" . helm-swoop)
-	 ("M-M" . helm-swoop-back-to-last-point))
-  :init
-  (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
-
-(use-package helm-wordnet
-  :ensure t
-  :after helm)
-
-(use-package projectile
-  :ensure t
-  :defer 5
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map))
-  :diminish
-  :config
-  (projectile-global-mode)
-  (setq projectile-enable-caching t
-        projectile-indexing-method 'alien
-        projectile-mode-line "Projectile"))
-
-(use-package helm-projectile
-  :ensure t
-  :config
-  (helm-projectile-on))
-
-(use-package elscreen
-  :ensure t
-  :config
-  (setq elscreen-tab-display-control nil  ; hide control tab at the left side
-        elscreen-tab-display-kill-screen nil ; hide kill button
-        elscreen-display-tab t)
-  (elscreen-start))
-
-(use-package powershell
-  :ensure t
-  :mode (("\.ps1$" . powershell-mode))
-  :config (setq powershell-location-of-exe "pwsh-preview"))
-
-(use-package markdown-mode
-  :ensure t
-  :mode (("\.md$" . markdown-mode)))
-
-(use-package elfeed
-  :ensure t
-  :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-title-max-width 140))
-
-(use-package elfeed-org
-  :ensure t
-  :after elfeed
-  :init (elfeed-org)
-  :config
-  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
-
-(use-package async)
-
-(use-package htmlize
-  :ensure t)
-
-(use-package zenburn-theme
-  :ensure t
-  :defer t)
-
-(use-package solarized-theme
-  :ensure t
-  :defer t)
-
-(use-package gnuplot-mode
-  :ensure t)
-
-(use-package org-super-agenda
-  :ensure t
-  :config
-  (org-super-agenda-mode 1)
-  (setq
-   org-agenda-custom-commands
-   '(("u" "Super view"
-      ((tags "booking/!TODO-DONE")
-       (agenda "" ((org-super-agenda-groups
-                    '((:name "Important"
-                             :priority>= "B")
-                      (:name "Late tasks"
-                             :deadline  past
-                             :scheduled past)
-                      (:name "Day's tasks"
-                             :time-grid t
-                             :date today
-                             :deadline  today
-                             :scheduled today)
-                      (:discard (:anything t)))))))))))
-
-(use-package org-gcal
-  :ensure t
-  :config
-  (let* ((gcal-plist (car (auth-source-search :host "gcal")))
-         (gcal-username (plist-get gcal-plist :user))
-         (gcal-secret (funcall (plist-get gcal-plist :secret))))
-    (setq org-gcal-client-id     gcal-username
-          org-gcal-client-secret gcal-secret)))
-
-(use-package calfw
-  :ensure t
-  :config
-  (setq cfw:org-overwrite-default-keybinding t))
-
-(use-package calfw-org
-  :ensure t
-  :after calfw)
-
-(use-package spaceline
-  :ensure t)
-
-(use-package spaceline-config
-  :ensure spaceline
-  :config
-  (require 'spaceline-config)
-  (spaceline-emacs-theme)
-  (spaceline-helm-mode)
-  (spaceline-info-mode)
-  (spaceline-toggle-buffer-encoding-abbrev-off)
-  (spaceline-toggle-buffer-size-off))
-
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -950,10 +477,6 @@ hit C-a twice:"
      (ledger . t)
      (org    . t))))
 
-(use-package org-ql
-  :ensure t
-  :after org)
-
 (use-package ox
   :after org
   :config
@@ -969,45 +492,434 @@ hit C-a twice:"
                    ((or `ascii `latex)
                     (replace-regexp-in-string "[][<>]" "" trans))))))
 
-(use-package ox-gfm
-  :ensure t
-  :after ox)
 
-(use-package org-tempo
-  :ensure nil
-  :after org)
+;;; end
 
-(use-package org-pomodoro
-  :ensure t
-  :after org)
+(let ((use-package-always-ensure t))
 
-(use-package hercules
-  :ensure t)
+;;; Libraries
 
-(use-package gnu-elpa-keyring-update
-  :ensure t)
+  (use-package diminish
+    :demand t)
+
+  (use-package s
+    :defer t)
+
+  (use-package shadchen
+    :defer t)
+
+  (use-package dash
+    :defer t)
+
+  (use-package ht
+    :defer t)
+
+;;; packages
+
+  (use-package async)
+
+  (use-package smtpmail-async
+    ;; this is fixed for gmail for now. Mu4e contexts could be used to set
+    ;; multiple values.
+    :after async
+    :ensure async
+    :config
+    (setq message-send-mail-function 'async-smtpmail-send-it
+          smtpmail-default-smtp-server "smtp.gmail.com"
+          smtpmail-smtp-server "smtp.gmail.com"
+          smtpmail-smtp-service 587
+          smtpmail-debug-info t))
+
+
+  (use-package undo-tree
+    :config
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-diff t)
+    (setq undo-tree-visualizer-timestamps t))
+
+  (use-package psession
+    :config
+    (psession-savehist-mode 1)
+    (psession-mode 1)
+    (psession-autosave-mode 1)
+    (bind-key "C-x p s" 'psession-save-winconf)
+    (bind-key "C-x p d" 'psession-delete-winconf)
+    (bind-key "C-x p j" 'psession-restore-winconf))
+
+  (use-package magit
+    :bind (("C-x g" . magit-status)))
+
+  (use-package forge
+    :after magit)
+
+  (use-package git-timemachine
+    :after magit)
+
+  (use-package switch-window
+    :config
+    (setq switch-window-threshold 3)
+    :bind
+    ("C-x o"     . 'switch-window)
+    ("C-x 1"     . 'switch-window-then-maximize)
+    ("C-x 2"     . 'switch-window-then-split-below)
+    ("C-x 3"     . 'switch-window-then-split-right)
+    ("C-x 0"     . 'switch-window-then-delete)
+    ("C-x 4 d"   . 'switch-window-then-dired)
+    ("C-x 4 f"   . 'switch-window-then-find-file)
+    ("C-x 4 m"   . 'switch-window-then-compose-mail)
+    ("C-x 4 r"   . 'switch-window-then-find-file-read-only)
+    ("C-x 4 C-f" . 'switch-window-then-find-file)
+    ("C-x 4 C-o" . 'switch-window-then-display-buffer)
+    ("C-x 4 0"   . 'switch-window-then-kill-buffer))
+
+  (use-package pdf-tools
+    :magic ("%PDF" . pdf-view-mode)
+    :config
+    ;; fix space next page problem. No idea why
+    (setq pdf-view-have-image-mode-pixel-vscroll nil)
+    (pdf-tools-install))
+
+  (use-package web-mode
+    :mode "\\.html?\\'\\|\\.fsproj$\\'")
+
+  (use-package hippie-exp
+    :bind ("M-/" . hippie-expand)
+    :init
+    (setf hippie-expand-try-functions-list
+          '(try-expand-dabbrev-visible
+            try-expand-dabbrev
+            try-expand-dabbrev-all-buffers
+            try-expand-line
+            try-complete-lisp-symbol)))
+
+  (use-package company
+    :diminish
+    :commands (company-mode company-indent-or-complete-common)
+    :config
+    (setf company-idle-delay 0
+          company-selection-wrap-around t)
+    (global-company-mode t))
+
+  (use-package helm-company
+    :after helm company
+    :bind (:map
+           company-mode-map ("C-;" . 'helm-company)
+           :map
+           company-active-map ("C-;" . 'helm-company)))
+
+  (use-package helm-org
+    :after helm org)
+
+  (use-package paredit
+    :diminish
+    :hook ((lisp-mode emacs-lisp-mode clojure-mode) . paredit-mode)
+    :bind (:map paredit-mode-map
+                ("C-c ( n"   . paredit-add-to-next-list)
+                ("C-c ( p"   . paredit-add-to-previous-list)
+                ("C-c ( j"   . paredit-join-with-next-list)
+                ("C-c ( J"   . paredit-join-with-previous-list))
+    :bind (:map lisp-mode-map       ("<return>" . paredit-newline))
+    :bind (:map emacs-lisp-mode-map ("<return>" . paredit-newline))
+    :config
+    (require 'eldoc)
+    (eldoc-add-command 'paredit-backward-delete
+                       'paredit-close-round))
+
+  (use-package visual-regexp
+    :bind (("C-c r"   . vr/replace)
+           ("C-c %"   . vr/query-replace)
+           ("<C-m> /" . vr/mc-mark)))
+
+  (use-package smartparens
+    :config
+    (require 'smartparens-config)
+    (bind-keys :map smartparens-mode-map
+               ("C-M-f" . sp-forward-sexp)
+               ("C-M-S-f" . sp-next-sexp)
+               ("C-M-b" . sp-backward-sexp)
+               ("C-M-S-b" . sp-previous-sexp)
+               ("C-M-n" . sp-down-sexp)
+               ("C-M-S-n" . sp-backward-down-sexp)
+               ("C-M-p" . sp-up-sexp)
+               ("C-M-S-p" . sp-backward-up-sexp)
+               ("C-M-a" . sp-beginning-of-sexp)
+               ("C-M-e" . sp-end-of-sexp)
+               ("C-M-k" . sp-kill-sexp)
+               ("C-M-S-k" . sp-backward-kill-sexp)
+               ("C-M-w" . sp-copy-sexp)
+               ("C-M-t" . sp-transpose-sexp)
+               ("C-M-h" . sp-backward-slurp-sexp)
+               ("C-M-S-h" . sp-backward-barf-sexp)
+               ("C-M-l" . sp-forward-slurp-sexp)
+               ("C-M-S-l" . sp-forward-barf-sexp)
+               ("C-M-j" . sp-splice-sexp)
+               ("C-M-S-j" . sp-raise-sexp))
+    (smartparens-global-mode t)
+    (smartparens-strict-mode t)
+    (show-smartparens-global-mode t)
+    ;; We write it the verbose way instead of with sp-with-modes because
+    ;; use-package does not properly expand the macro somehow during compilation
+    (sp-local-pair sp--html-modes "{{" "}}")
+    (sp-local-pair sp--html-modes "{%" "%}")
+    (sp-local-pair sp--html-modes "{#" "#}"))
+
+  (use-package eldoc
+    :diminish t
+    :hook ((c-mode-common
+            emacs-lisp-mode
+            lisp-interaction-mode
+            eval-expression-minibuffer-setup)
+           . eldoc-mode))
+
+  (use-package elint
+    :commands (elint-initialize elint-current-buffer)
+    :bind ("C-c e E" . my-elint-current-buffer)
+    :preface
+    (defun my-elint-current-buffer ()
+      (interactive)
+      (elint-initialize)
+      (elint-current-buffer))
+    :config
+    (add-to-list 'elint-standard-variables 'current-prefix-arg)
+    (add-to-list 'elint-standard-variables 'command-line-args-left)
+    (add-to-list 'elint-standard-variables 'buffer-file-coding-system)
+    (add-to-list 'elint-standard-variables 'emacs-major-version)
+    (add-to-list 'elint-standard-variables 'window-system))
+
+  (use-package elisp-depend
+    :commands elisp-depend-print-dependencies)
+
+  (use-package elisp-docstring-mode
+    :commands elisp-docstring-mode)
+
+  (use-package elisp-slime-nav
+    :diminish
+    :hook ((emacs-lisp-mode) . elisp-slime-nav-mode)
+    :commands (elisp-slime-nav-mode
+               elisp-slime-nav-find-elisp-thing-at-point))
+
+  (use-package json-mode
+    :mode "\\.json\\'")
+
+  (use-package helpful
+    :bind (("C-h C" . helpful-command)
+           ("C-h M" . helpful-macro)
+           ("C-h f" . helpful-callable)
+           ("C-c C-d" . helpful-at-point)
+           ("C-h v" . helpful-variable)
+           ("C-h F" . helpful-function)
+           ("C-h k" . helpful-key)))
+
+  (use-package info-rename-buffer
+    :config (info-rename-buffer-mode 1))
+
+  (use-package plantuml-mode
+    :mode (("\\.plantuml$" . plantuml-mode)
+           ("\\.puml$" . plantuml-mode
+            ))
+    :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
+                  plantuml-default-exec-mode 'jar))
+
+  (use-package docker
+    :bind ("C-c d" . docker))
+
+  (use-package docker-compose-mode
+    :mode "docker-compose.*\.yml\\'")
+
+  (use-package docker-tramp
+    :after tramp
+    :defer 5)
+
+  (use-package dockerfile-mode
+    :mode "Dockerfile[a-zA-Z.-]*\\'")
+
+  (use-package ledger-mode
+    :mode (("\.dat$" . ledger-mode)
+           ("\.ledger$" . ledger-mode))
+    :config
+    (add-hook 'ledger-mode-hook (lambda () (company-mode -1)))
+    (defun ledger-pcomplete (&optional interactively)
+      (interactive "p")
+      (completion-at-point)))
+
+  (use-package winner
+    :config (winner-mode 1))
+
+  (use-package helm
+    :diminish
+    :bind (("C-h a"   . helm-apropos)
+           ("C-x b"   . helm-mini)
+           ("C-x C-b" . helm-buffers-list)
+           ("C-x C-m" . helm-M-x)
+           ("C-x m"   . helm-M-x)
+           ("C-x C-f" . helm-find-files)
+           ("C-x C-r" . helm-recentf)
+           ("C-x r l" . helm-filtered-bookmarks)
+           ("C-x r b" . helm-filtered-bookmarks)
+           ("C-x i"   . helm-imenu)
+           ("M-y"     . helm-show-kill-ring)
+           ("M-i"     . helm-swoop-without-pre-input)
+           ("M-I"     . helm-swoop-back-to-last-point)
+           ("C-c M-i" . helm-multi-swoop)
+           ("C-x M-i" . helm-multi-swoop-all))
+    :bind (:map helm-map
+                ("<tab>" . helm-execute-persistent-action)
+                ("C-z"   . helm-select-action))
+    :config
+    (setq helm-ff-transformer-show-only-basename nil
+          helm-yank-symbol-first                 t
+          helm-move-to-line-cycle-in-source      t
+          helm-buffers-fuzzy-matching            t
+          helm-ff-auto-update-initial-value      t
+          helm-imenu-fuzzy-match                 t
+          helm-buffer-max-length                 nil
+          ;; the following would enable a separate frame.
+          ;; helm-display-function                  'helm-display-buffer-in-own-frame
+          ;; helm-display-buffer-reuse-frame        t
+          ;; helm-use-undecorated-frame-option      t
+          )
+    (helm-mode 1)
+    (helm-adaptive-mode 1)
+    (add-hook 'eshell-mode-hook
+              (lambda ()
+                (eshell-cmpl-initialize)
+                (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+                (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history))))
+
+  (use-package pcomplete-extension
+    )
+
+  (use-package pcmpl-args
+    )
+
+  (use-package helm-company
+    :after helm company
+    :bind ((:map company-mode-map ("C-;" . 'helm-company))
+           (:map company-active-map ("C-;" . 'helm-company))))
+
+  (use-package helm-flx
+    :after helm
+    :config (setq helm-flx-for-helm-find-files t ;; t by default
+                  helm-flx-for-helm-locate t)    ;; nil by default
+    )
+
+  (use-package helm-descbinds
+    :bind ("C-h b" . helm-descbinds))
+
+  (use-package helm-swoop
+    :bind (("M-m" . helm-swoop)
+	   ("M-M" . helm-swoop-back-to-last-point))
+    :init
+    (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
+
+  (use-package helm-wordnet
+    :after helm)
+
+  (use-package projectile
+    :defer 5
+    :bind (:map projectile-mode-map
+                ("C-c p" . projectile-command-map))
+    :diminish
+    :config
+    (projectile-global-mode)
+    (setq projectile-enable-caching t
+          projectile-indexing-method 'alien
+          projectile-mode-line "Projectile"))
+
+  (use-package helm-projectile
+    :config
+    (helm-projectile-on))
+
+  (use-package markdown-mode
+    :mode (("\.md$" . markdown-mode)))
+
+  (use-package elfeed
+    :bind (("C-x w" . 'elfeed))
+    :config (setq elfeed-search-title-max-width 140))
+
+  (use-package elfeed-org
+    :after elfeed
+    :init (elfeed-org)
+    :config
+    (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+
+  (use-package async)
+
+  (use-package htmlize
+    )
+
+  (use-package zenburn-theme
+    :defer t)
+
+  (use-package solarized-theme
+    :defer t)
+
+  (use-package gnuplot-mode
+    )
+
+  (use-package org-super-agenda
+    :config
+    (org-super-agenda-mode 1)
+    (setq
+     org-agenda-custom-commands
+     '(("u" "Super view"
+        ((tags "booking/!TODO-DONE")
+         (agenda "" ((org-super-agenda-groups
+                      '((:name "Important"
+                               :priority>= "B")
+                        (:name "Late tasks"
+                               :deadline  past
+                               :scheduled past)
+                        (:name "Day's tasks"
+                               :time-grid t
+                               :date today
+                               :deadline  today
+                               :scheduled today)
+                        (:discard (:anything t)))))))))))
+
+  (use-package org-gcal
+    :config
+    (let* ((gcal-plist (car (auth-source-search :host "gcal")))
+           (gcal-username (plist-get gcal-plist :user))
+           (gcal-secret (funcall (plist-get gcal-plist :secret))))
+      (setq org-gcal-client-id     gcal-username
+            org-gcal-client-secret gcal-secret)))
+
+  (use-package calfw
+
+    :config
+    (setq cfw:org-overwrite-default-keybinding t))
+
+  (use-package calfw-org
+    :after calfw)
+
+  (use-package org-ql
+    :after org)
+
+  (use-package ox-gfm
+    :after ox)
+
+  (use-package org-tempo
+    :after org)
+
+  (use-package helm-mu
+    :after mu4e)
+
+  (use-package w3m
+    :init (setq w3m-key-binding 'info))
+
+  (use-package erlang
+    :mode (("\\.erl?$" . erlang-mode)
+	   ("rebar\\.config$" . erlang-mode)
+	   ("relx\\.config$" . erlang-mode)
+	   ("sys\\.config\\.src$" . erlang-mode)
+	   ("sys\\.config$" . erlang-mode)
+	   ("\\.config\\.src?$" . erlang-mode)
+	   ("\\.config\\.script?$" . erlang-mode)
+	   ("\\.hrl?$" . erlang-mode)
+	   ("\\.app?$" . erlang-mode)
+	   ("\\.app.src?$" . erlang-mode)
+	   ("\\Emakefile" . erlang-mode))))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
-
-(use-package helm-mu
-  :ensure t
-  :after mu4e)
-
-(use-package w3m
-  :ensure t
-  :init (setq w3m-key-binding 'info))
-
-(use-package erlang
-  :ensure t
-  :mode (("\\.erl?$" . erlang-mode)
-	 ("rebar\\.config$" . erlang-mode)
-	 ("relx\\.config$" . erlang-mode)
-	 ("sys\\.config\\.src$" . erlang-mode)
-	 ("sys\\.config$" . erlang-mode)
-	 ("\\.config\\.src?$" . erlang-mode)
-	 ("\\.config\\.script?$" . erlang-mode)
-	 ("\\.hrl?$" . erlang-mode)
-	 ("\\.app?$" . erlang-mode)
-	 ("\\.app.src?$" . erlang-mode)
-	 ("\\Emakefile" . erlang-mode)))
