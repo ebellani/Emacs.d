@@ -477,6 +477,9 @@ hit C-a twice:"
      (ledger . t)
      (org    . t))))
 
+(use-package org-tempo
+  :after org)
+
 (use-package ox
   :after org
   :config
@@ -898,9 +901,6 @@ hit C-a twice:"
 (use-package ox-gfm
   :after ox)
 
-(use-package org-tempo
-  :after org)
-
 (use-package helm-mu
   :after mu4e)
 
@@ -922,7 +922,9 @@ hit C-a twice:"
 
 (use-package perspective
   :config
-  (persp-mode))
+  (persp-mode)
+  (add-hook 'kill-emacs-hook #'persp-state-save)
+  (setq persp-state-default-file "~/.emacs.d/persp.state"))
 
 (setq use-package-always-ensure nil)
 
