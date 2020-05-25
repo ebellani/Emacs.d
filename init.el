@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 90)
 
 ;;; things that I don't know how to do with use-package
 
@@ -494,7 +494,10 @@ hit C-a twice:"
 
 
 
-;; (setq use-package-always-ensure t)
+;;; packages that are fetched
+
+(setq use-package-always-ensure t)
+
 ;;; Libraries
 
 (use-package diminish)
@@ -916,6 +919,12 @@ hit C-a twice:"
 	 ("\\.app?$" . erlang-mode)
 	 ("\\.app.src?$" . erlang-mode)
 	 ("\\Emakefile" . erlang-mode)))
+
+(use-package perspective
+  :config
+  (persp-mode))
+
+(setq use-package-always-ensure nil)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
