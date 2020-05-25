@@ -924,7 +924,13 @@ hit C-a twice:"
   :config
   (persp-mode)
   (add-hook 'kill-emacs-hook #'persp-state-save)
-  (setq persp-state-default-file "~/.emacs.d/persp.state"))
+  (setq persp-state-default-file "~/.emacs.d/persp.state"
+        ;; https://github.com/nex3/perspective-el#some-musings-on-emacs-window-layouts
+        ;; avoid resizing
+        display-buffer-alist '((".*" (display-buffer-reuse-window display-buffer-pop-up-window)))
+        display-buffer-reuse-frames t         ; reuse windows in other frames
+        even-window-sizes nil                 ; display-buffer: avoid resizing
+        ))
 
 (setq use-package-always-ensure nil)
 
