@@ -444,8 +444,7 @@ hit C-a twice:"
         org-babel-default-header-args
         (cons '(:comments . "link")
               (assq-delete-all :comments org-babel-default-header-args))
-        org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>")
-        org-duration-format '((special . h:mm))
+         org-duration-format '((special . h:mm))
         org-goto-interface 'outline-path-completion
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
@@ -777,9 +776,9 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
         ;; the following would enable a separate frame.
-        ;; helm-display-function                  'helm-display-buffer-in-own-frame
-        ;; helm-display-buffer-reuse-frame        t
-        ;; helm-use-undecorated-frame-option      t
+        helm-display-function                  'helm-display-buffer-in-own-frame
+        helm-display-buffer-reuse-frame        t
+        helm-use-undecorated-frame-option      t
         )
   (helm-mode 1)
   (helm-adaptive-mode 1)
@@ -924,13 +923,7 @@ hit C-a twice:"
   :config
   (persp-mode)
   (add-hook 'kill-emacs-hook #'persp-state-save)
-  (setq persp-state-default-file "~/.emacs.d/persp.state"
-        ;; https://github.com/nex3/perspective-el#some-musings-on-emacs-window-layouts
-        ;; avoid resizing
-        display-buffer-alist '((".*" (display-buffer-reuse-window display-buffer-pop-up-window)))
-        display-buffer-reuse-frames t         ; reuse windows in other frames
-        even-window-sizes nil                 ; display-buffer: avoid resizing
-        ))
+  (setq persp-state-default-file "~/.emacs.d/persp.state"))
 
 (setq use-package-always-ensure nil)
 
