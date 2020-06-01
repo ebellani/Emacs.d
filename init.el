@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 90)
+                    :height 100)
 
 ;;; things that I don't know how to do with use-package
 
@@ -455,7 +455,6 @@ hit C-a twice:"
   ;; get images to reload after execution. Useful for things such as
   ;; gnuplot. See https://emacs.stackexchange.com/q/3302
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
-  (setq-default org-display-custom-times t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((dot     . t)
@@ -737,7 +736,8 @@ hit C-a twice:"
 
 (use-package ledger-mode
   :mode (("\.dat$" . ledger-mode)
-         ("\.ledger$" . ledger-mode))
+         ("\.ledger$" . ledger-mode)
+         ("\.timeclock$" . ledger-mode))
   :config
   (add-hook 'ledger-mode-hook (lambda () (company-mode -1)))
   (defun ledger-pcomplete (&optional interactively)
@@ -779,6 +779,7 @@ hit C-a twice:"
         helm-display-function                  'helm-display-buffer-in-own-frame
         helm-display-buffer-reuse-frame        t
         helm-use-undecorated-frame-option      t
+        helm-display-buffer-width  120
         )
   (helm-mode 1)
   (helm-adaptive-mode 1)
@@ -878,14 +879,6 @@ hit C-a twice:"
                       (:discard (:anything t))))))
        (tags "booking/!TODO-DONE"))))))
 
-(use-package org-gcal
-  :config
-  (let* ((gcal-plist (car (auth-source-search :host "gcal")))
-         (gcal-username (plist-get gcal-plist :user))
-         (gcal-secret (funcall (plist-get gcal-plist :secret))))
-    (setq org-gcal-client-id     gcal-username
-          org-gcal-client-secret gcal-secret)))
-
 (use-package calfw
 
   :config
@@ -924,6 +917,15 @@ hit C-a twice:"
   (persp-mode)
   (add-hook 'kill-emacs-hook #'persp-state-save)
   (setq persp-state-default-file "~/.emacs.d/persp.state"))
+
+(use-package org-gcal
+  :after org
+  :config
+  (let* ((gcal-plist (car (auth-source-search :host "gcal")))
+         (gcal-username (plist-get gcal-plist :user))
+         (gcal-secret (funcall (plist-get gcal-plist :secret))))
+    (setq org-gcal-client-id     gcal-username
+          org-gcal-client-secret gcal-secret)))
 
 (setq use-package-always-ensure nil)
 
