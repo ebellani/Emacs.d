@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 100)
+                    :height 130)
 
 ;;; things that I don't know how to do with use-package
 
@@ -280,7 +280,9 @@ hit C-a twice:"
       (if (= p (point))
           (beginning-of-line))))
   :config
-  (setq eshell-visual-commands
+  (setenv "PAGER" "cat")
+  (setq eshell-history-size 1024
+        eshell-visual-commands
         '("htop" "ncdu" "nmon" "vi" "screen" "top" "less" "more" "lynx" "ncftp" "pine" "tin" "trn" "elm"))
   :bind  (("C-a"   . 'eshell-maybe-bol)
           ("C-x !" . 'eshell-here)))
@@ -926,6 +928,12 @@ hit C-a twice:"
          (gcal-secret (funcall (plist-get gcal-plist :secret))))
     (setq org-gcal-client-id     gcal-username
           org-gcal-client-secret gcal-secret)))
+
+(use-package helm-org-rifle)
+
+(use-package bufler)
+
+(use-package helm-bufler)
 
 (setq use-package-always-ensure nil)
 
