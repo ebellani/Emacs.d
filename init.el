@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 120)
 
 ;;; things that I don't know how to do with use-package
 
@@ -778,10 +778,10 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
         ;; the following would enable a separate frame.
-        helm-display-function                  'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame        t
-        helm-use-undecorated-frame-option      t
-        helm-display-buffer-width  120
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-buffer-reuse-frame        t
+        ;; helm-use-undecorated-frame-option      t
+        ;; helm-display-buffer-width  120
         )
   (helm-mode 1)
   (helm-adaptive-mode 1)
@@ -866,7 +866,9 @@ hit C-a twice:"
   (org-super-agenda-mode 1)
   (setq
    org-agenda-custom-commands
-   '(("u" "Super view"
+   '(("c" "Covario"
+      ((tags "covario/!TODO-DONE")))
+     ("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
                     '((:name "Important"
                              :priority>= "B")
@@ -879,7 +881,8 @@ hit C-a twice:"
                              :deadline  today
                              :scheduled today)
                       (:discard (:anything t))))))
-       (tags "booking/!TODO-DONE"))))))
+       (tags "booking/!TODO-DONE")
+       (tags "covario/!TODO-DONE"))))))
 
 (use-package calfw
 
