@@ -505,6 +505,9 @@ hit C-a twice:"
 
 (use-package diminish)
 
+(use-package parse-csv
+  :defer t)
+
 (use-package s
   :defer t)
 
