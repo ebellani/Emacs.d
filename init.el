@@ -147,7 +147,10 @@ accumulating.")
         mu4e-date-format-long "%F"
         mu4e-headers-date-format "%F"
         mu4e-headers-time-format "%T"
-        mu4e-split-view 'single-window)
+        mu4e-split-view 'single-window
+        mail-user-agent 'mu4e-user-agent
+        mu4e-hide-index-messages t
+        )
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
@@ -604,7 +607,7 @@ hit C-a twice:"
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
-  (global-company-mode t))
+  (global-company-mode 1))
 
 (use-package helm-company
   :after helm company
@@ -780,6 +783,7 @@ hit C-a twice:"
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 nil
+        helm-show-completion-display-function #'helm-show-completion-default-display-function
         ;; the following would enable a separate frame.
         ;; helm-display-function                  'helm-display-buffer-in-own-frame
         ;; helm-display-buffer-reuse-frame        t
