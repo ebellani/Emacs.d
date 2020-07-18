@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120)
+                    :height 90)
 
 ;;; things that I don't know how to do with use-package
 
@@ -887,9 +887,7 @@ hit C-a twice:"
                              :date today
                              :deadline  today
                              :scheduled today)
-                      (:discard (:anything t))))))
-       (tags "booking/!TODO-DONE")
-       (tags "covario/!TODO-DONE"))))))
+                      (:discard (:anything t)))))))))))
 
 (use-package calfw
 
