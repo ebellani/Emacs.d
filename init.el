@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 90)
+                    :height 120)
 
 ;;; things that I don't know how to do with use-package
 
@@ -804,11 +804,6 @@ hit C-a twice:"
 (use-package pcmpl-args
   )
 
-(use-package helm-company
-  :after helm company
-  :bind ((:map company-mode-map ("C-;" . 'helm-company))
-         (:map company-active-map ("C-;" . 'helm-company))))
-
 (use-package helm-flx
   :after helm
   :config (setq helm-flx-for-helm-find-files t ;; t by default
@@ -942,6 +937,8 @@ hit C-a twice:"
 (use-package bufler)
 
 (use-package helm-bufler)
+
+(use-package pyenv-mode)
 
 (setq use-package-always-ensure nil)
 
