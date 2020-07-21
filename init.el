@@ -930,7 +930,8 @@ hit C-a twice:"
          (gcal-username (plist-get gcal-plist :user))
          (gcal-secret (funcall (plist-get gcal-plist :secret))))
     (setq org-gcal-client-id     gcal-username
-          org-gcal-client-secret gcal-secret)))
+          org-gcal-client-secret gcal-secret
+          org-gcal-notify-p nil)))
 
 (use-package helm-org-rifle)
 
@@ -938,7 +939,8 @@ hit C-a twice:"
 
 (use-package helm-bufler)
 
-(use-package pyenv-mode)
+(use-package pyenv-mode
+  :bind ("C-c C-s" . nil))
 
 (setq use-package-always-ensure nil)
 
