@@ -940,7 +940,8 @@ hit C-a twice:"
 (use-package helm-bufler)
 
 (use-package pyenv-mode
-  :bind ("C-c C-s" . nil))
+  :bind (:map pyenv-mode-map
+              ("C-c C-s" . nil)))
 
 (setq use-package-always-ensure nil)
 
