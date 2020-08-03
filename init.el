@@ -450,7 +450,7 @@ hit C-a twice:"
         org-babel-default-header-args
         (cons '(:comments . "link")
               (assq-delete-all :comments org-babel-default-header-args))
-         org-duration-format '((special . h:mm))
+        org-duration-format '((special . h:mm))
         org-goto-interface 'outline-path-completion
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
