@@ -607,7 +607,7 @@ hit C-a twice:"
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
-  (global-company-mode 1))
+  (global-company-mode))
 
 (use-package helm-company
   :after helm company
@@ -938,6 +938,14 @@ hit C-a twice:"
 (use-package bufler)
 
 (use-package helm-bufler)
+
+(use-package which-key
+  :config (which-key-mode))
+
+(use-package eglot)
+
+(use-package fsharp-mode
+  :config (require 'eglot-fsharp))
 
 (use-package pyenv-mode
   :bind (:map pyenv-mode-map
