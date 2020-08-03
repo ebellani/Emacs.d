@@ -108,6 +108,7 @@ accumulating.")
   (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         mu4e-headers-show-threads t
+        mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
         mu4e-contact-rewrite-function 'filter-bad-contacts
         ;;  "html2text -utf8 -width 72" ?
         ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
