@@ -74,7 +74,6 @@ accumulating.")
 (setq package-enable-at-startup nil)
 
 (add-to-list 'package-archives '("melpa"     . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (add-to-list 'package-archives '("org"       . "https://orgmode.org/elpa/") t)
 
 (unless package--initialized (package-initialize t))
