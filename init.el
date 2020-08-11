@@ -602,12 +602,12 @@ hit C-a twice:"
           try-complete-lisp-symbol)))
 
 (use-package company
-  :diminish
+  :ensure t
   :commands (company-mode company-indent-or-complete-common)
   :config
   (setf company-idle-delay 0
         company-selection-wrap-around t)
-  (global-company-mode))
+  :hook (after-init . global-company-mode))
 
 (use-package helm-company
   :after helm company
@@ -942,10 +942,16 @@ hit C-a twice:"
 (use-package which-key
   :config (which-key-mode))
 
-(use-package eglot)
+(use-package eglot
+  :after company)
 
 (use-package fsharp-mode
-  :config (require 'eglot-fsharp))
+  :after company
+  :config
+  (require 'eglot-fsharp)
+  (add-hook 'inferior-fsharp-mode-hook'turn-on-comint-history))
+
+(use-package dotnet)
 
 (use-package pyenv-mode
   :bind (:map pyenv-mode-map
