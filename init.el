@@ -117,7 +117,7 @@ accumulating.")
         mu4e-update-interval 120
         mu4e-headers-auto-update t
         mu4e-attachment-dir  "~/Downloads"
-        mu4e-maildir (expand-file-name "~/Mail/mail/")
+        mu4e-maildir (expand-file-name "~/Mail/")
         ;; don't save message to Sent Messages, GMail/IMAP will take care of this
         mu4e-sent-messages-behavior 'delete
         ;; kill buffers on exit
@@ -286,7 +286,9 @@ hit C-a twice:"
   (setenv "PAGER" "cat")
   (setq eshell-history-size 1024
         eshell-visual-commands
-        '("htop" "ncdu" "nmon" "vi" "screen" "top" "less" "more" "lynx" "ncftp" "pine" "tin" "trn" "elm"))
+        '("mtr -t" "nethogs"  "htop" "ncdu" "nmon"
+          "vi" "screen" "top" "less" "more" "lynx"
+          "ncftp" "pine" "tin" "trn" "elm"))
   :bind  (("C-a"   . 'eshell-maybe-bol)
           ("C-x !" . 'eshell-here)))
 
@@ -635,7 +637,7 @@ hit C-a twice:"
                      'paredit-close-round))
 
 (use-package visual-regexp
-  :bind (("C-c r"   . vr/replace)
+  :bind (("C-c v"   . vr/replace)
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
 
@@ -796,19 +798,13 @@ hit C-a twice:"
             (lambda ()
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history))))
+              (define-key eshell-hist-mode-map
+                [remap eshell-previous-matching-input-from-input]
+                'helm-eshell-history))))
 
-(use-package pcomplete-extension
-  )
+(use-package pcomplete-extension)
 
-(use-package pcmpl-args
-  )
-
-(use-package helm-flx
-  :after helm
-  :config (setq helm-flx-for-helm-find-files t ;; t by default
-                helm-flx-for-helm-locate t)    ;; nil by default
-  )
+(use-package pcmpl-args)
 
 (use-package helm-descbinds
   :bind ("C-h b" . helm-descbinds))
@@ -933,7 +929,8 @@ hit C-a twice:"
           org-gcal-client-secret gcal-secret
           org-gcal-notify-p nil)))
 
-(use-package helm-org-rifle)
+(use-package helm-org-rifle
+  :bind (("C-c r"   . helm-org-rifle-agenda-files)))
 
 (use-package bufler)
 
