@@ -248,7 +248,7 @@ accumulating.")
   :config
   (add-hook 'inferior-python-mode-hook 'turn-on-comint-history))
 
-(use-package eshell
+(use-package esh
   :init
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
@@ -293,6 +293,7 @@ hit C-a twice:"
         '("mtr" "nethogs"  "htop" "ncdu" "nmon"
           "vi" "screen" "top" "less" "more" "lynx"
           "ncftp" "pine" "tin" "trn" "elm"))
+  (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
   :bind  (:map
           global-map
           ("C-x !" . 'eshell-here)
@@ -798,9 +799,9 @@ hit C-a twice:"
         helm-buffer-max-length                 nil
         helm-show-completion-display-function #'helm-show-completion-default-display-function
         ;; the following would enable a separate frame.
-        helm-display-function                  'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame        t
-        helm-use-undecorated-frame-option      t
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-buffer-reuse-frame        t
+        ;; helm-use-undecorated-frame-option      t
         helm-display-buffer-width  120)
   (helm-mode 1)
   (helm-adaptive-mode 1)
