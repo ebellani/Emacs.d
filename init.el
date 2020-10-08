@@ -42,7 +42,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120)
+                    :height 110)
 
 ;;; things that I don't know how to do with use-package
 
@@ -193,6 +193,9 @@ accumulating.")
   :config
   (setq epa-file-cache-passphrase-for-symmetric-encryption t))
 
+(use-package linum
+  :config
+  (set-face-attribute 'linum nil :height 110))
 
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
