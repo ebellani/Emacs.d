@@ -38,11 +38,13 @@ accumulating.")
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
+(setq my-font-size 110)
+
 ;;; font family & size
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 110)
+                    :height my-font-size)
 
 ;;; things that I don't know how to do with use-package
 
@@ -195,7 +197,7 @@ accumulating.")
 
 (use-package linum
   :config
-  (set-face-attribute 'linum nil :height 110))
+  (set-face-attribute 'linum nil :height my-font-size))
 
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
