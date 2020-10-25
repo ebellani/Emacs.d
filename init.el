@@ -40,7 +40,6 @@ accumulating.")
 
 (setq *my-font-size* 110)
 
-
 ;;; font family & size
 
 (set-face-attribute 'default nil
@@ -93,6 +92,10 @@ accumulating.")
   :config
   (eval-after-load "linum"
     '(set-face-attribute 'linum nil :height *my-font-size*)))
+
+(use-package linum
+  :config
+  (set-face-attribute 'linum nil :height *my-font-size*))
 
 (use-package browse-url
   :config
