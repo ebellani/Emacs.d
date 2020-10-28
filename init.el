@@ -38,9 +38,8 @@ accumulating.")
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-(setq *my-font-size* 130)
+(setq *my-font-size* 110)
 
-(set-face-attribute 'linum nil :height *my-font-size*)
 
 ;;; font family & size
 
@@ -90,6 +89,10 @@ accumulating.")
   (require 'use-package))
 
 ;;; packages that come with emacs
+(use-package linum
+  :config
+  (eval-after-load "linum"
+    '(set-face-attribute 'linum nil :height *my-font-size*)))
 
 (use-package browse-url
   :config
