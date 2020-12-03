@@ -932,16 +932,6 @@ hit C-a twice:"
     (add-hook 'kill-emacs-hook #'persp-state-save)
     (setq persp-state-default-file "~/.emacs.d/persp.state"))
 
-  (use-package org-gcal
-    :after org
-    :config
-    (let* ((gcal-plist (car (auth-source-search :host "gcal")))
-           (gcal-username (plist-get gcal-plist :user))
-           (gcal-secret (funcall (plist-get gcal-plist :secret))))
-      (setq org-gcal-client-id     gcal-username
-            org-gcal-client-secret gcal-secret
-            org-gcal-notify-p nil)))
-
   (use-package helm-org-rifle
     :bind (("C-c r"   . helm-org-rifle-agenda-files)))
 
@@ -983,9 +973,18 @@ hit C-a twice:"
                     (minibuffer . t)
                     (menu-bar-lines . t)
                     (window-system . x))))
+
   (use-package anki-editor
     :config
-    (setq anki-editor-create-decks t)))
+    (setq anki-editor-create-decks t))
+
+  (use-package with-editor
+    :config
+    (defun crontab-e ()
+      "Run `crontab -e' in a emacs buffer. Comes from
+https://emacs.stackexchange.com/a/10080"
+      (interactive)
+      (with-editor-async-shell-command "crontab -e"))))
 
 
 (put 'scroll-left 'disabled nil)
