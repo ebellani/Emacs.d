@@ -493,9 +493,16 @@ hit C-a twice:"
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
 ")
+          ("m" "meeting" entry
+           (file "~/.emacs.d/refile.org")
+"* %u %?
+** Participants
+** Agenda
+** Results
+")
           ("c" "Anki card" entry
            (file "~/.emacs.d/refile.org")
-"* Item
+           "* Item
    :PROPERTIES:
    :ANKI_NOTE_TYPE: Basic
    :END:
