@@ -29,6 +29,9 @@
   "This is used to filter the bad contacts that mu4e is
 accumulating.")
 
+(defcustom anki-deck "~/.emacs.d/anki.org"
+  "Location of my anki deck for refiling purposes")
+
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -38,7 +41,7 @@ accumulating.")
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-(setq *my-font-size* 90)
+(setq *my-font-size* 110)
 
 ;;; font family & size
 
@@ -162,7 +165,32 @@ accumulating.")
         mail-user-agent 'mu4e-user-agent
         mu4e-hide-index-messages t
         )
+  (unintern 'mu4e-ask-bookmark)
+(defun mu4e-ask-bookmark (prompt)
+  "Ask the user for a bookmark (using PROMPT) as defined in
+`mu4e-bookmarks', then return the corresponding query."
+  (unless (mu4e-bookmarks) (mu4e-error "No bookmarks defined"))
+  (let* ((prompt (mu4e-format "%s" prompt))
+         (server-queries (plist-get mu4e~server-props :queries))
+         (bmarks
+          (mapconcat
+           (lambda (bm)
+             (let ((bm-server-query (seq-find (lambda (q)
+                                                (string= (plist-get q :query)
+                                                         (plist-get bm :query)))
+                                              server-queries)))
+               (format "[%s]%s (%s/%s)"
+                       (propertize (make-string 1 (plist-get bm :key))
+                                   'face 'mu4e-highlight-face)
+                       (plist-get bm :name)
+                       (plist-get bm-server-query :unread)
+                       (plist-get bm-server-query :count))))
+           (mu4e-bookmarks)
+           ", "))
+         (kar (read-char (concat prompt bmarks))))
+    (mu4e-get-bookmark-query kar)))
   (add-hook 'mu4e-message-changed-hook #'mu4e~start)
+  (add-hook 'mu4e-index-updated-hook #'mu4e~start)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
@@ -455,9 +483,28 @@ hit C-a twice:"
                         (:endgroup))
         org-refile-targets
         '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 9))
+          (org-agenda-files :maxlevel . 9)
+          (anki-deck :maxlevel . 1))
+        org-capture-templates
+        '(("t" "todo" entry
+           (file "~/.emacs.d/refile.org")
+"* TODO %?
+   :LOGBOOK:
+   - State \"TODO\"       from \"\"  %U  \\\\
+   :END:
+")
+          ("c" "Anki card" entry
+           (file "~/.emacs.d/refile.org")
+"* Item
+   :PROPERTIES:
+   :ANKI_NOTE_TYPE: Basic
+   :END:
+** Front
+  %?
+** Back
+"))
         org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d@/!)")
+        '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
           (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
         org-imenu-depth 6
         org-src-fontify-natively t
@@ -956,7 +1003,7 @@ hit C-a twice:"
     :after company)
 
   (use-package fsharp-mode
-    :after company
+    :after compayn
     :config
     (require 'eglot-fsharp)
     (add-hook 'inferior-fsharp-mode-hook'turn-on-comint-history))
