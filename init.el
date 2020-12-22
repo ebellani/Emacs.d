@@ -32,6 +32,9 @@ accumulating.")
 (defcustom anki-deck "~/.emacs.d/anki.org"
   "Location of my anki deck for refiling purposes")
 
+(defcustom meetings "~/.emacs.d/meetings.org"
+  "Location of my meetings ile for refiling purposes")
+
 ;; add the custom file inside the emacs folder
 (defvar custom-file-path "~/.emacs.d/custom.el"
   "Place where I store my local customizations. This file is not ")
@@ -483,8 +486,9 @@ hit C-a twice:"
                         (:endgroup))
         org-refile-targets
         '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 9)
-          (anki-deck :maxlevel . 1))
+          (org-agenda-files :maxlevel . 1)
+          (anki-deck :maxlevel . 1)
+          (meetings  :maxlevel . 2))
         org-capture-templates
         '(("t" "todo" entry
            (file "~/.emacs.d/refile.org")
