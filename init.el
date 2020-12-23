@@ -492,14 +492,14 @@ hit C-a twice:"
         org-capture-templates
         '(("t" "todo" entry
            (file "~/.emacs.d/refile.org")
-"* TODO %?
+           "* TODO %?
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
 ")
           ("m" "meeting" entry
            (file "~/.emacs.d/refile.org")
-"* %u %?
+           "* %u %?
 ** Participants
 ** Agenda
 ** Results
@@ -535,6 +535,14 @@ hit C-a twice:"
               (assq-delete-all :comments org-babel-default-header-args))
         org-duration-format '((special . h:mm))
         org-goto-interface 'outline-path-completion
+        ;; agenda stuff copied from
+        ;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-block-separator nil
+        org-agenda-include-diary t
+        org-agenda-compact-blocks t
+        org-agenda-start-with-log-mode t
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
         org-agenda-span 'day
