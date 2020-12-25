@@ -461,7 +461,7 @@ hit C-a twice:"
          ("C-c b" . 'org-iswitchb))
   :ensure org-plus-contrib
   :preface
-  (setq org-export-backends '(md gfm ascii taskjuggler html latex odt org))
+  (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
   (require 'org-tempo)
   (defun replace-in-string (what with in)
@@ -497,6 +497,11 @@ hit C-a twice:"
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
 ")
+          ("s" "scheduled" entry
+           (file "~/.emacs.d/refile.org")
+           "* Contexto
+%?
+* Objetivo")
           ("m" "meeting" entry
            (file "~/.emacs.d/refile.org")
            "* %u %?
@@ -592,7 +597,11 @@ hit C-a twice:"
        ((or `ascii `latex)
         (replace-regexp-in-string "[][<>]" "" trans))))))
 
-
+(use-package ox-beamer
+  :after ox
+  :config
+  (add-to-list 'org-beamer-environments-extra
+               '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}")))
 
 ;;; packages that are fetched
 
@@ -1065,3 +1074,4 @@ https://emacs.stackexchange.com/a/10080"
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
+(put 'downcase-region 'disabled nil)
