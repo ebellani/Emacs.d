@@ -44,7 +44,7 @@ accumulating.")
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-(setq *my-font-size* 110)
+(setq *my-font-size* 90)
 
 ;;; font family & size
 
@@ -297,6 +297,8 @@ accumulating.")
 
 (use-package esh
   :init
+  (require 'em-hist)
+
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
 current buffer's file. The eshell is renamed to match that
@@ -321,6 +323,7 @@ http://www.howardism.org/Technical/Emacs/eshell-fun.html"
       (erase-buffer)))
   (defun eshell/x ()
     (delete-window)
+    (eshell-save-some-history)
     (eshell/exit))
   (defun eshell-maybe-bol ()
     "I use the following code. It makes C-a go to the beginning of
@@ -596,12 +599,6 @@ hit C-a twice:"
          (replace-regexp-in-string "&[lg]t;" "" trans)))
        ((or `ascii `latex)
         (replace-regexp-in-string "[][<>]" "" trans))))))
-
-(use-package ox-beamer
-  :after ox
-  :config
-  (add-to-list 'org-beamer-environments-extra
-               '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}")))
 
 ;;; packages that are fetched
 
@@ -1061,7 +1058,13 @@ hit C-a twice:"
 
   (use-package anki-editor
     :config
-    (setq anki-editor-create-decks t))
+    (setq anki-editor-create-decks t)
+    ;; work around bug https://github.com/louietan/anki-editor/issues/76
+    (defun anki-editor--anki-connect-invoke! (orig-fun &rest args)
+      (let ((request--curl-callback
+             (lambda (proc event) (request--curl-callback "localhost" proc event))))
+        (apply orig-fun args)))
+    (advice-add 'anki-editor--anki-connect-invoke :around #'anki-editor--anki-connect-invoke!))
 
   (use-package with-editor
     :config
