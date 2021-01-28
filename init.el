@@ -874,6 +874,7 @@ hit C-a twice:"
     :config
     (setq helm-ff-transformer-show-only-basename nil
           helm-external-programs-associations '(("zip" . "unzip") ("mp4" . "smplayer") ("mkv" . "smplayer"))
+          helm-completion-style 'emacs
           helm-yank-symbol-first                 t
           helm-move-to-line-cycle-in-source      t
           helm-buffers-fuzzy-matching            t
