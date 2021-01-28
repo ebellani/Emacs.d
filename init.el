@@ -29,8 +29,9 @@
   "This is used to filter the bad contacts that mu4e is
 accumulating.")
 
-(defcustom anki-deck "~/.emacs.d/anki.org"
-  "Location of my anki deck for refiling purposes")
+(defcustom srs-deck "~/.emacs.d/deck.org"
+  "Location of my speaced repetition system (SRS) deck for
+  refiling purposes")
 
 (defcustom meetings "~/.emacs.d/meetings.org"
   "Location of my meetings ile for refiling purposes")
@@ -169,29 +170,29 @@ accumulating.")
         mu4e-hide-index-messages t
         )
   (unintern 'mu4e-ask-bookmark)
-(defun mu4e-ask-bookmark (prompt)
-  "Ask the user for a bookmark (using PROMPT) as defined in
+  (defun mu4e-ask-bookmark (prompt)
+    "Ask the user for a bookmark (using PROMPT) as defined in
 `mu4e-bookmarks', then return the corresponding query."
-  (unless (mu4e-bookmarks) (mu4e-error "No bookmarks defined"))
-  (let* ((prompt (mu4e-format "%s" prompt))
-         (server-queries (plist-get mu4e~server-props :queries))
-         (bmarks
-          (mapconcat
-           (lambda (bm)
-             (let ((bm-server-query (seq-find (lambda (q)
-                                                (string= (plist-get q :query)
-                                                         (plist-get bm :query)))
-                                              server-queries)))
-               (format "[%s]%s (%s/%s)"
-                       (propertize (make-string 1 (plist-get bm :key))
-                                   'face 'mu4e-highlight-face)
-                       (plist-get bm :name)
-                       (plist-get bm-server-query :unread)
-                       (plist-get bm-server-query :count))))
-           (mu4e-bookmarks)
-           ", "))
-         (kar (read-char (concat prompt bmarks))))
-    (mu4e-get-bookmark-query kar)))
+    (unless (mu4e-bookmarks) (mu4e-error "No bookmarks defined"))
+    (let* ((prompt (mu4e-format "%s" prompt))
+           (server-queries (plist-get mu4e~server-props :queries))
+           (bmarks
+            (mapconcat
+             (lambda (bm)
+               (let ((bm-server-query (seq-find (lambda (q)
+                                                  (string= (plist-get q :query)
+                                                           (plist-get bm :query)))
+                                                server-queries)))
+                 (format "[%s]%s (%s/%s)"
+                         (propertize (make-string 1 (plist-get bm :key))
+                                     'face 'mu4e-highlight-face)
+                         (plist-get bm :name)
+                         (plist-get bm-server-query :unread)
+                         (plist-get bm-server-query :count))))
+             (mu4e-bookmarks)
+             ", "))
+           (kar (read-char (concat prompt bmarks))))
+      (mu4e-get-bookmark-query kar)))
   (add-hook 'mu4e-message-changed-hook #'mu4e~start)
   (add-hook 'mu4e-index-updated-hook #'mu4e~start)
   ;; add info folder
@@ -490,7 +491,7 @@ hit C-a twice:"
         org-refile-targets
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 1)
-          (anki-deck :maxlevel . 1)
+          (srs-deck :maxlevel . 2)
           (meetings  :maxlevel . 2))
         org-capture-templates
         '(("t" "todo" entry
@@ -505,6 +506,10 @@ hit C-a twice:"
            "* Contexto
 %?
 * Objetivo")
+          ("1" "1-1 meeting" entry
+           (file "~/.emacs.d/refile.org")
+           "* %u %?
+")
           ("m" "meeting" entry
            (file "~/.emacs.d/refile.org")
            "* %u %?
@@ -512,14 +517,10 @@ hit C-a twice:"
 ** Agenda
 ** Results
 ")
-          ("c" "Anki card" entry
+          ("c" "SRS card" entry
            (file "~/.emacs.d/refile.org")
-           "* Item
-   :PROPERTIES:
-   :ANKI_NOTE_TYPE: Basic
-   :END:
-** Front
-  %?
+           "* Item    :drill:
+   %?
 ** Back
 "))
         org-todo-keywords
@@ -610,9 +611,6 @@ hit C-a twice:"
     :defer t)
 
   (use-package s
-    :defer t)
-
-  (use-package shadchen
     :defer t)
 
   (use-package dash
@@ -875,6 +873,7 @@ hit C-a twice:"
                 ("C-z"   . helm-select-action))
     :config
     (setq helm-ff-transformer-show-only-basename nil
+          helm-external-programs-associations '(("zip" . "unzip") ("mp4" . "smplayer") ("mkv" . "smplayer"))
           helm-yank-symbol-first                 t
           helm-move-to-line-cycle-in-source      t
           helm-buffers-fuzzy-matching            t
@@ -959,9 +958,7 @@ hit C-a twice:"
     (org-super-agenda-mode 1)
     (setq
      org-agenda-custom-commands
-     '(("c" "Covario"
-        ((tags "covario/!TODO-DONE")))
-       ("u" "Super view"
+     '(("u" "Super view"
         ((agenda "" ((org-super-agenda-groups
                       '((:name "Important"
                                :priority>= "B")
@@ -995,19 +992,6 @@ hit C-a twice:"
   (use-package w3m
     :init (setq w3m-key-binding 'info))
 
-  (use-package erlang
-    :mode (("\\.erl?$" . erlang-mode)
-	   ("rebar\\.config$" . erlang-mode)
-	   ("relx\\.config$" . erlang-mode)
-	   ("sys\\.config\\.src$" . erlang-mode)
-	   ("sys\\.config$" . erlang-mode)
-	   ("\\.config\\.src?$" . erlang-mode)
-	   ("\\.config\\.script?$" . erlang-mode)
-	   ("\\.hrl?$" . erlang-mode)
-	   ("\\.app?$" . erlang-mode)
-	   ("\\.app.src?$" . erlang-mode)
-	   ("\\Emakefile" . erlang-mode)))
-
   (use-package perspective
     :config
     (persp-mode)
@@ -1039,40 +1023,10 @@ hit C-a twice:"
     :bind (:map pyenv-mode-map
                 ("C-c C-s" . nil)))
 
-  (use-package edit-server
-    :ensure t
-    :commands edit-server-start
-    :init (if after-init-time
-              (edit-server-start)
-            (add-hook 'after-init-hook
-                      #'(lambda() (edit-server-start))))
-    :config (setq edit-server-new-frame-alist
-                  '((name . "Edit with Emacs FRAME")
-                    (top . 200)
-                    (left . 200)
-                    (width . 80)
-                    (height . 25)
-                    (minibuffer . t)
-                    (menu-bar-lines . t)
-                    (window-system . x))))
-
-  (use-package anki-editor
-    :config
-    (setq anki-editor-create-decks t)
-    ;; work around bug https://github.com/louietan/anki-editor/issues/76
-    (defun anki-editor--anki-connect-invoke! (orig-fun &rest args)
-      (let ((request--curl-callback
-             (lambda (proc event) (request--curl-callback "localhost" proc event))))
-        (apply orig-fun args)))
-    (advice-add 'anki-editor--anki-connect-invoke :around #'anki-editor--anki-connect-invoke!))
-
-  (use-package with-editor
-    :config
-    (defun crontab-e ()
-      "Run `crontab -e' in a emacs buffer. Comes from
-https://emacs.stackexchange.com/a/10080"
-      (interactive)
-      (with-editor-async-shell-command "crontab -e"))))
+  (use-package org-drill
+    :ensure org-plus-contrib
+    :commands (org-drill))
+  )
 
 
 (put 'scroll-left 'disabled nil)
