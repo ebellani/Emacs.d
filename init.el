@@ -501,11 +501,20 @@ hit C-a twice:"
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
 ")
-          ("s" "scheduled" entry
+          ("a" "agendado" entry
            (file "~/.emacs.d/refile.org")
            "* Contexto
 %?
-* Objetivo")
+* Objetivo
+
+* Agenda")
+          ("s" "scheduled" entry
+           (file "~/.emacs.d/refile.org")
+           "* Context
+%?
+* Goal
+
+* Agenda")
           ("1" "1-1 meeting" entry
            (file "~/.emacs.d/refile.org")
            "* %u %?
