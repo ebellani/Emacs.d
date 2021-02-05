@@ -128,9 +128,6 @@ accumulating.")
   (setq completion-styles '(flex))
   (scroll-bar-mode 0))
 
-(use-package gnu-elpa-keyring-update
-  :ensure t)
-
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
   :config
@@ -478,6 +475,7 @@ hit C-a twice:"
          ("C-c c" . 'org-capture)
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
+  :straight t
   :ensure org-plus-contrib
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
@@ -650,14 +648,9 @@ hit C-a twice:"
 ;;; packages
 
 (use-package async
-  :straight t)
-
-(use-package smtpmail-async
-  ;; this is fixed for gmail for now. Mu4e contexts could be used to set
-  ;; multiple values.
-  :after async
-  :ensure async
+  :straight t
   :config
+  (require 'smtpmail-async)
   (setq message-send-mail-function 'async-smtpmail-send-it
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
@@ -1113,6 +1106,10 @@ hit C-a twice:"
   :straight t
   :ensure org-plus-contrib
   :commands (org-drill))
+
+(use-package gnu-elpa-keyring-update
+  :straight t
+  :ensure t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
