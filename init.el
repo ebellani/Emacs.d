@@ -510,34 +510,28 @@ hit C-a twice:"
         '(("t" "todo" entry
            (file "~/.emacs.d/refile.org")
            "* TODO %?
+   SCHEDULED: %t
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
 ")
-          ("a" "agendado" entry
+          ("r" "reunião" entry
            (file "~/.emacs.d/refile.org")
-           "* Contexto
-%?
-* Objetivo
-
-* Agenda")
-          ("s" "scheduled" entry
+"* %u %?
+** Contexto
+** Objetivo
+** Agenda
+** Ata")
+          ("m" "meeting" entry
            (file "~/.emacs.d/refile.org")
-           "* Context
-%?
-* Goal
-
-* Agenda")
+"* %u %?
+** Context
+** Goal
+** Agenda
+** Minutes")
           ("1" "1-1 meeting" entry
            (file "~/.emacs.d/refile.org")
            "* %u %?
-")
-          ("m" "meeting" entry
-           (file "~/.emacs.d/refile.org")
-           "* %u %?
-** Participants
-** Agenda
-** Results
 ")
           ("c" "SRS card" entry
            (file "~/.emacs.d/refile.org")
