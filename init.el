@@ -475,8 +475,8 @@ hit C-a twice:"
          ("C-c c" . 'org-capture)
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
-  :straight t
-  :ensure org-plus-contrib
+  ;; https://github.com/raxod502/straight.el/issues/270#issuecomment-380262852
+  :straight org-plus-contrib
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
@@ -595,7 +595,11 @@ hit C-a twice:"
      (ditaa  . t)
      (C      . t)
      (ledger . t)
-     (org    . t))))
+     (org    . t)))
+  (require 'ol-git-link)
+  (defun org-set-as-habit ()
+    (interactive)
+    (org-set-property "STYLE" "habit")))
 
 (use-package org-tempo
   :after org)
