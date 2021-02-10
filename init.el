@@ -1100,6 +1100,10 @@ hit C-a twice:"
   :bind (:map pyenv-mode-map
               ("C-c C-s" . nil)))
 
+(use-package orgit
+  :straight t
+  :ensure org-plus-contrib)
+
 (use-package org-drill
   :straight t
   :ensure org-plus-contrib
