@@ -1134,9 +1134,13 @@ are equal return t."
 
 (use-package fsharp-mode
   :straight t
-  :after compayn
+  :after company
+)
+
+(use-package eglot-fsharp
+  :straight t
+  :after fsharp-mode
   :config
-  (require 'eglot-fsharp)
   (add-hook 'inferior-fsharp-mode-hook'turn-on-comint-history))
 
 (use-package dotnet
@@ -1159,6 +1163,12 @@ are equal return t."
 (use-package gnu-elpa-keyring-update
   :straight t
   :ensure t)
+
+(use-package editorconfig
+  :straight t
+  :ensure t
+  :config
+  (editorconfig-mode 1))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
