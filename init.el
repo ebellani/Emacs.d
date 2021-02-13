@@ -923,7 +923,10 @@ hit C-a twice:"
               ("C-z"   . helm-select-action))
   :config
   (setq helm-ff-transformer-show-only-basename nil
-        helm-external-programs-associations '(("zip" . "unzip") ("mp4" . "smplayer") ("mkv" . "smplayer"))
+        helm-external-programs-associations '(("zip" . "unzip")
+                                              ("mp4" . "smplayer")
+                                              ("mkv" . "smplayer")
+                                              ("docx" . "libreoffice"))
         helm-completion-style 'emacs
         helm-yank-symbol-first                 t
         helm-move-to-line-cycle-in-source      t
