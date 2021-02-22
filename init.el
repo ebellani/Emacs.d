@@ -494,22 +494,28 @@ hit C-a twice:"
                  (insert-file-contents-literally source)
                  (buffer-string)))
               (file-name-nondirectory source))))
+
   (defun myorg/numeric-entry-or-zero (pom entry-name)
     (let ((entry (org-entry-get pom entry-name)))
       (if entry (string-to-number entry) 0)))
+
+  (require 'calc-ext)
+
   (defun myorg/cmp-wsjf-property (entry-a entry-b)
     "Compare two `org-mode' agenda entries by their WSJF.
 If a is before b, return -1. If a is after b, return 1. If they
 are equal return t."
     (let* ((getter (lambda (entry)
-                     (myorg/numeric-entry-or-zero
-                      (get-text-property 0 'org-marker entry)
-                      "wsjf")))
-           (cmp (math-compare (funcall getter entry-a)
-                              (funcall getter entry-b))))
+                     (round (myorg/numeric-entry-or-zero
+                             (get-text-property 0 'org-marker entry)
+                             "wsjf"))))
+           (wsjf-a (funcall getter entry-a))
+           (wsjf-b (funcall getter entry-b))
+           (cmp (math-compare wsjf-a wsjf-b)))
       (if (zerop cmp)
           nil
         cmp)))
+
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
         org-agenda-sorting-strategy
@@ -542,7 +548,10 @@ are equal return t."
    :END:
 
    #+begin_src elisp :results none
-     (org-set-property \"wsjf\" (format \"%.2f\" (/ (+ bv tc rr-oe) eff)))
+     (org-set-property \"wsjf\" (format \"%.2f\" (/ (+ (myorg/numeric-entry-or-zero nil \"bv\")
+                                                   (myorg/numeric-entry-or-zero nil \"tc\")
+                                                   (myorg/numeric-entry-or-zero nil \"rr-oe\"))
+                                                (myorg/numeric-entry-or-zero nil \"eff\"))))
    #+end_src
 
    :LOGBOOK:
@@ -1055,26 +1064,7 @@ are equal return t."
   :straight t
   :config
   (org-super-agenda-mode 1)
-  (defun cmp-wsjf-property (entry-a entry-b)
-    "Compare two `org-mode' agenda entries by their WSJF.
-If a is before b, return -1. If a is after b, return 1. If they
-are equal return t."
-    (let* ((getter (lambda (entry)
-                     (let* ((pos (get-text-property 0 'org-marker entry))
-                            (wsjf (org-entry-get pos "wsjf")))
-                       (if wsjf (string-to-number wsjf) 0))))
-           (cmp (math-compare (funcall getter entry-a)
-                              (funcall getter entry-b))))
-      (if (zerop cmp)
-          nil
-        cmp)))
   (setq
-   org-agenda-cmp-user-defined 'cmp-wsjf-property
-   org-agenda-sorting-strategy
-   '((agenda habit-down user-defined-down time-up priority-down category-keep)
-     (todo priority-down category-keep)
-     (tags priority-down category-keep)
-     (search category-keep))
    org-agenda-custom-commands
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
@@ -1089,7 +1079,7 @@ are equal return t."
                              :deadline  today
                              :scheduled today)
                       (:discard (:anything t)))))))
-      ((org-overriding-columns-format "%WSJF %ITEM %ALLTAGS %bv %tc %rr-oe %eff"))))))
+      ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))))))
 
 (use-package calfw
   :straight t
