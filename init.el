@@ -494,7 +494,30 @@ hit C-a twice:"
                  (insert-file-contents-literally source)
                  (buffer-string)))
               (file-name-nondirectory source))))
+  (defun myorg/numeric-entry-or-zero (pom entry-name)
+    (let ((entry (org-entry-get pom entry-name)))
+      (if entry (string-to-number entry) 0)))
+  (defun myorg/cmp-wsjf-property (entry-a entry-b)
+    "Compare two `org-mode' agenda entries by their WSJF.
+If a is before b, return -1. If a is after b, return 1. If they
+are equal return t."
+    (let* ((getter (lambda (entry)
+                     (myorg/numeric-entry-or-zero
+                      (get-text-property 0 'org-marker entry)
+                      "wsjf")))
+           (cmp (math-compare (funcall getter entry-a)
+                              (funcall getter entry-b))))
+      (if (zerop cmp)
+          nil
+        cmp)))
   (setq org-refile-allow-creating-parent-nodes 'confirm
+        org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
+        org-agenda-sorting-strategy
+        '((agenda habit-down user-defined-down time-up priority-down category-keep)
+          (todo priority-down category-keep)
+          (tags priority-down category-keep)
+          (search category-keep))
+
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
         org-tag-alist '((:startgroup)
@@ -511,7 +534,14 @@ hit C-a twice:"
            (file "~/.emacs.d/refile.org")
            "* TODO %?
    SCHEDULED: %t
-   #+begin_src elisp :var bv=0 tc=0 rr-oe=0 eff=0 :results none
+   :PROPERTIES:
+   :bv:
+   :tc:
+   :rr-oe:
+   :eff:
+   :END:
+
+   #+begin_src elisp :results none
      (org-set-property \"wsjf\" (format \"%.2f\" (/ (+ bv tc rr-oe) eff)))
    #+end_src
 
@@ -521,14 +551,14 @@ hit C-a twice:"
 ")
           ("r" "reunião" entry
            (file "~/.emacs.d/refile.org")
-"* %u %?
+           "* %u %?
 ** Contexto
 ** Objetivo
 ** Agenda
 ** Ata")
           ("m" "meeting" entry
            (file "~/.emacs.d/refile.org")
-"* %u %?
+           "* %u %?
 ** Context
 ** Goal
 ** Agenda
@@ -1059,7 +1089,7 @@ are equal return t."
                              :deadline  today
                              :scheduled today)
                       (:discard (:anything t)))))))
-      ((org-overriding-columns-format "%WSJF %ITEM %ALLTAGS"))))))
+      ((org-overriding-columns-format "%WSJF %ITEM %ALLTAGS %bv %tc %rr-oe %eff"))))))
 
 (use-package calfw
   :straight t
