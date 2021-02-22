@@ -511,6 +511,10 @@ hit C-a twice:"
            (file "~/.emacs.d/refile.org")
            "* TODO %?
    SCHEDULED: %t
+   #+begin_src elisp :var bv=0 tc=0 rr-oe=0 eff=0 :results none
+     (org-set-property \"wsjf\" (format \"%.2f\" (/ (+ bv tc rr-oe) eff)))
+   #+end_src
+
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
    :END:
@@ -1021,7 +1025,26 @@ hit C-a twice:"
   :straight t
   :config
   (org-super-agenda-mode 1)
+  (defun cmp-wsjf-property (entry-a entry-b)
+    "Compare two `org-mode' agenda entries by their WSJF.
+If a is before b, return -1. If a is after b, return 1. If they
+are equal return t."
+    (let* ((getter (lambda (entry)
+                     (let* ((pos (get-text-property 0 'org-marker entry))
+                            (wsjf (org-entry-get pos "wsjf")))
+                       (if wsjf (string-to-number wsjf) 0))))
+           (cmp (math-compare (funcall getter entry-a)
+                              (funcall getter entry-b))))
+      (if (zerop cmp)
+          nil
+        cmp)))
   (setq
+   org-agenda-cmp-user-defined 'cmp-wsjf-property
+   org-agenda-sorting-strategy
+   '((agenda habit-down user-defined-down time-up priority-down category-keep)
+     (todo priority-down category-keep)
+     (tags priority-down category-keep)
+     (search category-keep))
    org-agenda-custom-commands
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
@@ -1035,7 +1058,8 @@ hit C-a twice:"
                              :date today
                              :deadline  today
                              :scheduled today)
-                      (:discard (:anything t)))))))))))
+                      (:discard (:anything t)))))))
+      ((org-overriding-columns-format "%WSJF %ITEM %ALLTAGS"))))))
 
 (use-package calfw
   :straight t
