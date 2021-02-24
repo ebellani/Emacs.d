@@ -244,6 +244,9 @@ accumulating.")
   :config
   (setq epa-file-cache-passphrase-for-symmetric-encryption t))
 
+(use-package nxml
+  :mode (("\..*proj$" . nxml-mode)))
+
 (use-package ediff
   ;; https://emacs.stackexchange.com/a/21336/16861
   :config
@@ -755,7 +758,7 @@ are equal return t."
 
 (use-package web-mode
   :straight t
-  :mode "\\.html?\\'\\|\\.fsproj$\\'")
+  :mode "\\.html?\\''")
 
 (use-package hippie-exp
   :straight t
