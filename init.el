@@ -473,6 +473,24 @@ hit C-a twice:"
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t))))
 
+(defun myorg/add-wsjf-to-agenda ()
+  "Tries to add a `wsjf' property to all items in the agenda"
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (condition-case err
+         (org-set-property
+          "wsjf"
+          (format "%.2f"
+                  (/ (+ (myorg/numeric-entry-or-zero nil "bv")
+                        (myorg/numeric-entry-or-zero nil "tc")
+                        (myorg/numeric-entry-or-zero nil "rr-oe"))
+                     (myorg/numeric-entry-or-zero nil "eff"))))
+       (error (message "%s" (error-message-string err))
+              t)))
+   nil
+   'agenda))
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -550,15 +568,9 @@ are equal return t."
    :eff:
    :END:
 
-   #+begin_src elisp :results none
-     (org-set-property \"wsjf\" (format \"%.2f\" (/ (+ (myorg/numeric-entry-or-zero nil \"bv\")
-                                                   (myorg/numeric-entry-or-zero nil \"tc\")
-                                                   (myorg/numeric-entry-or-zero nil \"rr-oe\"))
-                                                (myorg/numeric-entry-or-zero nil \"eff\"))))
-   #+end_src
-
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
+     hh
    :END:
 ")
           ("r" "reunião" entry
@@ -1086,11 +1098,14 @@ are equal return t."
 
 (use-package calfw
   :straight t
-
   :config
   (setq cfw:org-overwrite-default-keybinding t))
 
 (use-package calfw-org
+  :straight t
+  :after calfw)
+
+(use-package calfw-cal
   :straight t
   :after calfw)
 
