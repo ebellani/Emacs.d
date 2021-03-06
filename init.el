@@ -1159,7 +1159,7 @@ are equal return t."
   :straight t
   :after fsharp-mode
   :config
-  (add-hook 'inferior-fsharp-mode-hook'turn-on-comint-history))
+  (add-hook 'inferior-fsharp-mode-hook 'turn-on-comint-history))
 
 (use-package dotnet
   :straight t)
