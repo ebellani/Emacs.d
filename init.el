@@ -109,7 +109,192 @@ accumulating.")
 (eval-when-compile
   (require 'use-package))
 
-;;; packages that come with emacs
+(use-package org
+  :bind (("C-c l" . 'org-store-link)
+         ("C-c c" . 'org-capture)
+         ("C-c a" . 'org-agenda)
+         ("C-c b" . 'org-iswitchb))
+  ;; https://github.com/raxod502/straight.el/issues/270#issuecomment-380262852
+  :straight org-plus-contrib
+  :preface
+  (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
+  :config
+  (require 'org-tempo)
+  (defun replace-in-string (what with in)
+    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
+
+  (defun org-html--format-image (source attributes info)
+    (progn
+      (setq source (replace-in-string "%20" " " source))
+      (format "<img src=\"data:image/%s;base64,%s\"%s />"
+              (or (file-name-extension source) "")
+              (base64-encode-string
+               (with-temp-buffer
+                 (insert-file-contents-literally source)
+                 (buffer-string)))
+              (file-name-nondirectory source))))
+
+  (defun myorg/numeric-entry-or-zero (pom entry-name)
+    (let ((entry (org-entry-get pom entry-name)))
+      (if entry (string-to-number entry) 0)))
+
+  (require 'calc-ext)
+
+  (defun myorg/cmp-wsjf-property (entry-a entry-b)
+    "Compare two `org-mode' agenda entries by their WSJF.
+If a is before b, return -1. If a is after b, return 1. If they
+are equal return t."
+    (let* ((getter (lambda (entry)
+                     (round (myorg/numeric-entry-or-zero
+                             (get-text-property 0 'org-marker entry)
+                             "wsjf"))))
+           (wsjf-a (funcall getter entry-a))
+           (wsjf-b (funcall getter entry-b))
+           (cmp (math-compare wsjf-a wsjf-b)))
+      (if (zerop cmp)
+          nil
+        cmp)))
+
+  (defun myorg/add-wsjf-to-agenda ()
+    "Tries to add a `wsjf' property to all items in the agenda"
+    (interactive)
+    (org-map-entries
+     (lambda ()
+       (condition-case err
+           (org-set-property
+            "wsjf"
+            (format "%.2f"
+                    (/ (+ (myorg/numeric-entry-or-zero nil "bv")
+                          (myorg/numeric-entry-or-zero nil "tc")
+                          (myorg/numeric-entry-or-zero nil "rr-oe"))
+                       (myorg/numeric-entry-or-zero nil "eff"))))
+         (error (message "%s" (error-message-string err))
+                t)))
+     nil
+     'agenda))
+
+  (setq org-refile-allow-creating-parent-nodes 'confirm
+        org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
+        org-agenda-sorting-strategy
+        '((agenda habit-down user-defined-down time-up priority-down category-keep)
+          (todo priority-down category-keep)
+          (tags priority-down category-keep)
+          (search category-keep))
+
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil
+        org-tag-alist '((:startgroup)
+                        ("noexport" . ?n)
+                        ("export" . ?e)
+                        (:endgroup))
+        org-refile-targets
+        '((nil :maxlevel . 9)
+          (org-agenda-files :maxlevel . 1)
+          (srs-deck :maxlevel . 2)
+          (meetings  :maxlevel . 2))
+        org-capture-templates
+        '(("t" "todo" entry
+           (file "~/.emacs.d/refile.org")
+           "* TODO %?
+   SCHEDULED: %t
+   :PROPERTIES:
+   :bv:
+   :tc:
+   :rr-oe:
+   :eff:
+   :END:
+
+   :LOGBOOK:
+   - State \"TODO\"       from \"\"  %U  \\\\
+     hh
+   :END:
+")
+          ("r" "reunião" entry
+           (file "~/.emacs.d/refile.org")
+           "* %u %?
+** Contexto
+** Objetivo
+** Agenda
+** Ata")
+          ("m" "meeting" entry
+           (file "~/.emacs.d/refile.org")
+           "* %u %?
+** Context
+** Goal
+** Agenda
+** Minutes")
+          ("1" "1-1 meeting" entry
+           (file "~/.emacs.d/refile.org")
+           "* %u %?
+")
+          ("c" "SRS card" entry
+           (file "~/.emacs.d/refile.org")
+           "* Item    :drill:
+   %?
+** Back
+"))
+        org-todo-keywords
+        '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
+          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
+        org-imenu-depth 6
+        org-src-fontify-natively t
+        ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
+        ;; FOREIGN ORG FILES!
+        org-confirm-babel-evaluate nil
+        org-use-sub-superscripts '{}
+        org-export-with-sub-superscripts '{}
+        org-babel-default-header-args
+        (cons '(:noweb . "yes")
+              (assq-delete-all :noweb org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:tangle . "yes")
+              (assq-delete-all :tangle org-babel-default-header-args))
+        org-babel-default-header-args
+        (cons '(:comments . "link")
+              (assq-delete-all :comments org-babel-default-header-args))
+        org-duration-format '((special . h:mm))
+        org-goto-interface 'outline-path-completion
+        ;; agenda stuff copied from
+        ;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-block-separator nil
+        org-agenda-include-diary t
+        org-agenda-compact-blocks t
+        org-agenda-start-with-log-mode t
+        ;; allows multiple agenda views to coexist
+        org-agenda-sticky t
+        org-agenda-span 'day
+        org-latex-pdf-process (list "latexmk -f -pdf %f"))
+  ;; format timestamps. See
+  ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
+  ;; get images to reload after execution. Useful for things such as
+  ;; gnuplot. See https://emacs.stackexchange.com/q/3302
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot     . t)
+     (latex   . t)
+     (shell   . t)
+     (python  . t)
+     (js      . t)
+     (ditaa   . t)
+     (ocaml   . t)
+     (java    . t)
+     (scheme  . t)
+     (plantuml . t)
+     (ditaa   . t)
+     (sqlite  . t)
+     (gnuplot . t)
+     (ditaa  . t)
+     (C      . t)
+     (ledger . t)
+     (org    . t)))
+  (require 'ol-git-link)
+  (defun org-set-as-habit ()
+    (interactive)
+    (org-set-property "STYLE" "habit")))
+
 (use-package linum
   :config
   (eval-after-load "linum"
@@ -211,8 +396,6 @@ accumulating.")
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
-
-(use-package org-mu4e)
 
 (use-package mml-sec
   :config
@@ -473,191 +656,6 @@ hit C-a twice:"
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t))))
 
-(defun myorg/add-wsjf-to-agenda ()
-  "Tries to add a `wsjf' property to all items in the agenda"
-  (interactive)
-  (org-map-entries
-   (lambda ()
-     (condition-case err
-         (org-set-property
-          "wsjf"
-          (format "%.2f"
-                  (/ (+ (myorg/numeric-entry-or-zero nil "bv")
-                        (myorg/numeric-entry-or-zero nil "tc")
-                        (myorg/numeric-entry-or-zero nil "rr-oe"))
-                     (myorg/numeric-entry-or-zero nil "eff"))))
-       (error (message "%s" (error-message-string err))
-              t)))
-   nil
-   'agenda))
-
-(use-package org
-  :bind (("C-c l" . 'org-store-link)
-         ("C-c c" . 'org-capture)
-         ("C-c a" . 'org-agenda)
-         ("C-c b" . 'org-iswitchb))
-  ;; https://github.com/raxod502/straight.el/issues/270#issuecomment-380262852
-  :straight org-plus-contrib
-  :preface
-  (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
-  :config
-  (require 'org-tempo)
-  (defun replace-in-string (what with in)
-    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
-
-  (defun org-html--format-image (source attributes info)
-    (progn
-      (setq source (replace-in-string "%20" " " source))
-      (format "<img src=\"data:image/%s;base64,%s\"%s />"
-              (or (file-name-extension source) "")
-              (base64-encode-string
-               (with-temp-buffer
-                 (insert-file-contents-literally source)
-                 (buffer-string)))
-              (file-name-nondirectory source))))
-
-  (defun myorg/numeric-entry-or-zero (pom entry-name)
-    (let ((entry (org-entry-get pom entry-name)))
-      (if entry (string-to-number entry) 0)))
-
-  (require 'calc-ext)
-
-  (defun myorg/cmp-wsjf-property (entry-a entry-b)
-    "Compare two `org-mode' agenda entries by their WSJF.
-If a is before b, return -1. If a is after b, return 1. If they
-are equal return t."
-    (let* ((getter (lambda (entry)
-                     (round (myorg/numeric-entry-or-zero
-                             (get-text-property 0 'org-marker entry)
-                             "wsjf"))))
-           (wsjf-a (funcall getter entry-a))
-           (wsjf-b (funcall getter entry-b))
-           (cmp (math-compare wsjf-a wsjf-b)))
-      (if (zerop cmp)
-          nil
-        cmp)))
-
-  (setq org-refile-allow-creating-parent-nodes 'confirm
-        org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
-        org-agenda-sorting-strategy
-        '((agenda habit-down user-defined-down time-up priority-down category-keep)
-          (todo priority-down category-keep)
-          (tags priority-down category-keep)
-          (search category-keep))
-
-        org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil
-        org-tag-alist '((:startgroup)
-                        ("noexport" . ?n)
-                        ("export" . ?e)
-                        (:endgroup))
-        org-refile-targets
-        '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 1)
-          (srs-deck :maxlevel . 2)
-          (meetings  :maxlevel . 2))
-        org-capture-templates
-        '(("t" "todo" entry
-           (file "~/.emacs.d/refile.org")
-           "* TODO %?
-   SCHEDULED: %t
-   :PROPERTIES:
-   :bv:
-   :tc:
-   :rr-oe:
-   :eff:
-   :END:
-
-   :LOGBOOK:
-   - State \"TODO\"       from \"\"  %U  \\\\
-     hh
-   :END:
-")
-          ("r" "reunião" entry
-           (file "~/.emacs.d/refile.org")
-           "* %u %?
-** Contexto
-** Objetivo
-** Agenda
-** Ata")
-          ("m" "meeting" entry
-           (file "~/.emacs.d/refile.org")
-           "* %u %?
-** Context
-** Goal
-** Agenda
-** Minutes")
-          ("1" "1-1 meeting" entry
-           (file "~/.emacs.d/refile.org")
-           "* %u %?
-")
-          ("c" "SRS card" entry
-           (file "~/.emacs.d/refile.org")
-           "* Item    :drill:
-   %?
-** Back
-"))
-        org-todo-keywords
-        '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
-          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
-        org-imenu-depth 6
-        org-src-fontify-natively t
-        ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
-        ;; FOREIGN ORG FILES!
-        org-confirm-babel-evaluate nil
-        org-use-sub-superscripts '{}
-        org-export-with-sub-superscripts '{}
-        org-babel-default-header-args
-        (cons '(:noweb . "yes")
-              (assq-delete-all :noweb org-babel-default-header-args))
-        org-babel-default-header-args
-        (cons '(:tangle . "yes")
-              (assq-delete-all :tangle org-babel-default-header-args))
-        org-babel-default-header-args
-        (cons '(:comments . "link")
-              (assq-delete-all :comments org-babel-default-header-args))
-        org-duration-format '((special . h:mm))
-        org-goto-interface 'outline-path-completion
-        ;; agenda stuff copied from
-        ;; https://github.com/alphapapa/org-super-agenda/blob/master/examples.org
-        org-agenda-skip-scheduled-if-done t
-        org-agenda-skip-deadline-if-done t
-        org-agenda-block-separator nil
-        org-agenda-include-diary t
-        org-agenda-compact-blocks t
-        org-agenda-start-with-log-mode t
-        ;; allows multiple agenda views to coexist
-        org-agenda-sticky t
-        org-agenda-span 'day
-        org-latex-pdf-process (list "latexmk -f -pdf %f"))
-  ;; format timestamps. See
-  ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
-  ;; get images to reload after execution. Useful for things such as
-  ;; gnuplot. See https://emacs.stackexchange.com/q/3302
-  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((dot     . t)
-     (latex   . t)
-     (shell   . t)
-     (python  . t)
-     (js      . t)
-     (ditaa   . t)
-     (ocaml   . t)
-     (java    . t)
-     (scheme  . t)
-     (plantuml . t)
-     (ditaa   . t)
-     (sqlite  . t)
-     (gnuplot . t)
-     (ditaa  . t)
-     (C      . t)
-     (ledger . t)
-     (org    . t)))
-  (require 'ol-git-link)
-  (defun org-set-as-habit ()
-    (interactive)
-    (org-set-property "STYLE" "habit")))
 
 (use-package org-tempo
   :after org)
