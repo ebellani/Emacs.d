@@ -13,25 +13,6 @@
   (setq use-package-verbose nil
         use-package-expand-minimally t))
 
-;;; straight installation
-;;; https://github.com/raxod502/straight.el#getting-started
-(defvar bootstrap-version)
-(setq straight-repository-branch "develop")
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-
-
 ;;; path setup
 
 ;; prepare a folder for custom libraries
@@ -91,6 +72,27 @@ accumulating.")
 (keyboard-translate ?\] ?\))
 
 (define-key key-translation-map (kbd "<menu>") (kbd "ESC"))
+
+;;; packages
+
+
+;;; straight installation
+;;; https://github.com/raxod502/straight.el#getting-started
+(defvar bootstrap-version)
+(setq straight-repository-branch "develop")
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
 
 ;;; use-package config way
 
