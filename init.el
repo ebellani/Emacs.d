@@ -297,6 +297,9 @@ are equal return t."
     (interactive)
     (org-set-property "STYLE" "habit")))
 
+(use-package re-builder
+  :config (setq reb-re-syntax 'string))
+
 (use-package linum
   :config
   (eval-after-load "linum"
