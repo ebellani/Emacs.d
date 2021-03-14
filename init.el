@@ -59,7 +59,8 @@ accumulating.")
 
 (setq inhibit-startup-screen t
       pop-up-frames nil
-      standard-indent 2)
+      standard-indent 2
+      auto-save-no-message t)
 
 (setq-default indent-tabs-mode nil
               fill-column 80)
