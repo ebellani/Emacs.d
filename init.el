@@ -429,10 +429,6 @@ are equal return t."
    ("C-x <down>"  . 'windmove-down)     ; move to downer window
    ))
 
-(use-package epa
-  :config
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t))
-
 (use-package nxml
   :mode (("\..*proj$" . nxml-mode)))
 
