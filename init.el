@@ -197,7 +197,7 @@ are equal return t."
           (meetings  :maxlevel . 2))
         org-capture-templates
         '(("t" "todo" entry
-           (file "~/.emacs.d/refile.org")
+           org-refile-file-path
            "* TODO %?
    SCHEDULED: %t
    :PROPERTIES:
@@ -212,26 +212,33 @@ are equal return t."
      hh
    :END:
 ")
+          ("a" "remote agenda event" plain org-refile-file-path
+           "
+* Context
+  %?
+* Goal
+
+")
           ("r" "reunião" entry
-           (file "~/.emacs.d/refile.org")
+           org-refile-file-path
            "* %u %?
 ** Contexto
 ** Objetivo
 ** Agenda
 ** Ata")
           ("m" "meeting" entry
-           (file "~/.emacs.d/refile.org")
+           org-refile-file-path
            "* %u %?
 ** Context
 ** Goal
 ** Agenda
 ** Minutes")
           ("1" "1-1 meeting" entry
-           (file "~/.emacs.d/refile.org")
+           org-refile-file-path
            "* %u %?
 ")
           ("c" "SRS card" entry
-           (file "~/.emacs.d/refile.org")
+           org-refile-file-path
            "* Item    :drill:
    %?
 ** Back
