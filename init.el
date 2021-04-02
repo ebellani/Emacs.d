@@ -197,7 +197,7 @@ are equal return t."
           (meetings  :maxlevel . 2))
         org-capture-templates
         '(("t" "todo" entry
-           org-refile-file-path
+           (file org-refile-file-path)
            "* TODO %?
    SCHEDULED: %t
    :PROPERTIES:
@@ -212,7 +212,7 @@ are equal return t."
      hh
    :END:
 ")
-          ("a" "remote agenda event" plain org-refile-file-path
+          ("a" "remote agenda event" plain (file org-refile-file-path)
            "
 * Context
   %?
@@ -220,25 +220,25 @@ are equal return t."
 
 ")
           ("r" "reunião" entry
-           org-refile-file-path
+           (file org-refile-file-path)
            "* %u %?
 ** Contexto
 ** Objetivo
 ** Agenda
 ** Ata")
           ("m" "meeting" entry
-           org-refile-file-path
+           (file org-refile-file-path)
            "* %u %?
 ** Context
 ** Goal
 ** Agenda
 ** Minutes")
           ("1" "1-1 meeting" entry
-           org-refile-file-path
+           (file org-refile-file-path)
            "* %u %?
 ")
           ("c" "SRS card" entry
-           org-refile-file-path
+           (file org-refile-file-path)
            "* Item    :drill:
    %?
 ** Back
