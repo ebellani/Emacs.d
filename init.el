@@ -1095,7 +1095,9 @@ hit C-a twice:"
                       (:name "Late tasks"
                              :deadline  past
                              :scheduled past)
-                      (:name "Day's tasks"
+                      (:name "Habits"
+                             :habit t)
+                      (:name "Regular"
                              :time-grid t
                              :date today
                              :deadline  today
@@ -1160,7 +1162,8 @@ hit C-a twice:"
 (use-package fsharp-mode
   :straight t
   :after company
-)
+  :config
+  (setq inferior-fsharp-program "dotnet fsi"))
 
 (use-package eglot-fsharp
   :straight t
