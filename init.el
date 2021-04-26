@@ -1090,18 +1090,22 @@ hit C-a twice:"
    org-agenda-custom-commands
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
-                    '((:name "Important"
-                             :priority>= "B")
+                    '((:name "Habits"
+                             :habit t
+                             :order 20)
+                      (:name "Important"
+                             :priority>= "B"
+                             :order 0)
                       (:name "Late tasks"
-                             :deadline  past
-                             :scheduled past)
-                      (:name "Habits"
-                             :habit t)
+                             :deadline past
+                             :scheduled past
+                             :order 10)
                       (:name "Regular"
                              :time-grid t
                              :date today
                              :deadline  today
-                             :scheduled today)
+                             :scheduled today
+                             :order 30)
                       (:discard (:anything t)))))))
       ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))))))
 
