@@ -183,7 +183,9 @@ are equal return t."
           (todo priority-down category-keep)
           (tags priority-down category-keep)
           (search category-keep))
-
+        org-habit-graph-column 60
+        org-habit-following-days 3
+        org-habit-preceding-days 14
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
         org-tag-alist '((:startgroup)
