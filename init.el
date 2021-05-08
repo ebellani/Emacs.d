@@ -200,7 +200,7 @@ are equal return t."
         org-capture-templates
         '(("t" "todo" entry
            (file org-refile-file-path)
-           "* TODO %?
+           "* TODO %^{Title}
    SCHEDULED: %t
    :PROPERTIES:
    :bv:
@@ -211,39 +211,77 @@ are equal return t."
 
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
-     hh
+     %^{Initial log}
+   :END:
+")
+          ("h" "habit" entry
+           (file org-refile-file-path)
+           "* TODO %^{Title}
+   SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" +1w\")%?
+   :PROPERTIES:
+   :style: habit
+   :bv:
+   :tc:
+   :rr-oe:
+   :eff:
+   :END:
+
+   :LOGBOOK:
+   - State \"TODO\"       from \"\"  %U  \\\\
+     %^{Initial log}
    :END:
 ")
           ("a" "remote agenda event" plain (file org-refile-file-path)
            "
 * Context
-  %?
+  %^{Context}
 * Goal
-
+  %^{Goal}
 ")
-          ("r" "reunião" entry
+          ("p" "evento pt-br" plain (file org-refile-file-path)
+           "
+* Contexto
+  %^{Context}
+* Objetivo
+  %^{Goal}
+")
+          ("r" "reunião log" entry
            (file org-refile-file-path)
-           "* %u %?
+           "* %^{Title}
 ** Contexto
+  %^{Context}
 ** Objetivo
+  %^{Goal}
 ** Agenda
-** Ata")
-          ("m" "meeting" entry
+  %^{Agenda}
+** Ata
+  %^{Minutes}")
+          ("m" "meeting log" entry
            (file org-refile-file-path)
-           "* %u %?
+           "* %^{Title}
 ** Context
+  %^{Context}
 ** Goal
+  %^{Goal}
 ** Agenda
-** Minutes")
-          ("1" "1-1 meeting" entry
+  %^{Agenda}
+** Ata
+  %^{Minutes}")
+          ("d" "Regular drill card " entry
            (file org-refile-file-path)
-           "* %u %?
+           "* Item                                                               :drill:
+   %^{Question}
+** Answer
+   %^{Answer}
 ")
-          ("c" "SRS card" entry
+
+          ("z" "Drill cloze 1" entry
            (file org-refile-file-path)
-           "* Item    :drill:
-   %?
-** Back
+           "* Item                                                               :drill:
+   :PROPERTIES:
+   :drill_card_type: hide1cloze
+   :END:
+%?
 "))
         org-todo-keywords
         '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
