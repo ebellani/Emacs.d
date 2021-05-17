@@ -158,8 +158,8 @@ are equal return t."
           nil
         cmp)))
 
-  (defun myorg/add-wsjf-to-agenda ()
-    "Tries to add a `wsjf' property to all items in the agenda"
+  (cl-defun myorg/add-wsjf-to-scope (&optional (scope 'agenda))
+    "Tries to add a `wsjf' property to all items in SCOPE. Agenda is the default"
     (interactive)
     (org-map-entries
      (lambda ()
@@ -174,7 +174,7 @@ are equal return t."
          (error (message "%s" (error-message-string err))
                 t)))
      nil
-     'agenda))
+     scope))
 
   (setq org-refile-allow-creating-parent-nodes 'confirm
         org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
@@ -212,6 +212,23 @@ are equal return t."
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
      %^{Initial log}
+   :END:
+")
+          ("w" "work reminder" entry
+           (file org-refile-file-path)
+           "* TODO %^{Title}
+   SCHEDULED: <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>%?
+   :PROPERTIES:
+   :work_reminder: t
+   :bv:
+   :tc:
+   :rr-oe:
+   :eff:
+   :END:
+
+   :LOGBOOK:
+    - Initial note taken on %U \\
+     %^{Initial note}
    :END:
 ")
           ("h" "habit" entry
@@ -705,7 +722,6 @@ hit C-a twice:"
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t))))
 
-
 (use-package org-tempo
   :after org)
 
@@ -1133,6 +1149,9 @@ hit C-a twice:"
                     '((:name "Habits"
                              :habit t
                              :order 20)
+                      (:name "Work day notification"
+                             :property "work_reminder"
+                             :order 21)
                       (:name "Important"
                              :priority>= "B"
                              :order 0)
