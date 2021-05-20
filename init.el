@@ -55,6 +55,8 @@ accumulating.")
 
 ;;; things that I don't know how to do with use-package
 
+(setq system-time-locale "pt_BR.UTF-8")
+
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (setq inhibit-startup-screen t
@@ -211,7 +213,7 @@ are equal return t."
 
    :LOGBOOK:
    - State \"TODO\"       from \"\"  %U  \\\\
-     %^{Initial log}
+     %^{Initial log} %?
    :END:
 ")
           ("w" "work reminder" entry
@@ -1254,6 +1256,13 @@ hit C-a twice:"
 (use-package gnu-elpa-keyring-update
   :straight t
   :ensure t)
+
+(use-package langtool
+  :straight t
+  :ensure t
+  :config
+  (setq langtool-http-server-host "localhost"
+        langtool-http-server-port 8010))
 
 (use-package editorconfig
   :straight t
