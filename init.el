@@ -196,7 +196,7 @@ are equal return t."
                         (:endgroup))
         org-refile-targets
         '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 1)
+          (org-agenda-files :maxlevel . 2)
           (srs-deck :maxlevel . 2)
           (meetings  :maxlevel . 2))
         org-capture-templates
