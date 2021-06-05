@@ -869,22 +869,6 @@ hit C-a twice:"
   :straight t
   :after helm org)
 
-(use-package paredit
-  :straight t
-  :diminish
-  :hook ((lisp-mode emacs-lisp-mode clojure-mode) . paredit-mode)
-  :bind (:map paredit-mode-map
-              ("C-c ( n"   . paredit-add-to-next-list)
-              ("C-c ( p"   . paredit-add-to-previous-list)
-              ("C-c ( j"   . paredit-join-with-next-list)
-              ("C-c ( J"   . paredit-join-with-previous-list))
-  :bind (:map lisp-mode-map       ("<return>" . paredit-newline))
-  :bind (:map emacs-lisp-mode-map ("<return>" . paredit-newline))
-  :config
-  (require 'eldoc)
-  (eldoc-add-command 'paredit-backward-delete
-                     'paredit-close-round))
-
 (use-package visual-regexp
   :straight t
   :bind (("C-c v"   . vr/replace)
