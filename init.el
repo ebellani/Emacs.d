@@ -334,6 +334,7 @@ are equal return t."
         ;; allows multiple agenda views to coexist
         org-agenda-sticky t
         org-agenda-span 'day
+        org-plantuml-jar-path "/home/user/bin/plantuml.jar"
         org-latex-pdf-process (list "latexmk -f -pdf %f"))
   ;; format timestamps. See
   ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
@@ -972,7 +973,7 @@ hit C-a twice:"
   :mode (("\\.plantuml$" . plantuml-mode)
          ("\\.puml$" . plantuml-mode
           ))
-  :config (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
+  :config (setq plantuml-jar-path "/home/user/bin/plantuml.jar"
                 plantuml-default-exec-mode 'jar))
 
 (use-package docker
