@@ -119,8 +119,7 @@ accumulating.")
          ("C-c c" . 'org-capture)
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
-  ;; https://github.com/raxod502/straight.el/issues/270#issuecomment-380262852
-  :straight org-plus-contrib
+  :straight t
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
@@ -304,7 +303,8 @@ are equal return t."
 "))
         org-todo-keywords
         '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
-          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))
+          (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")
+          (sequence "REPEAT(!)"))
         org-imenu-depth 6
         org-src-fontify-natively t
         ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
@@ -341,6 +341,7 @@ are equal return t."
   ;; get images to reload after execution. Useful for things such as
   ;; gnuplot. See https://emacs.stackexchange.com/q/3302
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+  (add-hook 'org-mode-hook 'org-indent-mode)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((dot     . t)
@@ -360,7 +361,6 @@ are equal return t."
      (C      . t)
      (ledger . t)
      (org    . t)))
-  (require 'ol-git-link)
   (defun org-set-as-habit ()
     (interactive)
     (org-set-property "STYLE" "habit")))
@@ -851,6 +851,10 @@ hit C-a twice:"
   ;; (setq pdf-view-have-image-mode-pixel-vscroll nil)
   (pdf-tools-install))
 
+(use-package org-pdftools
+  :straight t
+  :hook (org-mode . org-pdftools-setup-link))
+
 (use-package web-mode
   :straight t
   :mode "\\.html?\\''")
@@ -1116,7 +1120,8 @@ hit C-a twice:"
 (use-package elfeed
   :straight t
   :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-title-max-width 140))
+  :config (setq elfeed-search-title-max-width 140
+                elfeed-show-entry-switch #'pop-to-buffer))
 
 (use-package elfeed-org
   :straight t
