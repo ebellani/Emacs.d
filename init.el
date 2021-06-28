@@ -849,7 +849,8 @@ hit C-a twice:"
   :config
   ;; fix space next page problem. No idea why
   ;; (setq pdf-view-have-image-mode-pixel-vscroll nil)
-  (pdf-tools-install))
+  (pdf-tools-install)
+  (setq pdf-view-resize-factor 1.05))
 
 (use-package org-pdftools
   :straight t
