@@ -45,13 +45,11 @@ accumulating.")
       (load custom-file))
   (warn "Custom file not found at expected path %s" custom-file-path))
 
-(setq *my-font-size* 90)
-
 ;;; font family & size
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height *my-font-size*)
+                    :height 90)
 
 ;;; things that I don't know how to do with use-package
 
@@ -368,11 +366,6 @@ are equal return t."
 (use-package re-builder
   :config (setq reb-re-syntax 'string))
 
-(use-package linum
-  :config
-  (eval-after-load "linum"
-    '(set-face-attribute 'linum nil :height *my-font-size*)))
-
 (use-package browse-url
   :config
   (setq browse-url-browser-function 'browse-url-chrome))
@@ -608,9 +601,7 @@ hit C-a twice:"
   (setenv "PAGER" "cat")
   (setq eshell-history-size 1024
         eshell-visual-commands
-        '("mtr" "nethogs"  "htop" "ncdu" "nmon"
-          "vi" "screen" "top" "less" "more" "lynx"
-          "ncftp" "pine" "tin" "trn" "elm"))
+        ("mtr" "nethogs"  "htop" "ncdu" "nmon" "top" "less" "more"))
   (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
   :bind  (:map
           global-map
@@ -1101,8 +1092,8 @@ hit C-a twice:"
 (use-package elfeed
   :straight t
   :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-title-max-width 140
-                elfeed-show-entry-switch #'pop-to-buffer))
+  :config (setq elfeed-search-title-max-width 140))
+
 
 (use-package elfeed-org
   :straight t
@@ -1257,6 +1248,23 @@ hit C-a twice:"
   :ensure t
   :config
   (editorconfig-mode 1))
+
+(use-package org-msg
+  :straight t
+  :ensure t
+  :after org
+  :config
+  (defun myorg/mu4e-compose-org-msg()
+    (org-hide-block-all)
+    (org-hide-drawer-all))
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+	org-msg-startup "hidestars indent inlineimages"
+	org-msg-default-alternatives '((new		. (text html))
+				       (reply-to-html	. (text html))
+				       (reply-to-text	. (text)))
+        org-msg-enforce-css nil
+	org-msg-convert-citation t)
+  (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
