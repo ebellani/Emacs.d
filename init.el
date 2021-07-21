@@ -1,4 +1,4 @@
-;; init file tips:
+;; init file tips:  -*- lexical-binding: t; -*-
 ;; http://a-nickels-worth.blogspot.com/2007/11/effective-emacs.html
 ;; http://sites.google.com/site/steveyegge2/effective-emacs
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
