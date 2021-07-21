@@ -182,6 +182,7 @@ are equal return t."
           (todo priority-down category-keep)
           (tags priority-down category-keep)
           (search category-keep))
+        org-babel-inline-result-wrap "%s"
         org-habit-graph-column 60
         org-habit-following-days 0
         org-habit-preceding-days 14
@@ -870,6 +871,7 @@ hit C-a twice:"
          ("<C-m> /" . vr/mc-mark)))
 
 (use-package smartparens
+  :demand t
   :straight t
   :config
   (require 'smartparens-config)
@@ -894,9 +896,9 @@ hit C-a twice:"
              ("C-M-S-l" . sp-forward-barf-sexp)
              ("C-M-j" . sp-splice-sexp)
              ("C-M-S-j" . sp-raise-sexp))
-  (smartparens-global-mode t)
-  (smartparens-strict-mode t)
-  (show-smartparens-global-mode t)
+  (smartparens-global-mode 1)
+  (smartparens-strict-mode 1)
+  (show-smartparens-global-mode 1)
   ;; We write it the verbose way instead of with sp-with-modes because
   ;; use-package does not properly expand the macro somehow during compilation
   (sp-local-pair sp--html-modes "{{" "}}")
@@ -1152,7 +1154,16 @@ hit C-a twice:"
 (use-package calfw
   :straight t
   :config
-  (setq cfw:org-overwrite-default-keybinding t))
+  (setq cfw:org-overwrite-default-keybinding t
+        cfw:fchar-junction ?╋
+        cfw:fchar-vertical-line ?┃
+        cfw:fchar-horizontal-line ?━
+        cfw:fchar-left-junction ?┣
+        cfw:fchar-right-junction ?┫
+        cfw:fchar-top-junction ?┯
+        cfw:fchar-top-left-corner ?┏
+        cfw:fchar-top-right-corner ?┓
+        cfw:event-format-overview "%s%e%t"))
 
 (use-package calfw-org
   :straight t
@@ -1264,7 +1275,8 @@ hit C-a twice:"
 				       (reply-to-text	. (text)))
         org-msg-enforce-css nil
 	org-msg-convert-citation t)
-  (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg))
+  (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg)
+  (org-msg-mode))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
