@@ -15,35 +15,36 @@
 
 ;;; path setup
 
-;; prepare a folder for custom libraries
-(defvar *my-default-lib* "~/.emacs.d/lib"
-  "Vendor libraries that cannot be installed via the package system")
-
-(add-to-list 'load-path *my-default-lib*)
-
-(defvar org-refile-file-path "~/.emacs.d/refile.org"
-  "A place to hold temporary refile information.")
-
 (defcustom filter-bad-contacts
   #'identity
   "This is used to filter the bad contacts that mu4e is
 accumulating.")
 
-(defcustom srs-deck "~/.emacs.d/deck.org"
-  "Location of my speaced repetition system (SRS) deck for
-  refiling purposes")
+(defcustom my/path-aliases
+  '(:emacs "~/.emacs.d")
+  "Location of my paths ile for refiling purposes")
 
-(defcustom meetings "~/.emacs.d/meetings.org"
-  "Location of my meetings ile for refiling purposes")
+(defun my/path (dir &optional subpath)
+  "Build a path name. See https://github.com/arecker/emacs.d"
+  (let ((dir (file-name-as-directory
+              (cl-getf my/path-aliases dir
+                       (format "~/%s" dir))))
+        (subpath (or subpath "")))
+    (concat dir subpath)))
+
+(defcustom main-agenda (my/path :emacs "agenda.org")
+  "This is used to store quickly todo items without refiling")
+
+(add-to-list 'load-path (my/path :emacs "lib"))
 
 ;; add the custom file inside the emacs folder
-(defvar custom-file-path "~/.emacs.d/custom.el"
-  "Place where I store my local customizations. This file is not ")
-(if (file-readable-p custom-file-path)
-    (progn
-      (setq custom-file custom-file-path)
-      (load custom-file))
-  (warn "Custom file not found at expected path %s" custom-file-path))
+
+(let ((custom-file-path (my/path :emacs "custom.el")))
+  (if (file-readable-p custom-file-path)
+      (progn
+        (setq custom-file custom-file-path)
+        (load custom-file))
+    (warn "Custom file not found at expected path %s" custom-file-path)))
 
 ;;; font family & size
 
@@ -104,6 +105,7 @@ accumulating.")
 
 (setq package-enable-at-startup nil)
 
+(add-to-list 'package-archives '("nongnu"     . "https://elpa.nongnu.org/nongnu/") t)
 (add-to-list 'package-archives '("melpa"     . "http://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org"       . "https://orgmode.org/elpa/") t)
 
@@ -175,7 +177,8 @@ are equal return t."
      nil
      scope))
 
-  (setq org-refile-allow-creating-parent-nodes 'confirm
+  (setq org-refile-file-path (my/path :emacs "refile.org")
+        org-refile-allow-creating-parent-nodes 'confirm
         org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
         org-agenda-sorting-strategy
         '((agenda habit-down user-defined-down time-up priority-down category-keep)
@@ -193,113 +196,93 @@ are equal return t."
                         ("export" . ?e)
                         (:endgroup))
         org-refile-targets
-        '((nil :maxlevel . 9)
+        `((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 2)
-          (srs-deck :maxlevel . 2)
-          (meetings  :maxlevel . 2))
+          (,(my/path :srs "deck.org") :maxlevel . 2)
+          (,(my/path :work "meetings.org") :maxlevel . 2))
         org-capture-templates
-        '(("t" "todo" entry
-           (file org-refile-file-path)
-           "* TODO %^{Title}
-   SCHEDULED: %t
-   :PROPERTIES:
-   :bv:
-   :tc:
-   :rr-oe:
-   :eff:
-   :END:
-
-   :LOGBOOK:
-   - State \"TODO\"       from \"\"  %U  \\\\
-     %^{Initial log} %?
-   :END:
-")
+        `(("e" "Email [mu4e]" entry (file main-agenda)
+           ,(concat "* TODO Process \"%a\" %?\n"
+                    ":LOGBOOK:\n"
+                    "- State \"TODO\"       from \"\"  %U  \\\\\n"
+                    "  %^{Initial log} %?\n"
+                    "  from %:from\n"
+                    ":END:"))
+          ("t" "todo" entry
+           (file main-agenda)
+           ,(concat "* TODO %^{Title}\n"
+                    "SCHEDULED: %t\n"
+                    ":PROPERTIES:\n"
+                    ":bv:\n"
+                    ":tc:\n"
+                    ":rr-oe:\n"
+                    ":eff:\n"
+                    ":END:\n"
+                    ":LOGBOOK:\n"
+                    " - State \"TODO\"       from \"\"  %U  \\\\\n"
+                    "  %^{Initial log} %?\n"
+                    ":END:"))
           ("w" "work reminder" entry
-           (file org-refile-file-path)
-           "* TODO %^{Title}
-   SCHEDULED: <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>%?
-   :PROPERTIES:
-   :work_reminder: t
-   :bv:
-   :tc:
-   :rr-oe:
-   :eff:
-   :END:
-
-   :LOGBOOK:
-    - Initial note taken on %U \\
-     %^{Initial note}
-   :END:
-")
+           (file main-agenda)
+           ,(concat "* TODO %^{Title}\n"
+                    "SCHEDULED: <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>%?\n"
+                    ":PROPERTIES:\n"
+                    ":work_reminder: t\n"
+                    ":bv:\n"
+                    ":tc:\n"
+                    ":rr-oe:\n"
+                    ":eff:\n"
+                    ":END:\n"
+                    ":LOGBOOK:\n"
+                    "- Initial note taken on %U \\\n"
+                    "%^{Initial note}\n"
+                    ":END:\n"))
           ("h" "habit" entry
-           (file org-refile-file-path)
-           "* TODO %^{Title}
-   SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" +1w\")%?
-   :PROPERTIES:
-   :style: habit
-   :bv:
-   :tc:
-   :rr-oe:
-   :eff:
-   :END:
-
-   :LOGBOOK:
-   - State \"TODO\"       from \"\"  %U  \\\\
-     %^{Initial log}
-   :END:
-")
-          ("a" "remote agenda event" plain (file org-refile-file-path)
-           "
-* Context
-  %^{Context}
-* Goal
-  %^{Goal}
-")
-          ("p" "evento pt-br" plain (file org-refile-file-path)
-           "
-* Contexto
-  %^{Context}
-* Objetivo
-  %^{Goal}
-")
-          ("r" "reunião log" entry
-           (file org-refile-file-path)
-           "* %^{Title}
-** Contexto
-  %^{Context}
-** Objetivo
-  %^{Goal}
-** Agenda
-  %^{Agenda}
-** Ata
-  %^{Minutes}")
+           (file main-agenda)
+           ,(concat "* TODO %^{Title}\n"
+                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" +1w\")%?\n"
+                    ":PROPERTIES:\n"
+                    ":style: habit\n"
+                    ":bv:\n"
+                    ":tc:\n"
+                    ":rr-oe:\n"
+                    ":eff:\n"
+                    ":END:\n"
+                    ":LOGBOOK:\n"
+                    "- State \"TODO\"       from \"\"  %U  \\\\\n"
+                    "%^{Initial log}\n"
+                    ":END:\n"))
           ("m" "meeting log" entry
-           (file org-refile-file-path)
-           "* %^{Title}
-** Context
-  %^{Context}
-** Goal
-  %^{Goal}
-** Agenda
-  %^{Agenda}
-** Ata
-  %^{Minutes}")
+           (file ,(my/path :work "meetings.org"))
+           ,(concat "* %^{Title}\n"
+                    "** Context\n"
+                    "%^{Context}\n"
+                    "** Goal\n"
+                    "%^{Goal}\n"
+                    "** Agenda\n"
+                    "%^{Agenda}\n"
+                    "** Ata\n"
+                    "%^{Minutes})\n"))
           ("d" "Regular drill card " entry
-           (file org-refile-file-path)
-           "* Item                                                               :drill:
-   %^{Question}
-** Answer
-   %^{Answer}
-")
-
+           (file ,(my/path :srs "deck.org"))
+           ,(concat "* Item           :drill:\n"
+                    "%^{Question}\n"
+                    "** Answer\n"
+                    "%^{Answer}\n"))
           ("z" "Drill cloze 1" entry
-           (file org-refile-file-path)
-           "* Item                                                               :drill:
-   :PROPERTIES:
-   :drill_card_type: hide1cloze
-   :END:
-%?
-"))
+           (file ,(my/path :srs "deck.org"))
+           ,(concat "* Item           :drill:\n"
+                    ":PROPERTIES:\n"
+                    ":drill_card_type: hide1cloze\n"
+                    ":END:\n"
+                    "%?\n"))
+          ("x" "Drill cloze 2" entry
+           (file ,(my/path :srs "deck.org"))
+           ,(concat "* Item           :drill:\n"
+                    ":PROPERTIES:\n"
+                    ":drill_card_type: hide2cloze\n"
+                    ":END:\n"
+                    "%?\n")))
         org-todo-keywords
         '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
           (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")
@@ -313,13 +296,13 @@ are equal return t."
         org-export-with-sub-superscripts '{}
         org-babel-default-header-args
         (cons '(:noweb . "yes")
-              (assq-delete-all :noweb org-babel-default-header-args))
+               (assq-delete-all :noweb org-babel-default-header-args))
         org-babel-default-header-args
         (cons '(:tangle . "yes")
-              (assq-delete-all :tangle org-babel-default-header-args))
+               (assq-delete-all :tangle org-babel-default-header-args))
         org-babel-default-header-args
         (cons '(:comments . "link")
-              (assq-delete-all :comments org-babel-default-header-args))
+               (assq-delete-all :comments org-babel-default-header-args))
         org-duration-format '((special . h:mm))
         org-goto-interface 'outline-path-completion
         ;; agenda stuff copied from
@@ -335,6 +318,11 @@ are equal return t."
         org-agenda-span 'day
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
         org-latex-pdf-process (list "latexmk -f -pdf %f"))
+  (defun my/org-capture-mail ()
+    "https://github.com/rougier/emacs-gtd"
+    (interactive)
+    (call-interactively 'org-store-link)
+    (org-capture nil "e"))
   ;; format timestamps. See
   ;; http://endlessparentheses.com/better-time-stamps-in-org-export.html
   ;; get images to reload after execution. Useful for things such as
@@ -382,6 +370,10 @@ are equal return t."
 
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
+  :bind (:map
+         mu4e-headers-mode-map ("C-c i" . 'my/org-capture-mail)
+         :map
+         mu4e-view-mode-map ("C-c i" . 'my/org-capture-mail))
   :config
   (require 'mu4e-contrib)
   ;; general config
@@ -432,7 +424,7 @@ are equal return t."
         mu4e-split-view 'single-window
         mail-user-agent 'mu4e-user-agent
         mu4e-hide-index-messages t
-        )
+        mu4e-org-contacts-file (my/path :agenda "contacts.org"))
   (unintern 'mu4e-ask-bookmark)
   (defun mu4e-ask-bookmark (prompt)
     "Ask the user for a bookmark (using PROMPT) as defined in
@@ -459,6 +451,10 @@ are equal return t."
       (mu4e-get-bookmark-query kar)))
   (add-hook 'mu4e-message-changed-hook #'mu4e~start)
   (add-hook 'mu4e-index-updated-hook #'mu4e~start)
+  (add-to-list 'mu4e-headers-actions
+               '("org-contact-add" . mu4e-action-add-org-contact) t)
+  (add-to-list 'mu4e-view-actions
+               '("org-contact-add" . mu4e-action-add-org-contact) t)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
@@ -1181,10 +1177,6 @@ hit C-a twice:"
   :straight t
   :after ox)
 
-(use-package helm-mu
-  :straight t
-  :after mu4e)
-
 (use-package w3m
   :straight t
   :init (setq w3m-key-binding 'info))
@@ -1201,9 +1193,6 @@ hit C-a twice:"
   :bind (("C-c r"   . helm-org-rifle-agenda-files)))
 
 (use-package bufler
-  :straight t)
-
-(use-package helm-bufler
   :straight t)
 
 (use-package which-key
@@ -1265,9 +1254,11 @@ hit C-a twice:"
   :ensure t
   :after org
   :config
+
   (defun myorg/mu4e-compose-org-msg()
     (org-hide-block-all)
     (org-hide-drawer-all))
+
   (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
 	org-msg-startup "hidestars indent inlineimages"
 	org-msg-default-alternatives '((new		. (text html))
@@ -1275,8 +1266,41 @@ hit C-a twice:"
 				       (reply-to-text	. (text)))
         org-msg-enforce-css nil
 	org-msg-convert-citation t)
+
   (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg)
   (org-msg-mode))
+
+(use-package helm-mu
+  :straight t
+  :after mu4e)
+
+(use-package helm-org-contacts
+  :straight '(:host github :repo "tmalsburg/helm-org-contacts")
+  :after helm-mu
+  :config
+  (defun helm-contacts (&optional arg)
+    (interactive "P")
+    (when arg
+      (setq helm-org-contacts-cache nil))
+    (helm :sources '(helm-source-org-contacts helm-source-mu-contacts)
+          :full-frame t
+          :candidate-number-limit 500)))
+
+(use-package org-contrib
+  :straight t
+  :after org
+  :config
+  (require 'org-contacts)
+  (setq org-contacts-files (list  (my/path :agenda "contacts.org")))
+  (add-to-list 'org-capture-templates
+               `("c" "Contacts" entry (file ,(my/path :agenda "contacts.org"))
+                 "* %(org-contacts-template-name)
+:PROPERTIES:
+:EMAIL: %(org-contacts-template-email)
+:PHONE:
+:BIRTHDAY: %^t
+:NOTE:
+:END:")))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
