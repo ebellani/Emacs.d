@@ -1302,6 +1302,9 @@ hit C-a twice:"
 :NOTE:
 :END:")))
 
+(use-package proof-general
+  :straight t)
+
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
 (put 'scroll-left 'disabled nil)
