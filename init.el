@@ -3,7 +3,7 @@
 ;; http://sites.google.com/site/steveyegge2/effective-emacs
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
 ;; https://github.com/cqql/dotfiles/blob/master/home/.emacs.d/init.org
-
+(require 'cl-lib)
 
 (if init-file-debug
     (setq use-package-verbose t
@@ -21,8 +21,12 @@
 accumulating.")
 
 (defcustom my/path-aliases
-  '(:emacs "~/.emacs.d")
-  "Location of my paths ile for refiling purposes")
+  (list :emacs  "~/.emacs.d"
+        :srs    "~/.emacs.d"
+        :work   "~/.emacs.d"
+        :agenda "~/.emacs.d")
+  "Location of my paths for ease of usage. Customize for each
+  environment if needed.")
 
 (defun my/path (dir &optional subpath)
   "Build a path name. See https://github.com/arecker/emacs.d"
@@ -314,7 +318,7 @@ are equal return t."
         org-agenda-compact-blocks t
         org-agenda-start-with-log-mode t
         ;; allows multiple agenda views to coexist
-        org-agenda-sticky t
+        org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
         org-latex-pdf-process (list "latexmk -f -pdf %f"))
@@ -1304,6 +1308,10 @@ hit C-a twice:"
 
 (use-package proof-general
   :straight t)
+
+(use-package nov
+  :straight t
+  :mode (("\\.epub$" . nov-mode)))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
