@@ -206,7 +206,8 @@ are equal return t."
           (,(my/path :work "meetings.org") :maxlevel . 2))
         org-capture-templates
         `(("e" "Email [mu4e]" entry (file main-agenda)
-           ,(concat "* TODO Process \"%a\" %?\n"
+           ,(concat "* TODO Process \"%a\"\n"
+                    "SCHEDULED: %t\n"
                     ":LOGBOOK:\n"
                     "- State \"TODO\"       from \"\"  %U  \\\\\n"
                     "  %^{Initial log} %?\n"
@@ -314,7 +315,7 @@ are equal return t."
         org-agenda-skip-scheduled-if-done t
         org-agenda-skip-deadline-if-done t
         org-agenda-block-separator nil
-        org-agenda-include-diary t
+        org-agenda-include-diary nil
         org-agenda-compact-blocks t
         org-agenda-start-with-log-mode t
         ;; allows multiple agenda views to coexist
@@ -1225,7 +1226,8 @@ hit C-a twice:"
 (use-package pyenv-mode
   :straight t
   :bind (:map pyenv-mode-map
-              ("C-c C-s" . nil)))
+              ("C-c C-s" . nil))
+  :config (pyenv-mode))
 
 (use-package orgit
   :straight t
@@ -1298,13 +1300,14 @@ hit C-a twice:"
   (setq org-contacts-files (list  (my/path :agenda "contacts.org")))
   (add-to-list 'org-capture-templates
                `("c" "Contacts" entry (file ,(my/path :agenda "contacts.org"))
-                 "* %(org-contacts-template-name)
-:PROPERTIES:
-:EMAIL: %(org-contacts-template-email)
-:PHONE:
-:BIRTHDAY: %^t
-:NOTE:
-:END:")))
+                 ,(concat
+                   "* %(org-contacts-template-name)\n"
+                   ":PROPERTIES:\n"
+                   ":EMAIL: %(org-contacts-template-email)\n"
+                   ":PHONE:\n"
+                   ":BIRTHDAY: %^t\n"
+                   ":NOTE:\n"
+                   ":END:\n"))))
 
 (use-package proof-general
   :straight t)
