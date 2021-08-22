@@ -118,6 +118,55 @@ accumulating.")
 (eval-when-compile
   (require 'use-package))
 
+;;; org auxiliary functions
+
+(defun myorg/choose-browser (org-open-at-point-fun &optional arg)
+  "From here. https://www.emacswiki.org/emacs/BrowseUrl"
+  (let ((browse-url-browser-function
+         (cond ((equal arg '(4)) 'browse-url-chrome)
+               (t (lambda (url &optional new)
+                    (w3m-browse-url url t))))))
+    (apply org-open-at-point-fun arg)))
+
+(defun myorg/numeric-entry-or-zero (pom entry-name)
+  (let ((entry (org-entry-get pom entry-name)))
+    (if entry (string-to-number entry) 0)))
+
+(require 'calc-ext)
+
+(defun myorg/cmp-wsjf-property (entry-a entry-b)
+  "Compare two `org-mode' agenda entries by their WSJF.
+If a is before b, return -1. If a is after b, return 1. If they
+are equal return t."
+  (let* ((getter (lambda (entry)
+                   (round (myorg/numeric-entry-or-zero
+                           (get-text-property 0 'org-marker entry)
+                           "wsjf"))))
+         (wsjf-a (funcall getter entry-a))
+         (wsjf-b (funcall getter entry-b))
+         (cmp (math-compare wsjf-a wsjf-b)))
+    (if (zerop cmp)
+        nil
+      cmp)))
+
+(cl-defun myorg/add-wsjf-to-scope (&optional (scope 'agenda))
+  "Tries to add a `wsjf' property to all items in SCOPE. Agenda is the default"
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (condition-case err
+         (org-set-property
+          "wsjf"
+          (format "%.2f"
+                  (/ (+ (myorg/numeric-entry-or-zero nil "bv")
+                        (myorg/numeric-entry-or-zero nil "tc")
+                        (myorg/numeric-entry-or-zero nil "rr-oe"))
+                     (myorg/numeric-entry-or-zero nil "eff"))))
+       (error (message "%s" (error-message-string err))
+              t)))
+   nil
+   scope))
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -127,59 +176,8 @@ accumulating.")
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
-  (require 'org-tempo)
-  (defun replace-in-string (what with in)
-    (replace-regexp-in-string (regexp-quote what) with in nil 'literal))
 
-  (defun org-html--format-image (source attributes info)
-    (progn
-      (setq source (replace-in-string "%20" " " source))
-      (format "<img src=\"data:image/%s;base64,%s\"%s />"
-              (or (file-name-extension source) "")
-              (base64-encode-string
-               (with-temp-buffer
-                 (insert-file-contents-literally source)
-                 (buffer-string)))
-              (file-name-nondirectory source))))
-
-  (defun myorg/numeric-entry-or-zero (pom entry-name)
-    (let ((entry (org-entry-get pom entry-name)))
-      (if entry (string-to-number entry) 0)))
-
-  (require 'calc-ext)
-
-  (defun myorg/cmp-wsjf-property (entry-a entry-b)
-    "Compare two `org-mode' agenda entries by their WSJF.
-If a is before b, return -1. If a is after b, return 1. If they
-are equal return t."
-    (let* ((getter (lambda (entry)
-                     (round (myorg/numeric-entry-or-zero
-                             (get-text-property 0 'org-marker entry)
-                             "wsjf"))))
-           (wsjf-a (funcall getter entry-a))
-           (wsjf-b (funcall getter entry-b))
-           (cmp (math-compare wsjf-a wsjf-b)))
-      (if (zerop cmp)
-          nil
-        cmp)))
-
-  (cl-defun myorg/add-wsjf-to-scope (&optional (scope 'agenda))
-    "Tries to add a `wsjf' property to all items in SCOPE. Agenda is the default"
-    (interactive)
-    (org-map-entries
-     (lambda ()
-       (condition-case err
-           (org-set-property
-            "wsjf"
-            (format "%.2f"
-                    (/ (+ (myorg/numeric-entry-or-zero nil "bv")
-                          (myorg/numeric-entry-or-zero nil "tc")
-                          (myorg/numeric-entry-or-zero nil "rr-oe"))
-                       (myorg/numeric-entry-or-zero nil "eff"))))
-         (error (message "%s" (error-message-string err))
-                t)))
-     nil
-     scope))
+  (advice-add 'org-open-at-point :around #'myorg/choose-browser)
 
   (setq org-refile-file-path (my/path :emacs "refile.org")
         org-refile-allow-creating-parent-nodes 'confirm
@@ -362,7 +360,9 @@ are equal return t."
 
 (use-package browse-url
   :config
-  (setq browse-url-browser-function 'browse-url-chrome))
+  (setq browse-url-browser-function 'w3m-browse-url
+        browse-url-secondary-browser-function 'browse-url-chrome
+        w3m-fill-column 80))
 
 (use-package scroll-bar
   :config
