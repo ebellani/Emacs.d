@@ -360,8 +360,7 @@ are equal return t."
 
 (use-package browse-url
   :config
-  (setq browse-url-browser-function 'w3m-browse-url
-        browse-url-secondary-browser-function 'browse-url-chrome
+  (setq browse-url-browser-function 'browse-url-chrome
         w3m-fill-column 80))
 
 (use-package scroll-bar
