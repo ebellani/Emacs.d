@@ -289,7 +289,7 @@ are equal return t."
         org-todo-keywords
         '((sequence "TODO(t@/!)" "|" "DONE(d@/!)")
           (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)")
-          (sequence "REPEAT(!)"))
+          (sequence "REPEAT(r@/!)"))
         org-imenu-depth 6
         org-src-fontify-natively t
         ;; disable confirmation of evaluation of code. CAREFUL WHEN EVALUATING
