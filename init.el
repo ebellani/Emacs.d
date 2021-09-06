@@ -125,7 +125,7 @@ accumulating.")
   (let ((browse-url-browser-function
          (cond ((equal arg '(4)) 'browse-url-chrome)
                (t (lambda (url &optional new)
-                    (w3m-browse-url url t))))))
+                    (eww-browse-url url t))))))
     (apply org-open-at-point-fun arg)))
 
 (defun myorg/numeric-entry-or-zero (pom entry-name)
@@ -166,6 +166,10 @@ are equal return t."
               t)))
    nil
    scope))
+
+(use-package shr
+  :config
+  (setq shr-max-width fill-column))
 
 (use-package org
   :bind (("C-c l" . 'org-store-link)
@@ -360,8 +364,7 @@ are equal return t."
 
 (use-package browse-url
   :config
-  (setq browse-url-browser-function 'browse-url-chrome
-        w3m-fill-column 80))
+  (setq browse-url-browser-function 'browse-url-chrome))
 
 (use-package scroll-bar
   :config
@@ -871,31 +874,30 @@ hit C-a twice:"
          ("<C-m> /" . vr/mc-mark)))
 
 (use-package smartparens
-  :demand t
   :straight t
+  :bind (:map smartparens-mode-map
+              ("C-M-f"   . sp-forward-sexp)
+              ("C-M-S-f" . sp-next-sexp)
+              ("C-M-b"   . sp-backward-sexp)
+              ("C-M-S-b" . sp-previous-sexp)
+              ("C-M-n"   . sp-down-sexp)
+              ("C-M-S-n" . sp-backward-down-sexp)
+              ("C-M-p"   . sp-up-sexp)
+              ("C-M-S-p" . sp-backward-up-sexp)
+              ("C-M-a"   . sp-beginning-of-sexp)
+              ("C-M-e"   . sp-end-of-sexp)
+              ("C-M-k"   . sp-kill-sexp)
+              ("C-M-S-k" . sp-backward-kill-sexp)
+              ("C-M-w"   . sp-copy-sexp)
+              ("C-M-t"   . sp-transpose-sexp)
+              ("C-M-h"   . sp-backward-slurp-sexp)
+              ("C-M-S-h" . sp-backward-barf-sexp)
+              ("C-M-l"   . sp-forward-slurp-sexp)
+              ("C-M-S-l" . sp-forward-barf-sexp)
+              ("C-M-j"   . sp-splice-sexp)
+              ("C-M-S-j" . sp-raise-sexp))
   :config
   (require 'smartparens-config)
-  (bind-keys :map smartparens-mode-map
-             ("C-M-f" . sp-forward-sexp)
-             ("C-M-S-f" . sp-next-sexp)
-             ("C-M-b" . sp-backward-sexp)
-             ("C-M-S-b" . sp-previous-sexp)
-             ("C-M-n" . sp-down-sexp)
-             ("C-M-S-n" . sp-backward-down-sexp)
-             ("C-M-p" . sp-up-sexp)
-             ("C-M-S-p" . sp-backward-up-sexp)
-             ("C-M-a" . sp-beginning-of-sexp)
-             ("C-M-e" . sp-end-of-sexp)
-             ("C-M-k" . sp-kill-sexp)
-             ("C-M-S-k" . sp-backward-kill-sexp)
-             ("C-M-w" . sp-copy-sexp)
-             ("C-M-t" . sp-transpose-sexp)
-             ("C-M-h" . sp-backward-slurp-sexp)
-             ("C-M-S-h" . sp-backward-barf-sexp)
-             ("C-M-l" . sp-forward-slurp-sexp)
-             ("C-M-S-l" . sp-forward-barf-sexp)
-             ("C-M-j" . sp-splice-sexp)
-             ("C-M-S-j" . sp-raise-sexp))
   (smartparens-global-mode 1)
   (smartparens-strict-mode 1)
   (show-smartparens-global-mode 1)
@@ -1181,10 +1183,6 @@ hit C-a twice:"
   :straight t
   :after ox)
 
-(use-package w3m
-  :straight t
-  :init (setq w3m-key-binding 'info))
-
 (use-package perspective
   :straight t
   :config
@@ -1255,11 +1253,10 @@ hit C-a twice:"
   (editorconfig-mode 1))
 
 (use-package org-msg
-  :straight t
+  :straight '(:host github :repo "ebellani/org-msg")
   :ensure t
   :after org
   :config
-
   (defun myorg/mu4e-compose-org-msg()
     (org-hide-block-all)
     (org-hide-drawer-all))
