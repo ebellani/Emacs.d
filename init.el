@@ -54,7 +54,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 90)
+                    :height 80)
 
 ;;; things that I don't know how to do with use-package
 
@@ -120,14 +120,6 @@ accumulating.")
 
 ;;; org auxiliary functions
 
-(defun myorg/choose-browser (org-open-at-point-fun &optional arg)
-  "From here. https://www.emacswiki.org/emacs/BrowseUrl"
-  (let ((browse-url-browser-function
-         (cond ((equal arg '(4)) 'browse-url-chrome)
-               (t (lambda (url &optional new)
-                    (eww-browse-url url t))))))
-    (apply org-open-at-point-fun arg)))
-
 (defun myorg/numeric-entry-or-zero (pom entry-name)
   (let ((entry (org-entry-get pom entry-name)))
     (if entry (string-to-number entry) 0)))
@@ -180,9 +172,6 @@ are equal return t."
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
-
-  (advice-add 'org-open-at-point :around #'myorg/choose-browser)
-
   (setq org-refile-file-path (my/path :emacs "refile.org")
         org-refile-allow-creating-parent-nodes 'confirm
         org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
@@ -363,8 +352,18 @@ are equal return t."
   :config (setq reb-re-syntax 'string))
 
 (use-package browse-url
+  :bind  (:map
+          global-map
+          ("C-c w" . 'set-browser!))
   :config
-  (setq browse-url-browser-function 'browse-url-chrome))
+  (defun set-browser! (&optional arg)
+    "Makes the default browser external or internal by setting the
+`browse-url-browser-function' accordingly"
+    (interactive "P")
+    (setq browse-url-browser-function
+          (if (equal arg '(4))
+              'eww-browse-url
+            'browse-url-chrome))))
 
 (use-package scroll-bar
   :config
@@ -1308,9 +1307,32 @@ hit C-a twice:"
 (use-package proof-general
   :straight t)
 
+(use-package shrface
+  :straight t
+  :defer t
+  :config
+  (shrface-basic)
+  (shrface-trial)
+  (shrface-default-keybindings) ; setup default keybindings
+  (setq shrface-href-versatile t))
+
+(use-package eww
+  :defer t
+  :init
+  (add-hook 'eww-after-render-hook #'shrface-mode)
+  :config
+  (require 'shrface))
+
 (use-package nov
   :straight t
-  :mode (("\\.epub$" . nov-mode)))
+  :defer t
+  :init
+  (add-hook 'nov-mode-hook #'shrface-mode)
+  :mode (("\\.epub$" . nov-mode))
+  :config
+  (require 'shrface)
+  (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
+  (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
