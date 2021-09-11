@@ -1037,7 +1037,7 @@ hit C-a twice:"
         helm-buffers-fuzzy-matching            t
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t
-        helm-buffer-max-length                 nil
+        helm-buffer-max-length                 30
         helm-show-completion-display-function #'helm-show-completion-default-display-function
         ;; the following would enable a separate frame.
         ;; helm-display-function                  'helm-display-buffer-in-own-frame
