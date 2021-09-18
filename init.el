@@ -874,6 +874,7 @@ hit C-a twice:"
 
 (use-package smartparens
   :straight t
+  :demand t
   :bind (:map smartparens-mode-map
               ("C-M-f"   . sp-forward-sexp)
               ("C-M-S-f" . sp-next-sexp)
