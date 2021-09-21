@@ -1335,6 +1335,10 @@ hit C-a twice:"
   (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
   (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
 
+(use-package ox-moderncv
+  :straight '(:host gitlab :repo "Titan-C/org-cv")
+  :init (require 'ox-moderncv))
+
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
 (put 'scroll-left 'disabled nil)
