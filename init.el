@@ -1256,6 +1256,14 @@ hit C-a twice:"
   :straight '(:host github :repo "ebellani/org-msg")
   :ensure t
   :after org
+  :bind (:map org-msg-edit-mode-map
+	      ("C-c RET C-c" . mml-secure-message-encrypt)
+              ("C-c RET C-s" . mml-secure-message-sign)
+              ("C-c RET t" . message-goto-to)
+              ("C-c RET c" . message-goto-cc)
+              ("C-c RET b" . message-goto-bcc)
+              ("C-c RET o" . org-msg-goto-body)
+              ("C-c RET s" . message-goto-subject))
   :config
   (defun myorg/mu4e-compose-org-msg()
     (org-hide-block-all)
