@@ -172,6 +172,7 @@ are equal return t."
   :preface
   (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
   :config
+  (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
         org-refile-allow-creating-parent-nodes 'confirm
         org-agenda-cmp-user-defined 'myorg/cmp-wsjf-property
@@ -209,10 +210,10 @@ are equal return t."
            ,(concat "* TODO %^{Title}\n"
                     "SCHEDULED: %t\n"
                     ":PROPERTIES:\n"
-                    ":bv:\n"
-                    ":tc:\n"
-                    ":rr-oe:\n"
-                    ":eff:\n"
+                    ":BV:\n"
+                    ":TC:\n"
+                    ":RR-OE:\n"
+                    ":EFF:\n"
                     ":END:\n"
                     ":LOGBOOK:\n"
                     " - State \"TODO\"       from \"\"  %U  \\\\\n"
@@ -224,10 +225,10 @@ are equal return t."
                     "SCHEDULED: <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>%?\n"
                     ":PROPERTIES:\n"
                     ":work_reminder: t\n"
-                    ":bv:\n"
-                    ":tc:\n"
-                    ":rr-oe:\n"
-                    ":eff:\n"
+                    ":BV:\n"
+                    ":TC:\n"
+                    ":RR-OE:\n"
+                    ":EFF:\n"
                     ":END:\n"
                     ":LOGBOOK:\n"
                     "- Initial note taken on %U \\\n"
@@ -239,10 +240,10 @@ are equal return t."
                     "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" +1w\")%?\n"
                     ":PROPERTIES:\n"
                     ":style: habit\n"
-                    ":bv:\n"
-                    ":tc:\n"
-                    ":rr-oe:\n"
-                    ":eff:\n"
+                    ":BV:\n"
+                    ":TC:\n"
+                    ":RR-OE:\n"
+                    ":EFF:\n"
                     ":END:\n"
                     ":LOGBOOK:\n"
                     "- State \"TODO\"       from \"\"  %U  \\\\\n"
@@ -292,13 +293,13 @@ are equal return t."
         org-export-with-sub-superscripts '{}
         org-babel-default-header-args
         (cons '(:noweb . "yes")
-               (assq-delete-all :noweb org-babel-default-header-args))
+              (assq-delete-all :noweb org-babel-default-header-args))
         org-babel-default-header-args
         (cons '(:tangle . "yes")
-               (assq-delete-all :tangle org-babel-default-header-args))
+              (assq-delete-all :tangle org-babel-default-header-args))
         org-babel-default-header-args
         (cons '(:comments . "link")
-               (assq-delete-all :comments org-babel-default-header-args))
+              (assq-delete-all :comments org-babel-default-header-args))
         org-duration-format '((special . h:mm))
         org-goto-interface 'outline-path-completion
         ;; agenda stuff copied from
@@ -313,7 +314,9 @@ are equal return t."
         org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
-        org-latex-pdf-process (list "latexmk -f -pdf %f"))
+        org-latex-pdf-process (list "latexmk -f -pdf %f")
+        org-cite-export-processors '((latex biblatex)
+                                     (t basic)))
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
@@ -1325,10 +1328,18 @@ hit C-a twice:"
   (shrface-default-keybindings) ; setup default keybindings
   (setq shrface-href-versatile t))
 
+(defun my/eww-rename-buffer-name ()
+  (rename-buffer
+   (if-let ((url (eww-current-url))
+            (title (plist-get eww-data :title)))
+       (format "*eww-%s_%s*" title url)
+     (generate-new-buffer "*eww*"))))
+
 (use-package eww
   :defer t
   :init
   (add-hook 'eww-after-render-hook #'shrface-mode)
+  (add-hook 'eww-after-render-hook #'my/eww-rename-buffer-name)
   :config
   (require 'shrface))
 
@@ -1346,6 +1357,9 @@ hit C-a twice:"
 (use-package ox-moderncv
   :straight '(:host gitlab :repo "Titan-C/org-cv")
   :init (require 'ox-moderncv))
+
+(use-package emojify
+  :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
