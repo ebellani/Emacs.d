@@ -1204,20 +1204,13 @@ hit C-a twice:"
   :straight t
   :config (which-key-mode))
 
-(use-package eglot
-  :straight t
-  :after company)
-
 (use-package fsharp-mode
+  :ensure t
   :straight t
-  :after company
+  :mode (("\\.fs$" .  fsharp-mode)
+	 ("\\.fsx$" .  fsharp-mode))
   :config
-  (setq inferior-fsharp-program "dotnet fsi"))
-
-(use-package eglot-fsharp
-  :straight t
-  :after fsharp-mode
-  :config
+  (setq inferior-fsharp-program "dotnet fsi")
   (add-hook 'inferior-fsharp-mode-hook 'turn-on-comint-history))
 
 (use-package dotnet
@@ -1360,6 +1353,14 @@ hit C-a twice:"
 
 (use-package emojify
   :straight t)
+
+(use-package lsp-mode
+  :straight t
+  :ensure   t)
+
+(use-package lsp-ui
+  :straight t
+  :ensure   t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
