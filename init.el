@@ -170,7 +170,7 @@ are equal return t."
          ("C-c b" . 'org-iswitchb))
   :straight t
   :preface
-  (setq org-export-backends '(md gfm beamer ascii taskjuggler html latex odt org))
+  (setq org-export-backends '(moderncv md gfm beamer ascii taskjuggler html latex odt org))
   :config
   (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
@@ -314,8 +314,9 @@ are equal return t."
         org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
-        org-latex-pdf-process (list "latexmk -f -pdf %f")
+        org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
         org-cite-export-processors '((latex biblatex)
+                                     (moderncv basic)
                                      (t basic)))
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
@@ -1348,7 +1349,7 @@ hit C-a twice:"
   (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
 
 (use-package ox-moderncv
-  :straight '(:host gitlab :repo "Titan-C/org-cv")
+  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
   :init (require 'ox-moderncv))
 
 (use-package emojify
