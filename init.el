@@ -118,6 +118,16 @@ accumulating.")
 (eval-when-compile
   (require 'use-package))
 
+;;; https://github.com/raxod502/radian/blob/develop/emacs/radian.el
+
+(defmacro use-feature (name &rest args)
+  "Like `use-package', but with `straight-use-package-by-default' disabled.
+NAME and ARGS are as in `use-package'."
+  (declare (indent defun))
+  `(use-package ,name
+     :straight nil
+     ,@args))
+
 ;;; org auxiliary functions
 
 (defun myorg/numeric-entry-or-zero (pom entry-name)
@@ -662,13 +672,6 @@ hit C-a twice:"
     (elisp-pp (cl-macroexpand-all form)))
   (elisp-slime-nav-mode 1))
 
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'reverse)
-  (setq uniquify-separator "|")
-  (setq uniquify-after-kill-buffer-p 1)
-  (setq uniquify-ignore-buffers-re "^\\*"))
-
 (use-package time
   :config
   (setq display-time-format "%F %R %z"
@@ -876,40 +879,117 @@ hit C-a twice:"
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
 
+
 (use-package smartparens
-  :straight t
   :demand t
-  :bind (:map smartparens-mode-map
-              ("C-M-f"   . sp-forward-sexp)
-              ("C-M-S-f" . sp-next-sexp)
-              ("C-M-b"   . sp-backward-sexp)
-              ("C-M-S-b" . sp-previous-sexp)
-              ("C-M-n"   . sp-down-sexp)
-              ("C-M-S-n" . sp-backward-down-sexp)
-              ("C-M-p"   . sp-up-sexp)
-              ("C-M-S-p" . sp-backward-up-sexp)
-              ("C-M-a"   . sp-beginning-of-sexp)
-              ("C-M-e"   . sp-end-of-sexp)
-              ("C-M-k"   . sp-kill-sexp)
-              ("C-M-S-k" . sp-backward-kill-sexp)
-              ("C-M-w"   . sp-copy-sexp)
-              ("C-M-t"   . sp-transpose-sexp)
-              ("C-M-h"   . sp-backward-slurp-sexp)
-              ("C-M-S-h" . sp-backward-barf-sexp)
-              ("C-M-l"   . sp-forward-slurp-sexp)
-              ("C-M-S-l" . sp-forward-barf-sexp)
-              ("C-M-j"   . sp-splice-sexp)
-              ("C-M-S-j" . sp-raise-sexp))
   :config
+
+  ;; Load the default pair definitions for Smartparens.
   (require 'smartparens-config)
-  (smartparens-global-mode 1)
-  (smartparens-strict-mode 1)
-  (show-smartparens-global-mode 1)
-  ;; We write it the verbose way instead of with sp-with-modes because
-  ;; use-package does not properly expand the macro somehow during compilation
-  (sp-local-pair sp--html-modes "{{" "}}")
-  (sp-local-pair sp--html-modes "{%" "%}")
-  (sp-local-pair sp--html-modes "{#" "#}"))
+
+  ;; Enable Smartparens functionality in all buffers.
+  (smartparens-global-mode +1)
+
+  ;; When in Paredit emulation mode, Smartparens binds M-( to wrap the
+  ;; following s-expression in round parentheses. By analogy, we
+  ;; should bind M-[ to wrap the following s-expression in square
+  ;; brackets. However, this breaks escape sequences in the terminal,
+  ;; so it may be controversial upstream. We only enable the
+  ;; keybinding in windowed mode.
+  (when (display-graphic-p)
+    (setf (map-elt sp-paredit-bindings "M-[") #'sp-wrap-square))
+
+  ;; Set up keybindings for s-expression navigation and manipulation
+  ;; in the style of Paredit.
+  (sp-use-paredit-bindings)
+
+  ;; Highlight matching delimiters.
+  (show-smartparens-global-mode +1)
+
+  ;; Prevent all transient highlighting of inserted pairs.
+  (setq sp-highlight-pair-overlay nil)
+  (setq sp-highlight-wrap-overlay nil)
+  (setq sp-highlight-wrap-tag-overlay nil)
+
+  ;; Don't disable autoskip when point moves backwards. (This lets you
+  ;; open a sexp, type some things, delete some things, etc., and then
+  ;; type over the closing delimiter as long as you didn't leave the
+  ;; sexp entirely.)
+  (setq sp-cancel-autoskip-on-backward-movement nil)
+
+  ;; Disable Smartparens in Org-related modes, since the keybindings
+  ;; conflict.
+
+  (use-feature org
+    :config
+
+    (add-to-list 'sp-ignore-modes-list #'org-mode))
+
+  (use-feature org-agenda
+    :config
+
+    (add-to-list 'sp-ignore-modes-list #'org-agenda-mode))
+
+  ;; Make C-k kill the sexp following point in Lisp modes, instead of
+  ;; just the current line.
+  (bind-key [remap kill-line] #'sp-kill-hybrid-sexp smartparens-mode-map
+            (apply #'derived-mode-p sp-lisp-modes))
+
+  (defun radian--smartparens-indent-new-pair (&rest _)
+    "Insert an extra newline after point, and reindent."
+    (newline)
+    (indent-according-to-mode)
+    (forward-line -1)
+    (indent-according-to-mode))
+
+  ;; The following is a really absurdly stupid hack that I can barely
+  ;; stand to look at. It needs to be fixed.
+  ;;
+  ;; Nevertheless, I can't live without the feature it provides (which
+  ;; should really come out of the box IMO): when pressing RET after
+  ;; inserting a pair, add an extra newline and indent. See
+  ;; <https://github.com/Fuco1/smartparens/issues/80#issuecomment-18910312>.
+
+  (defun radian--smartparens-pair-setup (mode delim)
+    "In major mode MODE, set up DELIM with newline-and-indent."
+    (sp-local-pair mode delim nil :post-handlers
+                   '((radian--smartparens-indent-new-pair "RET")
+                     (radian--smartparens-indent-new-pair "<return>"))))
+
+  (dolist (delim '("(" "[" "{"))
+    (dolist (mode '(
+                    fundamental-mode
+                    javascript-mode
+                    protobuf-mode
+                    text-mode
+                    web-mode
+                    ))
+      (radian--smartparens-pair-setup mode delim)))
+
+  (radian--smartparens-pair-setup #'python-mode "\"\"\"")
+  (radian--smartparens-pair-setup #'markdown-mode "```")
+
+  ;; Work around https://github.com/Fuco1/smartparens/issues/1036.
+  (when (fboundp 'minibuffer-mode)
+    (sp-local-pair #'minibuffer-mode "`" nil :actions nil)
+    (sp-local-pair #'minibuffer-mode "'" nil :actions nil))
+
+  ;; Work around https://github.com/Fuco1/smartparens/issues/783.
+  (setq sp-escape-quotes-after-insert nil)
+
+  ;; For some reason two C-g's are required to exit out of the
+  ;; minibuffer if you've just typed a parenthesis pair. This appears
+  ;; to be intentional, but doesn't make a lot of intuitive sense
+  ;; since we've disabled highlighting. Kill the problematic
+  ;; keybinding. See also
+  ;; https://github.com/Fuco1/smartparens/pull/890 which was about a
+  ;; similar problem.
+  (define-key sp-pair-overlay-keymap (kbd "C-g") nil)
+
+  ;; Quiet some silly messages.
+  (dolist (key '(:unmatched-expression :no-matching-tag))
+    (setf (cdr (assq key sp-message-alist)) nil)))
+
 
 (use-package eldoc
   :straight t
@@ -1252,7 +1332,6 @@ hit C-a twice:"
 (use-package org-msg
   :straight '(:host github :repo "ebellani/org-msg")
   :ensure t
-  :after org
   :bind (:map org-msg-edit-mode-map
 	      ("C-c RET C-c" . mml-secure-message-encrypt)
               ("C-c RET C-s" . mml-secure-message-sign)
@@ -1357,9 +1436,15 @@ hit C-a twice:"
 
 (use-package lsp-mode
   :straight t
-  :ensure   t)
+  :ensure   t
+  :config
+  (add-hook 'fsharp-mode-hook #'lsp))
 
 (use-package lsp-ui
+  :straight t
+  :ensure   t)
+
+(use-package bookmark+
   :straight t
   :ensure   t)
 
