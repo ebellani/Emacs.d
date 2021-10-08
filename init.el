@@ -270,18 +270,15 @@ are equal return t."
                     "%^{Agenda}\n"
                     "** Ata\n"
                     "%^{Minutes})\n"))
-          ("d" "Regular drill card " entry
+          ("d" "Drill card with answer" entry
            (file ,(my/path :srs "deck.org"))
            ,(concat "* Item           :drill:\n"
                     "%^{Question}\n"
                     "** Answer\n"
                     "%^{Answer}\n"))
-          ("z" "Drill cloze 1" entry
+          ("z" "Drill" entry
            (file ,(my/path :srs "deck.org"))
            ,(concat "* Item           :drill:\n"
-                    ":PROPERTIES:\n"
-                    ":drill_card_type: hide1cloze\n"
-                    ":END:\n"
                     "%?\n"))
           ("x" "Drill cloze 2" entry
            (file ,(my/path :srs "deck.org"))
@@ -824,6 +821,11 @@ hit C-a twice:"
   ("C-x 4 C-o" . 'switch-window-then-display-buffer)
   ("C-x 4 0"   . 'switch-window-then-kill-buffer))
 
+(defun my/pdf-bookmark-jump-handler (bmk)
+  "Fixes integration w/ bookmark plus"
+  (switch-to-buffer (current-buffer))
+  (current-buffer))
+
 (use-package pdf-tools
   :straight t
   :magic ("%PDF" . pdf-view-mode)
@@ -831,7 +833,8 @@ hit C-a twice:"
   ;; fix space next page problem. No idea why
   ;; (setq pdf-view-have-image-mode-pixel-vscroll nil)
   (pdf-tools-install)
-  (setq pdf-view-resize-factor 1.05))
+  (setq pdf-view-resize-factor 1.05)
+  (advice-add 'pdf-view-bookmark-jump-handler :after 'my/pdf-bookmark-jump-handler))
 
 (use-package org-pdftools
   :straight t
@@ -854,7 +857,7 @@ hit C-a twice:"
 
 (use-package company
   :straight t
-  :ensure t
+  :demand t
   :commands (company-mode company-indent-or-complete-common)
   :config
   (setf company-idle-delay 0
@@ -881,6 +884,7 @@ hit C-a twice:"
 
 
 (use-package smartparens
+  :straight t
   :demand t
   :config
 
@@ -889,6 +893,7 @@ hit C-a twice:"
 
   ;; Enable Smartparens functionality in all buffers.
   (smartparens-global-mode +1)
+  (smartparens-strict-mode +1)
 
   ;; When in Paredit emulation mode, Smartparens binds M-( to wrap the
   ;; following s-expression in round parentheses. By analogy, we
@@ -902,6 +907,7 @@ hit C-a twice:"
   ;; Set up keybindings for s-expression navigation and manipulation
   ;; in the style of Paredit.
   (sp-use-paredit-bindings)
+
 
   ;; Highlight matching delimiters.
   (show-smartparens-global-mode +1)
@@ -919,15 +925,16 @@ hit C-a twice:"
 
   ;; Disable Smartparens in Org-related modes, since the keybindings
   ;; conflict.
+  ;; interfers with e.g. org-mode, enable them specifically in lisp modes instead
 
-  (use-feature org
-    :config
+  (dolist (key '("M-<up>" "M-<down>"))
+    (unbind-key key sp-keymap))
 
-    (add-to-list 'sp-ignore-modes-list #'org-mode))
+  ;; smartparens
+  (require 'smartparens-config)
 
   (use-feature org-agenda
     :config
-
     (add-to-list 'sp-ignore-modes-list #'org-agenda-mode))
 
   ;; Make C-k kill the sexp following point in Lisp modes, instead of
@@ -989,7 +996,6 @@ hit C-a twice:"
   ;; Quiet some silly messages.
   (dolist (key '(:unmatched-expression :no-matching-tag))
     (setf (cdr (assq key sp-message-alist)) nil)))
-
 
 (use-package eldoc
   :straight t
@@ -1286,7 +1292,7 @@ hit C-a twice:"
   :config (which-key-mode))
 
 (use-package fsharp-mode
-  :ensure t
+  :demand t
   :straight t
   :mode (("\\.fs$" .  fsharp-mode)
 	 ("\\.fsx$" .  fsharp-mode))
@@ -1305,33 +1311,33 @@ hit C-a twice:"
 
 (use-package orgit
   :straight t
-  :ensure org-plus-contrib)
+  :demand org-plus-contrib)
 
 (use-package org-drill
   :straight t
-  :ensure org-plus-contrib
+  :demand org-plus-contrib
   :commands (org-drill))
 
 (use-package gnu-elpa-keyring-update
   :straight t
-  :ensure t)
+  :demand t)
 
 (use-package langtool
   :straight t
-  :ensure t
+  :demand t
   :config
   (setq langtool-http-server-host "localhost"
         langtool-http-server-port 8010))
 
 (use-package editorconfig
   :straight t
-  :ensure t
+  :demand t
   :config
   (editorconfig-mode 1))
 
 (use-package org-msg
   :straight '(:host github :repo "ebellani/org-msg")
-  :ensure t
+  :demand t
   :bind (:map org-msg-edit-mode-map
 	      ("C-c RET C-c" . mml-secure-message-encrypt)
               ("C-c RET C-s" . mml-secure-message-sign)
@@ -1436,17 +1442,17 @@ hit C-a twice:"
 
 (use-package lsp-mode
   :straight t
-  :ensure   t
+  :demand   t
   :config
   (add-hook 'fsharp-mode-hook #'lsp))
 
 (use-package lsp-ui
   :straight t
-  :ensure   t)
+  :demand   t)
 
 (use-package bookmark+
   :straight t
-  :ensure   t)
+  :demand   t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
