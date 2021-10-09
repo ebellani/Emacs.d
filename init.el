@@ -171,7 +171,7 @@ are equal return t."
 
 (use-package shr
   :config
-  (setq shr-max-width fill-column))
+  (setq shr-max-width (- fill-column 10)))
 
 (use-package org
   :bind (("C-c l" . 'org-store-link)
