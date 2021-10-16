@@ -1041,15 +1041,6 @@ hit C-a twice:"
   :straight t
   :mode "\\.json\\'")
 
-(use-package helpful
-  :straight t
-  :bind (("C-h C" . helpful-command)
-         ("C-h M" . helpful-macro)
-         ("C-h f" . helpful-callable)
-         ("C-c C-d" . helpful-at-point)
-         ("C-h v" . helpful-variable)
-         ("C-h F" . helpful-function)
-         ("C-h k" . helpful-key)))
 
 (use-package info-rename-buffer
   :straight t
@@ -1128,13 +1119,9 @@ hit C-a twice:"
         helm-buffers-fuzzy-matching            t
         helm-ff-auto-update-initial-value      t
         helm-imenu-fuzzy-match                 t
-        helm-buffer-max-length                 30
-        helm-show-completion-display-function #'helm-show-completion-default-display-function
-        ;; the following would enable a separate frame.
-        ;; helm-display-function                  'helm-display-buffer-in-own-frame
-        ;; helm-display-buffer-reuse-frame        t
-        ;; helm-use-undecorated-frame-option      t
-        helm-display-buffer-width  120)
+        helm-buffer-max-length                 50
+        helm-ff-candidate-number-limit         200
+        helm-show-completion-display-function #'helm-show-completion-default-display-function)
   (helm-mode 1)
   (helm-adaptive-mode 1)
   (add-hook 'eshell-mode-hook
@@ -1244,7 +1231,7 @@ hit C-a twice:"
       ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))))))
 
 (use-package calfw
-  :straight t
+  :straight '(:host github :repo "ebellani/emacs-calfw")
   :config
   (setq cfw:org-overwrite-default-keybinding t
         cfw:fchar-junction ?╋
@@ -1339,7 +1326,7 @@ hit C-a twice:"
   :straight '(:host github :repo "ebellani/org-msg")
   :demand t
   :bind (:map org-msg-edit-mode-map
-	      ("C-c RET C-c" . mml-secure-message-encrypt)
+	      ("C-c RET C-c" . mml-secure-message-sign-encrypt)
               ("C-c RET C-s" . mml-secure-message-sign)
               ("C-c RET t" . message-goto-to)
               ("C-c RET c" . message-goto-cc)
@@ -1453,6 +1440,9 @@ hit C-a twice:"
 (use-package bookmark+
   :straight t
   :demand   t)
+
+(use-package haskell-mode
+  :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
