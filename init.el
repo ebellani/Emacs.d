@@ -491,8 +491,6 @@ are equal return t."
   (setq mm-automatic-display
         (remove "application/pgp-signature" mm-automatic-display)))
 
-(use-package jl-encrypt)
-
 (use-package taskjuggler-mode)
 
 (use-package windmove
