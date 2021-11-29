@@ -1447,3 +1447,4 @@ hit C-a twice:"
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
