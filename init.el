@@ -828,8 +828,6 @@ hit C-a twice:"
   :straight t
   :magic ("%PDF" . pdf-view-mode)
   :config
-  ;; fix space next page problem. No idea why
-  ;; (setq pdf-view-have-image-mode-pixel-vscroll nil)
   (pdf-tools-install)
   (setq pdf-view-resize-factor 1.05)
   (advice-add 'pdf-view-bookmark-jump-handler :after 'my/pdf-bookmark-jump-handler))
