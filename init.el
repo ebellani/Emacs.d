@@ -856,7 +856,7 @@ hit C-a twice:"
   :demand t
   :commands (company-mode company-indent-or-complete-common)
   :config
-  (setf company-idle-delay 0
+  (setf company-idle-delay 0.5
         company-selection-wrap-around t)
   :hook (after-init . global-company-mode))
 
