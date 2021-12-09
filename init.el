@@ -760,6 +760,10 @@ hit C-a twice:"
   :straight t
   :defer t)
 
+(use-package org-ql
+  :straight t
+  :defer t)
+
 ;;; packages
 
 (use-package async
