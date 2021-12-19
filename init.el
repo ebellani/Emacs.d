@@ -1,9 +1,13 @@
-;; init file tips:  -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
+;; init file tips:
 ;; http://a-nickels-worth.blogspot.com/2007/11/effective-emacs.html
 ;; http://sites.google.com/site/steveyegge2/effective-emacs
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
 ;; https://github.com/cqql/dotfiles/blob/master/home/.emacs.d/init.org
+
 (require 'cl-lib)
+
+(setq lexical-binding t)
 
 (if init-file-debug
     (setq use-package-verbose t
@@ -322,6 +326,7 @@ are equal return t."
         org-agenda-span 'day
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
         org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
+        org-log-reschedule 'note
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
                                      (t basic)))
