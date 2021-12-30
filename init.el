@@ -358,7 +358,6 @@ are equal return t."
      (gnuplot . t)
      (ditaa  . t)
      (C      . t)
-     (ledger . t)
      (org    . t)))
   (defun org-set-as-habit ()
     (interactive)
