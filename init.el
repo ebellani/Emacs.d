@@ -1451,6 +1451,35 @@ hit C-a twice:"
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
+(use-package slack
+  :commands (slack-start)
+  :straight t
+  :init
+  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+  (setq slack-prefer-current-team t)
+  :config
+  (slack-register-team
+   :name "datarisk-slack"
+   :default t
+   :token (auth-source-pick-first-password
+           :host "datariskio.slack.com"
+           :user "eduardo.bellani@datarisk.io")
+   :cookie (auth-source-pick-first-password
+           :host "datariskio.slack.com"
+           :user "eduardo.bellani@datarisk.io_cookie")
+   ;; :subscribed-channels '(test-rename rrrrr)
+   :full-and-display-names t))
+
+(use-package helm-slack
+  :straight '(:host github :repo "yuya373/helm-slack")
+  :after (slack))
+
+(use-package alert
+  :straight t
+  :commands (alert)
+  :init
+  (setq alert-default-style 'fringe))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
