@@ -1177,7 +1177,8 @@ hit C-a twice:"
 (use-package elfeed
   :straight t
   :bind (("C-x w" . 'elfeed))
-  :config (setq elfeed-search-title-max-width 140))
+  :config (setq elfeed-search-title-max-width 140
+                elfeed-show-entry-switch #'pop-to-buffer))
 
 
 (use-package elfeed-org
