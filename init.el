@@ -1483,26 +1483,6 @@ hit C-a twice:"
          (">"   . slack-thread-show-or-create))
   :config
   (setq slack-thread-also-send-to-room nil)
-  (slack-register-team
-   :name "datarisk-slack"
-   :default t
-   :token (auth-source-pick-first-password
-           :host "datariskio.slack.com"
-           :user "eduardo.bellani@datarisk.io")
-   :cookie (auth-source-pick-first-password
-            :host "datariskio.slack.com"
-            :user "eduardo.bellani@datarisk.io_cookie")
-   :full-and-display-names t)
-  (slack-register-team
-   :name "fsharp-slack"
-   :default t
-   :token (auth-source-pick-first-password
-           :host "fsharp.slack.com"
-           :user "eduardo.bellani@datarisk.io")
-   :cookie (auth-source-pick-first-password
-            :host "fsharp.slack.com"
-            :user "eduardo.bellani@datarisk.io_cookie")
-   :full-and-display-names t)
   (run-with-timer 0 (* 25 60)
                   (lambda ()
                     (slack-ws--reconnect (oref slack-current-team :id) t)
