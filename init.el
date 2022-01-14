@@ -1133,8 +1133,8 @@ hit C-a twice:"
               (eshell-cmpl-initialize)
               (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
               (define-key eshell-hist-mode-map
-                [remap eshell-previous-matching-input-from-input]
-                'helm-eshell-history))))
+                          [remap eshell-previous-matching-input-from-input]
+                          'helm-eshell-history))))
 
 (use-package pcomplete-extension
   :straight t)
@@ -1213,12 +1213,16 @@ hit C-a twice:"
    org-agenda-custom-commands
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
-                    '((:name "Habits"
-                             :habit t
+                    '((:name "Work Habits"
+                             :and (:file-path "data-risk" :habit t)
                              :order 20)
+                      (:name "Personal Habits"
+                             :and (:file-path "personal" :habit t)
+                             :habit t
+                             :order 22)
                       (:name "Work day notification"
                              :property "work_reminder"
-                             :order 21)
+                             :order 25)
                       (:name "Important"
                              :priority>= "B"
                              :order 0)
@@ -1457,7 +1461,28 @@ hit C-a twice:"
   :init
   (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
   (setq slack-prefer-current-team t)
+  (defun endless/slack-message-embed-mention ()
+    (interactive)
+    (call-interactively #'slack-message-embed-mention)
+    (insert " "))
+  (defun my/thumbs-up ()
+    (interactive)
+    (insert ":+1:"))
+  ;; from http://endlessparentheses.com/keep-your-slack-distractions-under-control-with-emacs.html
+  :bind (:map
+         global-map
+         ("C-c C-l j" . #'slack-select-rooms)
+         :map
+         slack-thread-message-buffer-mode-map
+         ("C-=" . my/thumbs-up)
+         ("@"   . endless/slack-message-embed-mention)
+         :map
+         slack-mode-map
+	 ("C-=" . my/thumbs-up)
+         ("@"   . endless/slack-message-embed-mention)
+         (">"   . slack-thread-show-or-create))
   :config
+  (setq slack-thread-also-send-to-room nil)
   (slack-register-team
    :name "datarisk-slack"
    :default t
@@ -1465,10 +1490,23 @@ hit C-a twice:"
            :host "datariskio.slack.com"
            :user "eduardo.bellani@datarisk.io")
    :cookie (auth-source-pick-first-password
-           :host "datariskio.slack.com"
-           :user "eduardo.bellani@datarisk.io_cookie")
-   ;; :subscribed-channels '(test-rename rrrrr)
-   :full-and-display-names t))
+            :host "datariskio.slack.com"
+            :user "eduardo.bellani@datarisk.io_cookie")
+   :full-and-display-names t)
+  (slack-register-team
+   :name "fsharp-slack"
+   :default t
+   :token (auth-source-pick-first-password
+           :host "fsharp.slack.com"
+           :user "eduardo.bellani@datarisk.io")
+   :cookie (auth-source-pick-first-password
+            :host "fsharp.slack.com"
+            :user "eduardo.bellani@datarisk.io_cookie")
+   :full-and-display-names t)
+  (run-with-timer 0 (* 25 60)
+                  (lambda ()
+                    (slack-ws--reconnect (oref slack-current-team :id) t)
+                    (slack-im-list-update))))
 
 (use-package helm-slack
   :straight '(:host github :repo "yuya373/helm-slack")
@@ -1478,7 +1516,7 @@ hit C-a twice:"
   :straight t
   :commands (alert)
   :init
-  (setq alert-default-style 'fringe))
+  (setq alert-default-style 'libnotify))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
