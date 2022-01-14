@@ -1483,6 +1483,7 @@ hit C-a twice:"
          (">"   . slack-thread-show-or-create))
   :config
   (setq slack-thread-also-send-to-room nil)
+  (setq lui-time-stamp-format "%F [%R] %Z")
   (run-with-timer 0 (* 25 60)
                   (lambda ()
                     (slack-ws--reconnect (oref slack-current-team :id) t)
