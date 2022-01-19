@@ -1472,6 +1472,7 @@ hit C-a twice:"
   :bind (:map
          global-map
          ("C-c C-l j" . #'slack-select-rooms)
+         ("C-c C-l t" . #'slack-all-threads)
          :map
          slack-thread-message-buffer-mode-map
          ("C-=" . my/thumbs-up)
