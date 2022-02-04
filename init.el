@@ -613,11 +613,10 @@ hit C-a twice:"
       (eshell-bol)
       (if (= p (point))
           (beginning-of-line))))
-  :config
   (setenv "PAGER" "cat")
   (setq eshell-history-size 1024
         eshell-visual-commands
-        ("mtr" "nethogs"  "htop" "ncdu" "nmon" "top" "less" "more"))
+        '("mtr" "nethogs"  "htop" "ncdu" "nmon" "top" "less" "more"))
   (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
   :bind  (:map
           global-map
@@ -1272,7 +1271,8 @@ hit C-a twice:"
 (use-package perspective
   :straight t
   :config
-  (persp-mode)
+  (unless (default-value 'persp-mode)
+    (persp-mode +1))
   (add-hook 'kill-emacs-hook #'persp-state-save)
   (setq persp-state-default-file "~/.emacs.d/persp.state"))
 
