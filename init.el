@@ -1475,10 +1475,12 @@ hit C-a twice:"
          ("C-c C-l t" . #'slack-all-threads)
          :map
          slack-thread-message-buffer-mode-map
+         ("C-:" . #'slack-insert-emoji)
          ("C-=" . my/thumbs-up)
          ("@"   . endless/slack-message-embed-mention)
          :map
          slack-mode-map
+         ("C-:" . #'slack-insert-emoji)
 	 ("C-=" . my/thumbs-up)
          ("@"   . endless/slack-message-embed-mention)
          (">"   . slack-thread-show-or-create))
