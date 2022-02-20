@@ -1502,6 +1502,12 @@ hit C-a twice:"
   :init
   (setq alert-default-style 'libnotify))
 
+(use-package ace-link
+  :straight t
+  :demand t
+  :config
+  (ace-link-setup-default))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
