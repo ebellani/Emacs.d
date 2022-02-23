@@ -1446,10 +1446,6 @@ hit C-a twice:"
   :straight t
   :demand   t)
 
-(use-package bookmark+
-  :straight t
-  :demand   t)
-
 (use-package haskell-mode
   :straight t)
 
