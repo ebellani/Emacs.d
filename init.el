@@ -173,6 +173,12 @@ are equal return t."
    nil
    scope))
 
+
+(use-package bookmark
+  :config
+  (setq bookmark-use-annotations t
+        bookmark-save-flag t))
+
 (use-package shr
   :config
   (setq shr-max-width (- fill-column 10)))
@@ -889,14 +895,16 @@ hit C-a twice:"
 (use-package smartparens
   :straight t
   :demand t
+  :init
+  (smartparens-global-mode +1)
+  (smartparens-strict-mode +1)
+
   :config
 
   ;; Load the default pair definitions for Smartparens.
   (require 'smartparens-config)
 
   ;; Enable Smartparens functionality in all buffers.
-  (smartparens-global-mode +1)
-  (smartparens-strict-mode +1)
 
   ;; When in Paredit emulation mode, Smartparens binds M-( to wrap the
   ;; following s-expression in round parentheses. By analogy, we
@@ -1483,10 +1491,7 @@ hit C-a twice:"
   :config
   (setq slack-thread-also-send-to-room nil)
   (setq lui-time-stamp-format "%F [%R] %Z")
-  (run-with-timer 0 (* 25 60)
-                  (lambda ()
-                    (slack-ws--reconnect (oref slack-current-team :id) t)
-                    (slack-im-list-update))))
+  )
 
 (use-package helm-slack
   :straight '(:host github :repo "yuya373/helm-slack")
