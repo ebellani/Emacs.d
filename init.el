@@ -1394,9 +1394,9 @@ hit C-a twice:"
                    ":PROPERTIES:\n"
                    ":EMAIL: %(org-contacts-template-email)\n"
                    ":PHONE:\n"
-                   ":BIRTHDAY: %^t\n"
-                   ":NOTE:\n"
-                   ":END:\n"))))
+                   ":BIRTHDAY:\n"
+                   ":NOTE: %^{Note}\n"
+                   ":END:\n %?"))))
 
 (use-package proof-general
   :straight t)
