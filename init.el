@@ -1225,7 +1225,6 @@ hit C-a twice:"
                              :order 20)
                       (:name "Personal Habits"
                              :and (:file-path "personal" :habit t)
-                             :habit t
                              :order 22)
                       (:name "Work day notification"
                              :property "work_reminder"
