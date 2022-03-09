@@ -176,7 +176,7 @@ are equal return t."
 
 (use-package bookmark
   :config
-  (setq bookmark-use-annotations t
+  (setq bookmark-use-annotations nil
         bookmark-save-flag t))
 
 (use-package shr
