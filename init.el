@@ -1453,10 +1453,37 @@ hit C-a twice:"
   :straight t
   :demand   t)
 
+(use-package lsp-java
+  :straight t
+  :after lsp
+  :config (add-hook 'java-mode-hook 'lsp))
+
+(use-package dap-mode
+  :straight t
+  :after lsp-mode
+  :config (dap-auto-configure-mode))
+
+(use-package dap-java
+  :after dap-mode
+  :ensure nil)
+
 (use-package haskell-mode
   :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+
+(use-package helm-lsp
+  :after '(lsp helm)
+  :straight t)
+
+(use-package yasnippet
+  :straight t
+  :config (yas-global-mode))
+
+(use-package flycheck
+  :ensure t
+  :straight t
+  :init (global-flycheck-mode))
 
 (use-package slack
   :commands (slack-start)
