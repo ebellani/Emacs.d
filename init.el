@@ -58,7 +58,7 @@ accumulating.")
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 80)
+                    :height 100)
 
 ;;; things that I don't know how to do with use-package
 
@@ -384,7 +384,7 @@ are equal return t."
     (setq browse-url-browser-function
           (if (equal arg '(4))
               'eww-browse-url
-            'browse-url-chrome))))
+            'browse-url-generic))))
 
 (use-package scroll-bar
   :config
@@ -1221,6 +1221,7 @@ hit C-a twice:"
    '(("u" "Super view"
       ((agenda "" ((org-super-agenda-groups
                     '((:name "Work Habits"
+                             :and (:file-path "work" :habit t)
                              :and (:file-path "data-risk" :habit t)
                              :order 20)
                       (:name "Personal Habits"
