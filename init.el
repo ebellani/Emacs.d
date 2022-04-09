@@ -54,12 +54,6 @@ accumulating.")
         (load custom-file))
     (warn "Custom file not found at expected path %s" custom-file-path)))
 
-;;; font family & size
-
-(set-face-attribute 'default nil
-                    :family "DejaVu Sans Mono"
-                    :height 100)
-
 ;;; things that I don't know how to do with use-package
 
 (setq system-time-locale "pt_BR.UTF-8")
@@ -339,6 +333,7 @@ are equal return t."
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
+    (mu4e-headers-mark-for-move)
     (call-interactively 'org-store-link)
     (org-capture nil "e"))
   ;; format timestamps. See
@@ -406,6 +401,8 @@ are equal return t."
   ;; general config
   ;; add encryption to all messages
   (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
+  ;; need to update the key
+  ;; (remove-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         mu4e-headers-show-threads t
         mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
@@ -484,6 +481,7 @@ are equal return t."
                '("org-contact-add" . mu4e-action-add-org-contact) t)
   ;; add info folder
   (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
+  ;; (add-to-list 'Info-directory-list   "~/Projects/emacs/info/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
 
@@ -789,8 +787,9 @@ hit C-a twice:"
   :straight t
   :config
   (global-undo-tree-mode)
-  (setq undo-tree-visualizer-diff t)
-  (setq undo-tree-visualizer-timestamps t))
+  (setq undo-tree-visualizer-diff t
+        undo-tree-visualizer-timestamps t
+        undo-tree-history-directory-alist  `(("." . ,temporary-file-directory))))
 
 (use-package psession
   :straight t
@@ -900,7 +899,7 @@ hit C-a twice:"
   (smartparens-strict-mode +1)
 
   :config
-
+  (smartparens-strict-mode +1)
   ;; Load the default pair definitions for Smartparens.
   (require 'smartparens-config)
 
@@ -1310,8 +1309,7 @@ hit C-a twice:"
 (use-package pyenv-mode
   :straight t
   :bind (:map pyenv-mode-map
-              ("C-c C-s" . nil))
-  :config (pyenv-mode))
+              ("C-c C-s" . nil)))
 
 (use-package orgit
   :straight t
