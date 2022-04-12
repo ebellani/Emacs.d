@@ -55,7 +55,7 @@ accumulating.")
     (warn "Custom file not found at expected path %s" custom-file-path)))
 
 ;;; things that I don't know how to do with use-package
-
+(setq system-time-locale "en_US.UTF-8")
 (setq system-time-locale "pt_BR.UTF-8")
 
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -895,11 +895,11 @@ hit C-a twice:"
   :straight t
   :demand t
   :init
-  (smartparens-global-mode +1)
-  (smartparens-strict-mode +1)
+  (smartparens-global-mode 1)
+
 
   :config
-  (smartparens-strict-mode +1)
+  (smartparens-strict-mode 1)
   ;; Load the default pair definitions for Smartparens.
   (require 'smartparens-config)
 
@@ -1005,7 +1005,8 @@ hit C-a twice:"
 
   ;; Quiet some silly messages.
   (dolist (key '(:unmatched-expression :no-matching-tag))
-    (setf (cdr (assq key sp-message-alist)) nil)))
+    (setf (cdr (assq key sp-message-alist)) nil))
+  (smartparens-strict-mode 1))
 
 (use-package eldoc
   :straight t
@@ -1533,6 +1534,40 @@ hit C-a twice:"
   :demand t
   :config
   (ace-link-setup-default))
+
+(use-package clojure-mode
+  :straight t
+  :ensure t
+  :init
+  (defconst clojure--prettify-symbols-alist
+    '(("fn"   . ?λ)))
+  :config
+  (add-hook 'clojure-mode-hook 'global-prettify-symbols-mode)
+  :bind (("C-c j f" . cider-code)
+         ("C-c j g" . cider-grimoire)
+         ("C-c j w" . cider-grimoire-web)
+         ("C-c j c" . clojure-cheatsheet)
+         ("C-c j d" . dash-at-point)))
+
+(use-package cider
+  :straight t
+  :ensure t
+  :commands (cider cider-connect cider-jack-in)
+  :init
+  (setq cider-auto-select-error-buffer t
+        cider-repl-pop-to-buffer-on-connect nil
+        cider-repl-use-clojure-font-lock t
+        cider-repl-wrap-history t
+        cider-repl-history-size 1000
+        cider-show-error-buffer t
+        nrepl-hide-special-buffers t
+        ;; Stop error buffer from popping up while working in buffers other than the REPL:
+        nrepl-popup-stacktraces nil)
+  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  (add-hook 'cider-mode-hook 'company-mode)
+  :bind (:map cider-mode-map
+         ("C-c C-v C-c" . cider-send-and-evaluate-sexp)
+         ("C-c C-p"     . cider-eval-print-last-sexp)))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
