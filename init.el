@@ -13,7 +13,8 @@
     (setq use-package-verbose t
           use-package-expand-minimally nil
           use-package-compute-statistics t
-          debug-on-error t)
+          debug-on-error t
+          async-debug t)
   (setq use-package-verbose nil
         use-package-expand-minimally t))
 
@@ -777,7 +778,8 @@ hit C-a twice:"
   :straight t
   :config
   (require 'smtpmail-async)
-  (setq message-send-mail-function 'async-smtpmail-send-it
+  (setq message-send-mail-function  'async-smtpmail-send-it
+        ;; #'message--default-send-mail-function
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587
@@ -1521,6 +1523,10 @@ hit C-a twice:"
 
 (use-package helm-slack
   :straight '(:host github :repo "yuya373/helm-slack")
+  :after (slack))
+
+(use-package ox-slack
+  :straight t
   :after (slack))
 
 (use-package alert
