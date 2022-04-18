@@ -178,6 +178,14 @@ are equal return t."
   :config
   (setq shr-max-width (- fill-column 10)))
 
+(use-package comp
+  ;; https://www.reddit.com/r/emacs/comments/qf7o8t/orgofferlinksinentry_is_incompatible_with/
+  ;; org agenda links not working.
+  :config
+  (setq native-comp-deferred-compilation-deny-list '("org\\.el")))
+
+
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
