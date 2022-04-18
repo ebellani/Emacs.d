@@ -786,7 +786,7 @@ hit C-a twice:"
   :straight t
   :config
   (require 'smtpmail-async)
-  (setq message-send-mail-function  'async-smtpmail-send-it
+  (setq message-send-mail-function  #'async-smtpmail-send-it
         ;; #'message--default-send-mail-function
         smtpmail-default-smtp-server "smtp.gmail.com"
         smtpmail-smtp-server "smtp.gmail.com"
