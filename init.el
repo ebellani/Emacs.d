@@ -588,7 +588,7 @@ are equal return t."
 (use-package esh
   :init
   (require 'em-hist)
-
+  (require 'em-tramp)
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
 current buffer's file. The eshell is renamed to match that
@@ -904,17 +904,8 @@ hit C-a twice:"
 (use-package smartparens
   :straight t
   :demand t
-  :init
-  (smartparens-global-mode 1)
-
-
+  :ensure t
   :config
-  (smartparens-strict-mode 1)
-  ;; Load the default pair definitions for Smartparens.
-  (require 'smartparens-config)
-
-  ;; Enable Smartparens functionality in all buffers.
-
   ;; When in Paredit emulation mode, Smartparens binds M-( to wrap the
   ;; following s-expression in round parentheses. By analogy, we
   ;; should bind M-[ to wrap the following s-expression in square
@@ -1016,6 +1007,8 @@ hit C-a twice:"
   ;; Quiet some silly messages.
   (dolist (key '(:unmatched-expression :no-matching-tag))
     (setf (cdr (assq key sp-message-alist)) nil))
+  ;; Enable Smartparens functionality in all buffers.
+  (smartparens-global-mode 1)
   (smartparens-strict-mode 1))
 
 (use-package eldoc
@@ -1072,7 +1065,7 @@ hit C-a twice:"
   :mode (("\\.plantuml$" . plantuml-mode)
          ("\\.puml$" . plantuml-mode
           ))
-  :config (setq plantuml-jar-path "/home/user/bin/plantuml.jar"
+  :config (setq plantuml-jar-path "~/bin/plantuml.jar"
                 plantuml-default-exec-mode 'jar))
 
 (use-package docker
