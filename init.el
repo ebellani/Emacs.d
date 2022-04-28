@@ -25,6 +25,9 @@
   "This is used to filter the bad contacts that mu4e is
 accumulating.")
 
+(defun set-gpg-as-ssh ()
+  (setenv  "SSH_AUTH_SOCK" (shell-command-to-string "gpgconf --list-dirs agent-ssh-socket")))
+
 (defcustom my/path-aliases
   (list :emacs  "~/.emacs.d"
         :srs    "~/.emacs.d"
@@ -283,6 +286,13 @@ are equal return t."
                     "%^{Agenda}\n"
                     "** Ata\n"
                     "%^{Minutes})\n"))
+          ("1" "1-1 meeting log" entry
+           (file ,(my/path :work "1-1.org"))
+           ,(concat "* %u\n"
+                    "** Agenda\n"
+                    "%^{Agenda}\n"
+                    "** Commitments\n"
+                    "%^{Commitments}\n"))
           ("d" "Drill card with answer" entry
            (file ,(my/path :srs "deck.org"))
            ,(concat "* Item           :drill:\n"
@@ -413,6 +423,8 @@ are equal return t."
   ;; need to update the key
   ;; (remove-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
+        ;; avoid auto next
+        mu4e-headers-advance-after-mark nil
         mu4e-headers-show-threads t
         mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
         mu4e-contact-process-function 'filter-bad-contacts
@@ -987,7 +999,7 @@ hit C-a twice:"
   (radian--smartparens-pair-setup #'python-mode "\"\"\"")
   (radian--smartparens-pair-setup #'markdown-mode "```")
 
-  ;; Work around https://github.com/Fuco1/smartparens/issues/1036.
+  ;; around https://github.com/Fuco1/smartparens/issues/1036.
   (when (fboundp 'minibuffer-mode)
     (sp-local-pair #'minibuffer-mode "`" nil :actions nil)
     (sp-local-pair #'minibuffer-mode "'" nil :actions nil))
@@ -1489,7 +1501,6 @@ hit C-a twice:"
   :init (global-flycheck-mode))
 
 (use-package slack
-  :commands (slack-start)
   :straight t
   :init
   (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
@@ -1519,8 +1530,7 @@ hit C-a twice:"
          (">"   . slack-thread-show-or-create))
   :config
   (setq slack-thread-also-send-to-room nil)
-  (setq lui-time-stamp-format "%F [%R] %Z")
-  )
+  (setq lui-time-stamp-format "%F [%R] %Z"))
 
 (use-package helm-slack
   :straight '(:host github :repo "yuya373/helm-slack")
