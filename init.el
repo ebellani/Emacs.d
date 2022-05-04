@@ -352,7 +352,7 @@ are equal return t."
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
-    (mu4e-headers-mark-for-move)
+    ;; (mu4e-headers-mark-for-move)
     (call-interactively 'org-store-link)
     (org-capture nil "e"))
   ;; format timestamps. See
@@ -412,9 +412,11 @@ are equal return t."
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
   :bind (:map
-         mu4e-headers-mode-map ("C-c i" . 'my/org-capture-mail)
+         mu4e-headers-mode-map (("C-c i" . 'my/org-capture-mail)
+                                ("R" . 'mu4e-ose-reply))
          :map
-         mu4e-view-mode-map ("C-c i" . 'my/org-capture-mail))
+         mu4e-view-mode-map (("C-c i" . 'my/org-capture-mail)
+                             ("R" . 'mu4e-ose-reply)))
   :config
   (require 'mu4e-contrib)
   ;; general config
@@ -424,7 +426,7 @@ are equal return t."
   ;; (remove-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
         ;; avoid auto next
-        mu4e-headers-advance-after-mark nil
+        mu4e-headers-advance-after-mark t
         mu4e-headers-show-threads t
         mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
         mu4e-contact-process-function 'filter-bad-contacts
@@ -1021,7 +1023,7 @@ hit C-a twice:"
     (setf (cdr (assq key sp-message-alist)) nil))
   ;; Enable Smartparens functionality in all buffers.
   (smartparens-global-mode 1)
-  (smartparens-strict-mode 1))
+  (smartparens-global-strict-mode +1))
 
 (use-package eldoc
   :straight t
