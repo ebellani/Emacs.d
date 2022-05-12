@@ -288,7 +288,7 @@ are equal return t."
                     "%^{Minutes})\n"))
           ("1" "1-1 meeting log" entry
            (file ,(my/path :work "1-1.org"))
-           ,(concat "* %u\n"
+           ,(concat "* %^u\n"
                     "** Agenda\n"
                     "%^{Agenda}\n"
                     "** Commitments\n"
