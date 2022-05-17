@@ -1588,6 +1588,9 @@ hit C-a twice:"
          ("C-c C-v C-c" . cider-send-and-evaluate-sexp)
          ("C-c C-p"     . cider-eval-print-last-sexp)))
 
+(use-package almost-mono-themes
+  :straight t)
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
