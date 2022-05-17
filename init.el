@@ -412,11 +412,9 @@ are equal return t."
 (use-package mu4e
   :load-path "/opt/mu/mu4e/"
   :bind (:map
-         mu4e-headers-mode-map (("C-c i" . 'my/org-capture-mail)
-                                ("R" . 'mu4e-ose-reply))
+         mu4e-headers-mode-map (("C-c i" . 'my/org-capture-mail))
          :map
-         mu4e-view-mode-map (("C-c i" . 'my/org-capture-mail)
-                             ("R" . 'mu4e-ose-reply)))
+         mu4e-view-mode-map (("C-c i" . 'my/org-capture-mail)))
   :config
   (require 'mu4e-contrib)
   ;; general config
