@@ -421,55 +421,55 @@ are equal return t."
   ;; add encryption to all messages
   (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   ;; need to update the key
-  ;; (remove-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
-  (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
-        ;; avoid auto next
-        mu4e-headers-advance-after-mark t
-        mu4e-headers-show-threads t
-        mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
-        mu4e-contact-process-function 'filter-bad-contacts
-        ;;  "html2text -utf8 -width 72" ?
-        ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
-        ;; stop UID errors
-        mu4e-change-filenames-when-moving t
-        mu4e-html2text-command 'mu4e-shr2text
-        mu4e-update-interval 120
-        mu4e-headers-auto-update t
-        mu4e-attachment-dir  "~/Downloads"
-        mu4e-maildir (expand-file-name "~/Mail/")
-        ;; don't save message to Sent Messages, GMail/IMAP will take care of this
-        mu4e-sent-messages-behavior 'delete
-        ;; kill buffers on exit
-        message-kill-buffer-on-exit t
-        ;; show fancy chars
-        mu4e-use-fancy-chars t
-        ;; attempt to show images when viewing messages sometimes this
-        ;; slows down in the case of big djvu files (they are
-        ;; interpreted as images).
-        mu4e-view-show-images t
-        org-mu4e-convert-to-html t
-        mu4e-mu-binary "/opt/mu/mu/mu"
-        mu4e-headers-fields '((:human-date   . 12)
-                              (:flags        . 6)
-                              (:from-or-to   . 22)
-                              (:subject))
-        mu4e-maildir-shortcuts
-        '(("/INBOX" . 105)
-          ("/sent" . 115)
-          ("/starred" . 116)
-          ("/all" . 97))
-        ;; There is a new message-view for mu4e, based on the Gnus'
-        ;; article-view. This bring a lot of (but not all) of the very rich Gnus
-        ;; article-mode feature-set to mu4e, such as S/MIME-support,
-        ;; syntax-highlighting,
-        mu4e-view-use-gnus nil
-        mu4e-date-format-long "%F"
-        mu4e-headers-date-format "%F"
-        mu4e-headers-time-format "%T"
-        mu4e-split-view 'single-window
-        mail-user-agent 'mu4e-user-agent
-        mu4e-hide-index-messages t
-        mu4e-org-contacts-file (my/path :agenda "contacts.org"))
+  (setq
+   mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
+   ;; avoid auto next
+   mu4e-headers-advance-after-mark t
+   mu4e-headers-show-threads t
+   mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
+   mu4e-contact-process-function 'filter-bad-contacts
+   ;;  "html2text -utf8 -width 72" ?
+   ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
+   ;; stop UID errors
+   mu4e-change-filenames-when-moving t
+   mu4e-html2text-command 'mu4e-shr2text
+   mu4e-update-interval 120
+   mu4e-headers-auto-update t
+   mu4e-attachment-dir  "~/Downloads"
+   mu4e-maildir (expand-file-name "~/Mail/")
+   ;; don't save message to Sent Messages, GMail/IMAP will take care of this
+   mu4e-sent-messages-behavior 'delete
+   ;; kill buffers on exit
+   message-kill-buffer-on-exit t
+   ;; show fancy chars
+   mu4e-use-fancy-chars t
+   ;; attempt to show images when viewing messages sometimes this
+   ;; slows down in the case of big djvu files (they are
+   ;; interpreted as images).
+   mu4e-view-show-images t
+   org-mu4e-convert-to-html t
+   mu4e-mu-binary "/opt/mu/mu/mu"
+   mu4e-headers-fields '((:human-date   . 12)
+                         (:flags        . 6)
+                         (:from-or-to   . 22)
+                         (:subject))
+   mu4e-maildir-shortcuts
+   '(("/INBOX" . 105)
+     ("/sent" . 115)
+     ("/starred" . 116)
+     ("/all" . 97))
+   ;; There is a new message-view for mu4e, based on the Gnus'
+   ;; article-view. This bring a lot of (but not all) of the very rich Gnus
+   ;; article-mode feature-set to mu4e, such as S/MIME-support,
+   ;; syntax-highlighting,
+   mu4e-view-use-gnus nil
+   mu4e-date-format-long "%F"
+   mu4e-headers-date-format "%F"
+   mu4e-headers-time-format "%T"
+   mu4e-split-view 'single-window
+   mail-user-agent 'mu4e-user-agent
+   mu4e-hide-index-messages t
+   mu4e-org-contacts-file (my/path :agenda "contacts.org"))
   (unintern 'mu4e-ask-bookmark)
   (defun mu4e-ask-bookmark (prompt)
     "Ask the user for a bookmark (using PROMPT) as defined in
