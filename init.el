@@ -386,19 +386,19 @@ are equal return t."
 (use-package re-builder
   :config (setq reb-re-syntax 'string))
 
+(defun set-browser! (&optional arg)
+  "Makes the default browser external or internal by setting the
+`browse-url-browser-function' accordingly"
+  (interactive "P")
+  (setq browse-url-browser-function
+        (if (equal arg '(4))
+            'eww-browse-url
+          'browse-url-generic)))
+
 (use-package browse-url
   :bind  (:map
           global-map
-          ("C-c w" . 'set-browser!))
-  :config
-  (defun set-browser! (&optional arg)
-    "Makes the default browser external or internal by setting the
-`browse-url-browser-function' accordingly"
-    (interactive "P")
-    (setq browse-url-browser-function
-          (if (equal arg '(4))
-              'eww-browse-url
-            'browse-url-generic))))
+          ("C-c w" . 'set-browser!)))
 
 (use-package scroll-bar
   :config
@@ -1147,6 +1147,10 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 50
         helm-ff-candidate-number-limit         200
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
+        helm-display-function                  'helm-default-display-buffer
+        helm-display-buffer-reuse-frame        t
+        helm-use-undecorated-frame-option      t
         helm-show-completion-display-function #'helm-show-completion-default-display-function)
   (helm-mode 1)
   (helm-adaptive-mode 1)
