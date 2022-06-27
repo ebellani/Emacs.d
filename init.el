@@ -1423,10 +1423,18 @@ hit C-a twice:"
 (use-package shrface
   :straight t
   :defer t
+  :bind (:map
+         shrface-mode-map
+         ("TAB" . 'shrface-outline-cycle)
+         ("<backtab>" . 'shrface-outline-cycle-buffer)
+         ("C-t" . 'shrface-toggle-bullets)
+         ("C-j" . 'shrface-next-headline)
+         ("C-k" . 'shrface-previous-headline)
+         ("M-l" . 'shrface-links-helm)
+         ("M-h" . 'shrface-headline-helm))
   :config
   (shrface-basic)
   (shrface-trial)
-  (shrface-default-keybindings) ; setup default keybindings
   (setq shrface-href-versatile t))
 
 (defun my/eww-rename-buffer-name ()
