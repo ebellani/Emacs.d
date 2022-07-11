@@ -49,15 +49,6 @@ accumulating.")
 
 (add-to-list 'load-path (my/path :emacs "lib"))
 
-;; add the custom file inside the emacs folder
-
-(let ((custom-file-path (my/path :emacs "custom.el")))
-  (if (file-readable-p custom-file-path)
-      (progn
-        (setq custom-file custom-file-path)
-        (load custom-file))
-    (warn "Custom file not found at expected path %s" custom-file-path)))
-
 ;;; things that I don't know how to do with use-package
 (setq system-time-locale "en_US.UTF-8")
 (setq system-time-locale "pt_BR.UTF-8")
@@ -1605,3 +1596,12 @@ hit C-a twice:"
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+
+;; add the custom file inside the emacs folder
+
+(let ((custom-file-path (my/path :emacs "custom.el")))
+  (if (file-readable-p custom-file-path)
+      (progn
+        (setq custom-file custom-file-path)
+        (load custom-file))
+    (warn "Custom file not found at expected path %s" custom-file-path)))
