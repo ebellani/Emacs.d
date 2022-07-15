@@ -1602,6 +1602,23 @@ hit C-a twice:"
 (use-package almost-mono-themes
   :straight t)
 
+(use-package emms
+  :straight t
+  :config
+  (require 'emms-setup)
+  (emms-all)
+  (emms-default-players)
+  (setq-default
+   emms-source-file-default-directory "~/Music/"
+   emms-source-playlist-default-format 'm3u
+   emms-playlist-mode-center-when-go t
+   emms-playlist-default-major-mode 'emms-playlist-mode
+   emms-show-format "NP: %s"
+
+   emms-player-list '(emms-player-mpv)
+   emms-player-mpv-environment '("PULSE_PROP_media.role=music")
+   emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--force-window=no" "--vo=null")))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
