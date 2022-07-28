@@ -495,6 +495,7 @@ are equal return t."
              ", "))
            (kar (read-char (concat prompt bmarks))))
       (mu4e-get-bookmark-query kar)))
+  (add-hook 'mu4e-view-mode-hook #'shrface-mode)
   (add-hook 'mu4e-message-changed-hook #'mu4e~start)
   (add-hook 'mu4e-index-updated-hook #'mu4e~start)
   (add-to-list 'mu4e-headers-actions
