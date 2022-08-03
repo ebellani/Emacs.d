@@ -1512,7 +1512,9 @@ hit C-a twice:"
 (use-package flycheck
   :ensure t
   :straight t
-  :init (global-flycheck-mode))
+  :init (global-flycheck-mode)
+  :config
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 (use-package slack
   :straight t
