@@ -1446,6 +1446,17 @@ hit C-a twice:"
        (format "*eww-%s_%s*" title url)
      (generate-new-buffer "*eww*"))))
 
+(defun my/eww-save-image (filename)
+  "Save an image opened in an *eww* buffer to a file. From
+https://emacs.stackexchange.com/questions/17417/how-to-save-images-from-buffer"
+  (interactive "G")
+  (let ((image (get-text-property (point) 'display)))
+    (with-temp-buffer
+      (setq buffer-file-name filename)
+      (insert
+       (plist-get (if (eq (car image) 'image) (cdr image)) :data))
+      (save-buffer))))
+
 (use-package eww
   :defer t
   :init
@@ -1596,7 +1607,7 @@ hit C-a twice:"
         nrepl-hide-special-buffers t
         ;; Stop error buffer from popping up while working in buffers other than the REPL:
         nrepl-popup-stacktraces nil)
-  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  (add-hook 'cider-mode-hook 'eldoc-mode)
   (add-hook 'cider-mode-hook 'company-mode)
   :bind (:map cider-mode-map
          ("C-c C-v C-c" . cider-send-and-evaluate-sexp)
