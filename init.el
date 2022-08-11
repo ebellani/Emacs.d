@@ -1448,14 +1448,14 @@ hit C-a twice:"
 
 (defun my/eww-save-image (filename)
   "Save an image opened in an *eww* buffer to a file. From
-https://emacs.stackexchange.com/questions/17417/how-to-save-images-from-buffer"
+https://emacs.stackexchange.com/questions/17417/how-to-save-images-from-buffer
+https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-file"
   (interactive "G")
   (let ((image (get-text-property (point) 'display)))
     (with-temp-buffer
-      (setq buffer-file-name filename)
-      (insert
-       (plist-get (if (eq (car image) 'image) (cdr image)) :data))
-      (save-buffer))))
+      (set-buffer-file-coding-system 'binary)
+      (insert (plist-get (if (eq (car image) 'image) (cdr image)) :data))
+      (write-region nil nil filename))))
 
 (use-package eww
   :defer t
