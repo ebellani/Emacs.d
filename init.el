@@ -188,7 +188,10 @@ are equal return t."
   :config
   (setq native-comp-deferred-compilation-deny-list '("org\\.el")))
 
-
+(use-package diary-lib
+  :config
+  (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files))
 
 (use-package org
   :bind (("C-c l" . 'org-store-link)
@@ -349,7 +352,11 @@ are equal return t."
         org-log-reschedule 'note
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
-                                     (t basic)))
+                                     (t basic))
+        ;; The error occurs because mu4e is binding more variables than emacs allows
+        ;; for, by default.  You can avoid this by setting a higher value, e.g.  by
+        ;; adding the following to your configuration:
+        max-specpdl-size 1000)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
