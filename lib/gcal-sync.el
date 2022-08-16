@@ -20,14 +20,16 @@
 
 ;;; Commentary:
 ;;;
-;;; Add the folling line to your diary file
-;;; #include "~/.emacs.d/gcal-diary"
+;;; Add the folling line to your diary file #include "~/.emacs.d/gcal-diary"
+;;; This is slightly modified from
+;;; https://gist.githubusercontent.com/SjB/18999655439765eb413a29c6aedc9385/raw/162ab1a7ed5b22186712c8a4bb7d46a01d0985b0/gcal-sync.el,
+;;; making it parameterized over cretentials. I did that to help fetching
+;;; credentials from .authinfo.gpg instead of hard coding custom.el or similar
+;;; things. -- E.B.
 ;;
 
 ;;; Code:
 
-;; (defvar gcal-private-calendar-urls ())
-;; (defvar gcal-diary-file (expand-file-name "gcal-diary" user-emacs-directory))
 (defun gcal-sync--import-ical-to-diary (diary)
   "Import an ical buffer to the diary file"
   (set-buffer-multibyte t)
@@ -60,6 +62,8 @@ pairs) and import them into a default diary file"
     (with-temp-file gcal-diary-file (erase-buffer))
     (while urls
       (gcal-sync--import-to-diary-file (car urls) gcal-diary-file)
+      ;; new lines break diary display.
+      (flush-lines "^$" (point-min) (point-max))
       (setq urls (cdr urls)))))
 
 (provide 'gcal-sync)
