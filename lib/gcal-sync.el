@@ -32,21 +32,30 @@
 
 (defun gcal-sync--import-ical-to-diary (diary)
   "Import an ical buffer to the diary file"
-  (set-buffer-multibyte t)
-  (set-buffer-file-coding-system 'utf-8)
-  (when (icalendar-import-buffer diary t)
-    (let ((b (find-buffer-visiting diary)))
-      (kill-buffer b))))
+  (async-start
+   `(lambda ()
+      (with-temp-buffer
+        (set-buffer-multibyte t)
+        (set-buffer-file-coding-system 'utf-8)
+        (insert ,(buffer-substring-no-properties
+                  (point-min)
+                  (point-max)))
+        (when (icalendar-import-buffer ,diary t)
+          (let ((b (find-buffer-visiting ,diary)))
+            (with-current-buffer b
+              (flush-lines "^$" (point-min) (point-max))
+              (save-buffer)
+              (kill-buffer b))))))))
 
 (defun gcal-sync--import-to-diary-file (url diary)
   "Fetch a ical calendar from a private google calendar url
 and import it into a diary file"
   (url-retrieve url (lambda (status)
-		      (when (plist-get status :error)
-			(cl-destructuring-bind (error-symbol . data)
-			    (plist-get status :error)
-			  (signal error-symbol data)))
-		      (gcal-sync--import-ical-to-diary diary))))
+		       (when (plist-get status :error)
+			 (cl-destructuring-bind (error-symbol . data)
+			     (plist-get status :error)
+			   (signal error-symbol data)))
+		       (gcal-sync--import-ical-to-diary diary))))
 
 (defun gcal-build-url (credentials)
   "Build a standard (as of 2022-08-15) gcal ics url from
@@ -62,8 +71,6 @@ pairs) and import them into a default diary file"
     (with-temp-file gcal-diary-file (erase-buffer))
     (while urls
       (gcal-sync--import-to-diary-file (car urls) gcal-diary-file)
-      ;; new lines break diary display.
-      (flush-lines "^$" (point-min) (point-max))
       (setq urls (cdr urls)))))
 
 (provide 'gcal-sync)

@@ -71,7 +71,7 @@ accumulating.")
       auto-save-no-message t)
 
 (setq-default indent-tabs-mode nil
-              fill-column 80)
+              fill-column 72)
 
 ;; Maps swaps [ for ( and vice versa. I use parens much more than square
 ;; brackets.
@@ -238,7 +238,7 @@ are equal return t."
           ("t" "todo" entry
            (file main-agenda)
            ,(concat "* TODO %^{Title}\n"
-                    "SCHEDULED: %t\n"
+                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1w\")\n"
                     ":PROPERTIES:\n"
                     ":BV:\n"
                     ":TC:\n"
@@ -1463,6 +1463,16 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
       (set-buffer-file-coding-system 'binary)
       (insert (plist-get (if (eq (car image) 'image) (cdr image)) :data))
       (write-region nil nil filename))))
+
+(defun my/nov-save-image (filename)
+  "Save an image opened in an nov. derived from
+`my/eww-rename-buffer-name'"
+  (interactive "G")
+  (let* ((image (get-text-property (point) 'display))
+         (image-path (plist-get (cdr image) :file)))
+    (when (and (eq (car image) 'image)
+             (file-exists-p image-path))
+      (copy-file image-path filename 1))))
 
 (use-package eww
   :defer t
