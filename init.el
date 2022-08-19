@@ -356,7 +356,7 @@ are equal return t."
         ;; The error occurs because mu4e is binding more variables than emacs allows
         ;; for, by default.  You can avoid this by setting a higher value, e.g.  by
         ;; adding the following to your configuration:
-        max-specpdl-size 1000)
+        max-specpdl-size 5000)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)

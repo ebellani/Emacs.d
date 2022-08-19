@@ -40,12 +40,13 @@
         (insert ,(buffer-substring-no-properties
                   (point-min)
                   (point-max)))
-        (when (icalendar-import-buffer ,diary t)
-          (let ((b (find-buffer-visiting ,diary)))
-            (with-current-buffer b
-              (flush-lines "^$" (point-min) (point-max))
-              (save-buffer)
-              (kill-buffer b))))))))
+        (icalendar-import-buffer ,diary t)))
+   (lambda (results)
+     (message "Ical turned to diary %s %s."
+              diary
+              (if results
+                  "successfully"
+                "unsuccessfully")))))
 
 (defun gcal-sync--import-to-diary-file (url diary)
   "Fetch a ical calendar from a private google calendar url
