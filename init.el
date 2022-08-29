@@ -1661,6 +1661,19 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package gcal-sync)
 
+(defun get-gcal (username diary-file)
+  "From a .authinfo file, uses `USERNAME' to get the secret URL
+password for a gcal sync and calls `gcal-sync-calendars-to-diary'
+with those, storing the result in a `DIARY-FILE'"
+  (let ((auth (car (auth-source-search :host username))))
+    (gcal-sync-calendars-to-diary
+     `((,(plist-get auth :user)
+        ,(let ((s (plist-get auth :secret)))
+           (if (functionp s)
+               (funcall s)
+             s))))
+     diary-file)))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
