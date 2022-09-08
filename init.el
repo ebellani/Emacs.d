@@ -191,7 +191,8 @@ are equal return t."
 (use-package diary-lib
   :config
   (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
-  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files))
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
+  (add-hook 'diary-list-entries-hook 'diary-sort-entries t))
 
 (use-package org
   :bind (("C-c l" . 'org-store-link)
@@ -229,7 +230,7 @@ are equal return t."
         org-capture-templates
         `(("e" "Email [mu4e]" entry (file main-agenda)
            ,(concat "* TODO Process \"%a\"\n"
-                    "SCHEDULED: %t\n"
+                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1w\")\n"
                     ":LOGBOOK:\n"
                     "- State \"TODO\"       from \"\"  %U  \\\\\n"
                     "  %^{Initial log} %?\n"
@@ -352,11 +353,7 @@ are equal return t."
         org-log-reschedule 'note
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
-                                     (t basic))
-        ;; The error occurs because mu4e is binding more variables than emacs allows
-        ;; for, by default.  You can avoid this by setting a higher value, e.g.  by
-        ;; adding the following to your configuration:
-        max-specpdl-size 5000)
+                                     (t basic)))
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
@@ -477,7 +474,11 @@ are equal return t."
    mu4e-split-view 'single-window
    mail-user-agent 'mu4e-user-agent
    mu4e-hide-index-messages t
-   mu4e-org-contacts-file (my/path :agenda "contacts.org"))
+   mu4e-org-contacts-file (my/path :agenda "contacts.org")
+   ;; The error occurs because mu4e is binding more variables than emacs allows
+   ;; for, by default.  You can avoid this by setting a higher value, e.g.  by
+   ;; adding the following to your configuration:
+   max-specpdl-size 10000)
   (unintern 'mu4e-ask-bookmark)
   (defun mu4e-ask-bookmark (prompt)
     "Ask the user for a bookmark (using PROMPT) as defined in
