@@ -1660,9 +1660,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
    emms-player-mpv-environment '("PULSE_PROP_media.role=music")
    emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--force-window=no" "--vo=null")))
 
-(use-package gcal-sync)
-
-(defun get-gcal (username diary-file)
+(defun my/get-gcal (username diary-file)
   "From a .authinfo file, uses `USERNAME' to get the secret URL
 password for a gcal sync and calls `gcal-sync-calendars-to-diary'
 with those, storing the result in a `DIARY-FILE'"
@@ -1674,6 +1672,35 @@ with those, storing the result in a `DIARY-FILE'"
                (funcall s)
              s))))
      diary-file)))
+
+(use-package gcal-sync)
+
+(use-package transpose-frame
+  :straight t)
+
+(use-package racket-mode
+  :straight t)
+
+;; http://sachachua.com/notebook/emacs/small-functions.el
+(defun strip-html ()
+  "Remove HTML tags from the current buffer,
+   (this will affect the whole buffer regardless of the restrictions in effect)."
+  (interactive "*")
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (while (re-search-forward "<[^<]*>" (point-max) t)
+    (replace-match "\\1"))
+      (goto-char (point-min))
+      (replace-string "&copy;" "(c)")
+      (goto-char (point-min))
+      (replace-string "&amp;" "&")
+      (goto-char (point-min))
+      (replace-string "&lt;" "<")
+      (goto-char (point-min))
+      (replace-string "&gt;" ">")
+      (goto-char (point-min)))))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
