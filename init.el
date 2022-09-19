@@ -353,7 +353,8 @@ are equal return t."
         org-log-reschedule 'note
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
-                                     (t basic)))
+                                     (t basic))
+        org-refile-use-cache t)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
@@ -1701,6 +1702,12 @@ with those, storing the result in a `DIARY-FILE'"
       (goto-char (point-min))
       (replace-string "&gt;" ">")
       (goto-char (point-min)))))
+
+(use-package org-inline-anim
+  :after org
+  :straight t
+  :config
+  (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
