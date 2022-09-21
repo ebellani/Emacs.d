@@ -415,8 +415,31 @@ are equal return t."
   (setq completion-styles '(flex))
   (scroll-bar-mode 0))
 
+(defun my/mu4e-ask-bookmark (prompt)
+    "Ask the user for a bookmark (using PROMPT) as defined in
+`mu4e-bookmarks', then return the corresponding query."
+    (unless (mu4e-bookmarks) (mu4e-error "No bookmarks defined"))
+    (let* ((prompt (mu4e-format "%s" prompt))
+           (server-queries (plist-get mu4e--server-props :queries))
+           (bmarks
+            (mapconcat
+             (lambda (bm)
+               (let ((bm-server-query (seq-find (lambda (q)
+                                                  (string= (plist-get q :query)
+                                                           (plist-get bm :query)))
+                                                server-queries)))
+                 (format "[%s]%s (%s/%s)"
+                         (propertize (make-string 1 (plist-get bm :key))
+                                     'face 'mu4e-highlight-face)
+                         (plist-get bm :name)
+                         (plist-get bm-server-query :unread)
+                         (plist-get bm-server-query :count))))
+             (mu4e-bookmarks)
+             ", "))
+           (kar (read-char (concat prompt bmarks))))
+      (mu4e-get-bookmark-query kar)))
+
 (use-package mu4e
-  :load-path "/opt/mu/mu4e/"
   :bind (:map
          mu4e-headers-mode-map (("C-c i" . 'my/org-capture-mail))
          :map
@@ -427,6 +450,7 @@ are equal return t."
   ;; add encryption to all messages
   (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   ;; need to update the key
+  (advice-add 'mu4e-ask-bookmark :override #'my/mu4e-ask-bookmark)
   (setq
    mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
    ;; avoid auto next
@@ -449,12 +473,12 @@ are equal return t."
    message-kill-buffer-on-exit t
    ;; show fancy chars
    mu4e-use-fancy-chars t
+   mu4e-headers-visible-flags '(draft flagged new passed replied trashed attach encrypted signed)
    ;; attempt to show images when viewing messages sometimes this
    ;; slows down in the case of big djvu files (they are
    ;; interpreted as images).
    mu4e-view-show-images t
    org-mu4e-convert-to-html t
-   mu4e-mu-binary "/opt/mu/mu/mu"
    mu4e-headers-fields '((:human-date   . 12)
                          (:flags        . 6)
                          (:from-or-to   . 22)
@@ -480,42 +504,21 @@ are equal return t."
    ;; for, by default.  You can avoid this by setting a higher value, e.g.  by
    ;; adding the following to your configuration:
    max-specpdl-size 10000)
-  (unintern 'mu4e-ask-bookmark)
-  (defun mu4e-ask-bookmark (prompt)
-    "Ask the user for a bookmark (using PROMPT) as defined in
-`mu4e-bookmarks', then return the corresponding query."
-    (unless (mu4e-bookmarks) (mu4e-error "No bookmarks defined"))
-    (let* ((prompt (mu4e-format "%s" prompt))
-           (server-queries (plist-get mu4e~server-props :queries))
-           (bmarks
-            (mapconcat
-             (lambda (bm)
-               (let ((bm-server-query (seq-find (lambda (q)
-                                                  (string= (plist-get q :query)
-                                                           (plist-get bm :query)))
-                                                server-queries)))
-                 (format "[%s]%s (%s/%s)"
-                         (propertize (make-string 1 (plist-get bm :key))
-                                     'face 'mu4e-highlight-face)
-                         (plist-get bm :name)
-                         (plist-get bm-server-query :unread)
-                         (plist-get bm-server-query :count))))
-             (mu4e-bookmarks)
-             ", "))
-           (kar (read-char (concat prompt bmarks))))
-      (mu4e-get-bookmark-query kar)))
+
   (add-hook 'mu4e-view-mode-hook #'shrface-mode)
-  (add-hook 'mu4e-message-changed-hook #'mu4e~start)
-  (add-hook 'mu4e-index-updated-hook #'mu4e~start)
+  (add-hook 'mu4e-message-changed-hook #'mu4e--start)
+  (add-hook 'mu4e-index-updated-hook #'mu4e--start)
   (add-to-list 'mu4e-headers-actions
                '("org-contact-add" . mu4e-action-add-org-contact) t)
   (add-to-list 'mu4e-view-actions
                '("org-contact-add" . mu4e-action-add-org-contact) t)
   ;; add info folder
-  (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
+  ;; (add-to-list 'Info-directory-list "/opt/mu/mu4e/")
   ;; (add-to-list 'Info-directory-list   "~/Projects/emacs/info/")
   (add-to-list 'mu4e-view-actions '("decrypt inline PGP" . epa-mail-decrypt))
   (add-to-list 'mu4e-view-actions '("browse body" . mu4e-action-view-in-browser)))
+
+
 
 (use-package mml-sec
   :config
@@ -879,6 +882,7 @@ hit C-a twice:"
 
 (use-package org-pdftools
   :straight t
+  :after pdf-tools
   :hook (org-mode . org-pdftools-setup-link))
 
 (use-package web-mode
@@ -1238,7 +1242,7 @@ hit C-a twice:"
         modus-themes-bold-constructs nil
         modus-themes-region '(bg-only no-extend)
         modus-themes-bold-constructs t
-        modus-themes-mode-line '3d)
+        modus-themes-mode-line '(borderless accented))
   ;; Load the theme files before enabling a theme (else you get an error).
   (modus-themes-load-themes)
   :config
@@ -1282,7 +1286,8 @@ hit C-a twice:"
                              :scheduled today
                              :order 30)
                       (:discard (:anything t)))))))
-      ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))))))
+      ;; ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))
+      ))))
 
 (use-package calfw
   :straight '(:host github :repo "ebellani/emacs-calfw")
@@ -1317,6 +1322,8 @@ hit C-a twice:"
 
 (use-package perspective
   :straight t
+  :custom
+  (persp-mode-prefix-key (kbd "C-x x"))
   :config
   (unless (default-value 'persp-mode)
     (persp-mode +1))
@@ -1422,9 +1429,12 @@ hit C-a twice:"
 
 (use-package org-contrib
   :straight t
+  :after org)
+
+(use-package org-contacts
   :after org
+  :straight t
   :config
-  (require 'org-contacts)
   (setq org-contacts-files (list  (my/path :agenda "contacts.org")))
   (add-to-list 'org-capture-templates
                `("c" "Contacts" entry (file ,(my/path :agenda "contacts.org"))
@@ -1705,9 +1715,14 @@ with those, storing the result in a `DIARY-FILE'"
 
 (use-package org-inline-anim
   :after org
-  :straight t
   :config
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
+
+(use-package unicode-fonts
+    :straight t
+  :config
+  (unicode-fonts-setup)
+  (set-frame-font "DejaVu Sans Mono 10"))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
