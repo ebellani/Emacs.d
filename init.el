@@ -1723,6 +1723,7 @@ with those, storing the result in a `DIARY-FILE'"
 
 (use-package org-inline-anim
   :after org
+  :straight t
   :config
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
