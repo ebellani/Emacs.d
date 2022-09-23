@@ -351,6 +351,8 @@ are equal return t."
         org-plantuml-jar-path "/home/user/bin/plantuml.jar"
         org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
         org-log-reschedule 'note
+        org-log-into-drawer t
+        org-refile-use-cache t
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
                                      (t basic))
@@ -1450,6 +1452,11 @@ hit C-a twice:"
 (use-package proof-general
   :straight t)
 
+(defun my/open-gitlab-mr ()
+  (interactive)
+  (search-forward "view it on GitLa")
+  (shr-browse-url))
+
 (use-package shrface
   :straight t
   :defer t
@@ -1461,7 +1468,8 @@ hit C-a twice:"
          ("C-j" . 'shrface-next-headline)
          ("C-k" . 'shrface-previous-headline)
          ("M-l" . 'shrface-links-helm)
-         ("M-h" . 'shrface-headline-helm))
+         ("M-h" . 'shrface-headline-helm)
+         ("M-t" . 'my/open-gitlab-mr))
   :config
   (shrface-basic)
   (shrface-trial)
@@ -1723,6 +1731,9 @@ with those, storing the result in a `DIARY-FILE'"
   :config
   (unicode-fonts-setup)
   (set-frame-font "DejaVu Sans Mono 10"))
+
+(use-package tuareg
+  :straight t)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
