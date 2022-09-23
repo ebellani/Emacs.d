@@ -1728,7 +1728,7 @@ with those, storing the result in a `DIARY-FILE'"
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
 (use-package unicode-fonts
-    :straight t
+  :straight t
   :config
   (unicode-fonts-setup)
   (set-frame-font "DejaVu Sans Mono 10"))
