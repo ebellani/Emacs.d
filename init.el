@@ -213,6 +213,7 @@ are equal return t."
           (tags priority-down category-keep)
           (search category-keep))
         org-babel-inline-result-wrap "%s"
+        org-image-actual-width nil
         org-habit-graph-column 60
         org-habit-following-days 0
         org-habit-preceding-days 14
@@ -449,8 +450,6 @@ are equal return t."
   :config
   (require 'mu4e-contrib)
   ;; general config
-  ;; add encryption to all messages
-  (add-hook 'mu4e-compose-mode-hook 'mml-secure-message-sign-encrypt)
   ;; need to update the key
   (advice-add 'mu4e-ask-bookmark :override #'my/mu4e-ask-bookmark)
   (setq
@@ -475,6 +474,22 @@ are equal return t."
    message-kill-buffer-on-exit t
    ;; show fancy chars
    mu4e-use-fancy-chars t
+   ;; really fancy
+   mu4e-headers-draft-mark     '("D" . "💈")
+   mu4e-headers-flagged-mark   '("F" . "📍")
+   mu4e-headers-new-mark       '("N" . "🔥")
+   mu4e-headers-passed-mark    '("P" . "❯")
+   mu4e-headers-replied-mark   '("R" . "❮")
+   mu4e-headers-seen-mark      '("S" . "☑")
+   mu4e-headers-trashed-mark   '("T" . "💀")
+   mu4e-headers-attach-mark    '("a" . "📎")
+   mu4e-headers-encrypted-mark '("x" . "🔒")
+   mu4e-headers-signed-mark    '("s" . "🔑")
+   mu4e-headers-unread-mark    '("u" . "⎕")
+   mu4e-headers-list-mark      '("s" . "🔈")
+   mu4e-headers-personal-mark  '("p" . "👨")
+   mu4e-headers-calendar-mark  '("c" . "📅")
+
    mu4e-headers-visible-flags '(draft flagged new passed replied trashed attach encrypted signed)
    ;; attempt to show images when viewing messages sometimes this
    ;; slows down in the case of big djvu files (they are
@@ -875,10 +890,10 @@ hit C-a twice:"
   (current-buffer))
 
 (use-package pdf-tools
-  :straight t
+  :straight t ;; '(:host github :repo "ebellani/pdf-tools")
   :magic ("%PDF" . pdf-view-mode)
   :config
-  (pdf-tools-install)
+  ;; (pdf-tools-install)
   (setq pdf-view-resize-factor 1.05)
   (advice-add 'pdf-view-bookmark-jump-handler :after 'my/pdf-bookmark-jump-handler))
 
@@ -1378,13 +1393,23 @@ hit C-a twice:"
   :demand t
   :config
   (setq langtool-http-server-host "localhost"
-        langtool-http-server-port 8010))
+        langtool-http-server-port 8081))
 
 (use-package editorconfig
   :straight t
   :demand t
   :config
   (editorconfig-mode 1))
+
+(defun myorg/mu4e-compose-org-msg ()
+  (mml-secure-message-sign-encrypt)
+  (org-hide-block-all)
+  (org-hide-drawer-all))
+
+(defun advice-unadvice (sym)
+  "Remove all advices from symbol SYM. https://emacs.stackexchange.com/a/24658"
+  (interactive "aFunction symbol: ")
+  (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
 
 (use-package org-msg
   :straight '(:host github :repo "ebellani/org-msg")
@@ -1398,10 +1423,6 @@ hit C-a twice:"
               ("C-c RET o" . org-msg-goto-body)
               ("C-c RET s" . message-goto-subject))
   :config
-  (defun myorg/mu4e-compose-org-msg()
-    (org-hide-block-all)
-    (org-hide-drawer-all))
-
   (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
 	org-msg-startup "hidestars indent inlineimages"
 	org-msg-default-alternatives '((new		. (text html))
@@ -1409,9 +1430,10 @@ hit C-a twice:"
 				       (reply-to-text	. (text)))
         org-msg-enforce-css nil
 	org-msg-convert-citation t)
-
+  (org-msg-mode)
   (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg)
-  (org-msg-mode))
+  (advice-add 'mu4e~compose-handler :after (lambda (&rest r)
+                                             (org-msg-goto-body))))
 
 (use-package helm-mu
   :straight t
@@ -1730,8 +1752,16 @@ with those, storing the result in a `DIARY-FILE'"
 (use-package unicode-fonts
   :straight t
   :config
+  ;; https://www.djcbsoftware.nl/code/mu/mu4e/Fancy-characters.html
+  (require 'persistent-soft) ; To cache the fonts and reduce load time
   (unicode-fonts-setup)
-  (set-frame-font "DejaVu Sans Mono 10"))
+  (set-face-attribute 'default nil
+                      :family "Noto Mono"
+                      :height 90
+                      :weight 'normal
+                      :width 'normal))
+
+
 
 (use-package tuareg
   :straight t)
