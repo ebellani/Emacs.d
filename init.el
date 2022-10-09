@@ -889,11 +889,13 @@ hit C-a twice:"
   (switch-to-buffer (current-buffer))
   (current-buffer))
 
+
 (use-package pdf-tools
-  :straight t ;; '(:host github :repo "ebellani/pdf-tools")
+  ;; https://github.com/jwiegley/use-package#magic-handlers
+  :straight t
   :magic ("%PDF" . pdf-view-mode)
   :config
-  ;; (pdf-tools-install)
+  (pdf-tools-install :no-query)
   (setq pdf-view-resize-factor 1.05)
   (advice-add 'pdf-view-bookmark-jump-handler :after 'my/pdf-bookmark-jump-handler))
 
@@ -1376,13 +1378,10 @@ hit C-a twice:"
               ("C-c C-s" . nil)))
 
 (use-package orgit
-  :straight t
-  :demand org-plus-contrib)
+  :straight t)
 
 (use-package org-drill
-  :straight t
-  :demand org-plus-contrib
-  :commands (org-drill))
+  :straight t)
 
 (use-package gnu-elpa-keyring-update
   :straight t
