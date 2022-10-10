@@ -1422,7 +1422,7 @@ hit C-a twice:"
               ("C-c RET o" . org-msg-goto-body)
               ("C-c RET s" . message-goto-subject))
   :config
-  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t broken-links:t"
 	org-msg-startup "hidestars indent inlineimages"
 	org-msg-default-alternatives '((new		. (text html))
 				       (reply-to-html	. (text html))
