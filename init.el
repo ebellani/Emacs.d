@@ -1760,10 +1760,45 @@ with those, storing the result in a `DIARY-FILE'"
                       :weight 'normal
                       :width 'normal))
 
-
-
+;; Major mode for OCaml programming
 (use-package tuareg
-  :straight t)
+  :straight t
+  :ensure t
+  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
+
+;; Major mode for editing Dune project files
+(use-package dune
+  :straight t
+  :ensure t)
+
+;; Merlin provides advanced IDE features
+(use-package merlin
+  :straight t
+  :ensure t
+  :config
+  (add-hook 'tuareg-mode-hook #'merlin-mode)
+  (add-hook 'merlin-mode-hook #'company-mode)
+  ;; we're using flycheck instead
+  (setq merlin-error-after-save nil))
+
+(use-package merlin-eldoc
+  :straight t
+  :ensure t
+  :hook ((tuareg-mode) . merlin-eldoc-setup))
+
+;; This uses Merlin internally
+(use-package flycheck-ocaml
+  :straight t
+  :ensure t
+  :config
+  (flycheck-ocaml-setup))
+
+;; utop configuration
+(use-package utop
+  :straight t
+  :ensure t
+  :config
+  (add-hook 'tuareg-mode-hook #'utop-minor-mode))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
