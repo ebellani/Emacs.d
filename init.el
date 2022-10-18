@@ -893,7 +893,7 @@ hit C-a twice:"
 (use-package pdf-tools
   ;; https://github.com/jwiegley/use-package#magic-handlers
   :straight t
-  :magic ("%PDF" . pdf-view-mode)
+  ;; :magic ("%PDF" . pdf-view-mode)
   :config
   (pdf-tools-install :no-query)
   (setq pdf-view-resize-factor 1.05)
@@ -1748,11 +1748,16 @@ with those, storing the result in a `DIARY-FILE'"
   :config
   (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
-(use-package unicode-fonts
+(use-package persistent-soft
   :straight t
-  :config
+  :demand t)
+
+(use-package unicode-fonts
   ;; https://www.djcbsoftware.nl/code/mu/mu4e/Fancy-characters.html
-  (require 'persistent-soft) ; To cache the fonts and reduce load time
+  :straight t
+  :init
+  (require 'persistent-soft)
+  :config
   (unicode-fonts-setup)
   (set-face-attribute 'default nil
                       :family "Noto Mono"
