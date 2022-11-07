@@ -194,6 +194,29 @@ are equal return t."
   (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
   (add-hook 'diary-list-entries-hook 'diary-sort-entries t))
 
+(cl-defun random-schedule (&key (n 21) extra-prop extra-log)
+  (when (<= n 0)
+    (error "Please provide a non negative quantity."))
+  (format "* TODO %%^{Title}
+SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
+:PROPERTIES:%s
+:BV:
+:TC:
+:RR-OE:
+:EFF:
+:END:
+:LOGBOOK:
+ - State \"TODO\"       from \"\"  %%U  \\\\
+  %%^{Initial log} %%?%s
+:END:"
+          (1+ (random n))
+          (if extra-prop
+              (concat "\n" extra-prop)
+            "")
+          (if extra-log
+              (concat "\n" extra-log)
+            "")))
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -230,27 +253,10 @@ are equal return t."
           (,(my/path :work "meetings.org") :maxlevel . 2))
         org-capture-templates
         `(("e" "Email [mu4e]" entry (file main-agenda)
-           ,(concat "* TODO Process \"%a\"\n"
-                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1w\")\n"
-                    ":LOGBOOK:\n"
-                    "- State \"TODO\"       from \"\"  %U  \\\\\n"
-                    "  %^{Initial log} %?\n"
-                    "  from %:from\n"
-                    ":END:"))
+           (function (lambda () (random-schedule :extra-log "  from %%:from"))))
           ("t" "todo" entry
            (file main-agenda)
-           ,(concat "* TODO %^{Title}\n"
-                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" .+1w\")\n"
-                    ":PROPERTIES:\n"
-                    ":BV:\n"
-                    ":TC:\n"
-                    ":RR-OE:\n"
-                    ":EFF:\n"
-                    ":END:\n"
-                    ":LOGBOOK:\n"
-                    " - State \"TODO\"       from \"\"  %U  \\\\\n"
-                    "  %^{Initial log} %?\n"
-                    ":END:"))
+           (function (lambda () (random-schedule))))
           ("w" "work reminder" entry
            (file main-agenda)
            ,(concat "* TODO %^{Title}\n"
@@ -265,21 +271,6 @@ are equal return t."
                     ":LOGBOOK:\n"
                     "- Initial note taken on %U \\\n"
                     "%^{Initial note}\n"
-                    ":END:\n"))
-          ("h" "habit" entry
-           (file main-agenda)
-           ,(concat "* TODO %^{Title}\n"
-                    "SCHEDULED: %(org-insert-time-stamp nil nil nil nil nil \" +1w\")%?\n"
-                    ":PROPERTIES:\n"
-                    ":style: habit\n"
-                    ":BV:\n"
-                    ":TC:\n"
-                    ":RR-OE:\n"
-                    ":EFF:\n"
-                    ":END:\n"
-                    ":LOGBOOK:\n"
-                    "- State \"TODO\"       from \"\"  %U  \\\\\n"
-                    "%^{Initial log}\n"
                     ":END:\n"))
           ("m" "meeting log" entry
            (file ,(my/path :work "meetings.org"))
@@ -1689,11 +1680,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (require 'emms-setup)
   (emms-all)
   (emms-default-players)
-  (setq-default
+  (setq
+   emms-playlist-default-major-mode 'emms-playlist-mode;; 'emms-mark-mode
    emms-source-file-default-directory "~/Music/"
    emms-source-playlist-default-format 'm3u
    emms-playlist-mode-center-when-go t
-   emms-playlist-default-major-mode 'emms-playlist-mode
+   ;; emms-playlist-default-major-mode 'emms-playlist-mode
    emms-show-format "NP: %s"
 
    emms-player-list '(emms-player-mpv)
@@ -1760,7 +1752,8 @@ with those, storing the result in a `DIARY-FILE'"
   :config
   (unicode-fonts-setup)
   (set-face-attribute 'default nil
-                      :family "Noto Mono"
+                      ;; :family "Noto Mono"
+                      :family "Dejavu Sans Mono"
                       :height 90
                       :weight 'normal
                       :width 'normal))
