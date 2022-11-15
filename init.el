@@ -455,7 +455,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    ;; stop UID errors
    mu4e-change-filenames-when-moving t
    mu4e-html2text-command 'mu4e-shr2text
-   mu4e-update-interval 120
+   mu4e-update-interval 300
    mu4e-headers-auto-update t
    mu4e-attachment-dir  "~/Downloads"
    mu4e-maildir (expand-file-name "~/Mail/")
@@ -875,20 +875,11 @@ hit C-a twice:"
   ("C-x 4 C-o" . 'switch-window-then-display-buffer)
   ("C-x 4 0"   . 'switch-window-then-kill-buffer))
 
-(defun my/pdf-bookmark-jump-handler (bmk)
-  "Fixes integration w/ bookmark plus"
-  (switch-to-buffer (current-buffer))
-  (current-buffer))
-
-
 (use-package pdf-tools
   ;; https://github.com/jwiegley/use-package#magic-handlers
-  :straight t
-  ;; :magic ("%PDF" . pdf-view-mode)
-  :config
+  :straight t  :config
   (pdf-tools-install :no-query)
-  (setq pdf-view-resize-factor 1.05)
-  (advice-add 'pdf-view-bookmark-jump-handler :after 'my/pdf-bookmark-jump-handler))
+  (setq pdf-view-resize-factor 1.05))
 
 (use-package org-pdftools
   :straight t
@@ -1372,7 +1363,9 @@ hit C-a twice:"
   :straight t)
 
 (use-package org-drill
-  :straight t)
+  :straight t
+  :config
+  (setq org-drill-maximum-items-per-session nil))
 
 (use-package gnu-elpa-keyring-update
   :straight t
@@ -1518,8 +1511,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package eww
   :defer t
   :init
-  (add-hook 'eww-after-render-hook #'shrface-mode)
   (add-hook 'eww-after-render-hook #'my/eww-rename-buffer-name)
+  (add-hook 'eww-after-render-hook #'shrface-mode)
   :config
   (require 'shrface))
 
