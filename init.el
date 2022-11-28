@@ -724,7 +724,8 @@ hit C-a twice:"
 
 (use-package dired
   :config
-  (setq dired-listing-switches "-alh"))
+  (setq dired-listing-switches "-alh"
+        dired-dwim-target 'dired-dwim-target-recent))
 
 (use-package dired-x
   :after dired)
