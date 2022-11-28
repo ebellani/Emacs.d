@@ -1236,21 +1236,18 @@ hit C-a twice:"
 (use-package htmlize
   :straight t)
 
-(use-package modus-themes
+;; Only for the built-in themes on Emacs 28+
+(use-package emacs
+  :ensure
   :init
   ;; Add all your customizations prior to loading the themes
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs nil
-        modus-themes-region '(bg-only no-extend)
-        modus-themes-bold-constructs t
-        modus-themes-mode-line '(borderless accented))
-  ;; Load the theme files before enabling a theme (else you get an error).
-  (modus-themes-load-themes)
+        modus-themes-region '(bg-only no-extend))
   :config
   ;; Load the theme of your choice:
-  (modus-themes-load-operandi) ;; OR (modus-themes-load-vivendi)
+  (load-theme 'modus-operandi) ; OR (load-theme 'modus-vivendi)
   :bind ("<f5>" . modus-themes-toggle))
-
 
 (use-package gnuplot-mode
   :straight t)
