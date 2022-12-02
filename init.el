@@ -340,14 +340,15 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         ;; allows multiple agenda views to coexist
         org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
-        org-plantuml-jar-path "/home/user/bin/plantuml.jar"
+        org-plantuml-jar-path "/opt/plantuml/plantuml"
         org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
         org-log-reschedule 'note
         org-log-into-drawer t
         org-refile-use-cache t
         org-cite-export-processors '((latex biblatex)
                                      (moderncv basic)
-                                     (t basic))
+                                     (html csl)
+                                     (t csl))
         org-refile-use-cache t)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
@@ -1788,6 +1789,9 @@ with those, storing the result in a `DIARY-FILE'"
   :ensure t
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode))
+
+(use-package citeproc
+  :straight '(:host github :repo "andras-simonyi/citeproc-el"))
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
