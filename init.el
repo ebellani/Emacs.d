@@ -61,7 +61,7 @@ accumulating.")
 
 ;;; things that I don't know how to do with use-package
 (setq system-time-locale "en_US.UTF-8")
-(setq system-time-locale "pt_BR.UTF-8")
+;; (setq system-time-locale "pt_BR.UTF-8")
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -273,7 +273,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                     "%^{Initial note}\n"
                     ":END:\n"))
           ("m" "meeting log" entry
-           (file ,(my/path :work "meetings.org"))
+           (file+olp+datetree ,(my/path :work "meetings.org") "Regular")
            ,(concat "* %^{Title}\n"
                     "** Context\n"
                     "%^{Context}\n"
@@ -283,6 +283,14 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                     "%^{Agenda}\n"
                     "** Ata\n"
                     "%^{Minutes})\n"))
+          ("l" "daly meeting log" entry
+           (file+olp+datetree ,(my/path :work "meetings.org") "Daily")
+           ,(concat "** Context\n"
+                    "%^{Context}\n"
+                    "** Goal\n"
+                    "%^{Situation}\n"
+                    "** Next steps\n"
+                    "%^{Next steps}\n"))
           ("1" "1-1 meeting log" entry
            (file ,(my/path :work "1-1.org"))
            ,(concat "* %^u\n"
