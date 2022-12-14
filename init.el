@@ -1801,6 +1801,11 @@ with those, storing the result in a `DIARY-FILE'"
 (use-package citeproc
   :straight '(:host github :repo "andras-simonyi/citeproc-el"))
 
+
+(use-package ob-mermaid
+  :straight t)
+
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
