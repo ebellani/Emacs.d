@@ -1805,6 +1805,9 @@ with those, storing the result in a `DIARY-FILE'"
 (use-package ob-mermaid
   :straight t)
 
+(use-package wiki-drill
+  :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
+
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
