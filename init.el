@@ -282,7 +282,8 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                     "** Agenda\n"
                     "%^{Agenda}\n"
                     "** Ata\n"
-                    "%^{Minutes})\n"))
+                    "%^{Minutes})\n")
+           :time-prompt t)
           ("l" "daly meeting log" entry
            (file+olp+datetree ,(my/path :work "meetings.org") "Daily")
            ,(concat "** Context\n"
