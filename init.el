@@ -1115,11 +1115,6 @@ hit C-a twice:"
   :straight t
   :mode "docker-compose.*\.yml\\'")
 
-(use-package docker-tramp
-  :straight t
-  :after tramp
-  :defer 5)
-
 (use-package dockerfile-mode
   :straight t
   :mode "Dockerfile[a-zA-Z.-]*\\'")
