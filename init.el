@@ -359,6 +359,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                                      (html csl)
                                      (t csl))
         org-refile-use-cache t)
+  (plist-put org-format-latex-options :scale 1.5)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
