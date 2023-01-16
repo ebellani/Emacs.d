@@ -253,7 +253,19 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
           (,(my/path :work "meetings.org") :maxlevel . 2))
         org-capture-templates
         `(("e" "Email [mu4e]" entry (file main-agenda)
-           (function (lambda () (random-schedule :extra-log "  from %%:from"))))
+           ,(format
+             "* TODO %%a
+SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
+:PROPERTIES:
+:BV:
+:TC:
+:RR-OE:
+:EFF:
+:END:
+:LOGBOOK:
+ - State \"TODO\"       from \"\"  %%U  \\\\
+    from %%:from %%?
+:END:" (1+ (random 21))))
           ("t" "todo" entry
            (file main-agenda)
            (function (lambda () (random-schedule))))
