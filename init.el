@@ -370,7 +370,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                                      (moderncv basic)
                                      (html csl)
                                      (t csl))
-        org-refile-use-cache t)
+        org-refile-use-cache t
+        org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts t)
   (plist-put org-format-latex-options :scale 1.5)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
