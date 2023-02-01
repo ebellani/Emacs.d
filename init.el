@@ -1824,3 +1824,12 @@ with those, storing the result in a `DIARY-FILE'"
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+
+(defun combination (k l)
+  (cond
+   ((< k 0) nil)
+   ((= k 0) (list nil))
+   ((> k (length l)) nil)
+   (t (append (mapcar #'(lambda (x) (cons (first l) x))
+		      (combination (1- k) (rest l)))
+	      (combination k (rest l))))))
