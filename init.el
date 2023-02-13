@@ -1366,7 +1366,7 @@ hit C-a twice:"
   :mode (("\\.fs$" .  fsharp-mode)
 	 ("\\.fsx$" .  fsharp-mode))
   :config
-  (setq inferior-fsharp-program "dotnet fsi")
+  (setq inferior-fsharp-program "dotnet fsi --readline-")
   (add-hook 'inferior-fsharp-mode-hook 'turn-on-comint-history))
 
 (use-package dotnet
