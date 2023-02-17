@@ -1119,7 +1119,7 @@ hit C-a twice:"
   :mode (("\\.plantuml$" . plantuml-mode)
          ("\\.puml$" . plantuml-mode
           ))
-  :config (setq plantuml-jar-path "~/bin/plantuml.jar"
+  :config (setq plantuml-jar-path "/opt/plantuml/plantuml"
                 plantuml-default-exec-mode 'jar))
 
 (use-package docker
