@@ -1217,23 +1217,6 @@ hit C-a twice:"
   :init
   (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
 
-(use-package projectile
-  :straight t
-  :defer 5
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map))
-  :diminish
-  :config
-  (projectile-global-mode)
-  (setq projectile-enable-caching t
-        projectile-indexing-method 'alien
-        projectile-mode-line "Projectile"))
-
-(use-package helm-projectile
-  :straight t
-  :config
-  (helm-projectile-on))
-
 (use-package markdown-mode
   :straight t
   :mode (("\.md$" . markdown-mode)))
