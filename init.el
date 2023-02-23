@@ -1184,9 +1184,9 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 50
         helm-ff-candidate-number-limit         200
-        helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
         helm-display-buffer-width              90
-        ;; helm-display-function                  'helm-default-display-buffer
+        helm-display-function                  'helm-default-display-buffer
         helm-display-buffer-reuse-frame        t
         helm-use-undecorated-frame-option      t
         helm-show-completion-display-function #'helm-show-completion-default-display-function)
@@ -1826,7 +1826,7 @@ with those, storing the result in a `DIARY-FILE'"
 
 (use-package display-line-numbers
   :ensure t
-  :config (setq display-line-numbers 'relative))
+  :config (setq display-line-numbers-type 'relative))
 
 
 
