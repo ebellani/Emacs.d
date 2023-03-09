@@ -954,6 +954,8 @@ hit C-a twice:"
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
 
+(use-package emacs
+  :hook ((compilation-filter . ansi-color-compilation-filter)))
 
 (use-package smartparens
   :straight t
