@@ -1817,6 +1817,8 @@ with those, storing the result in a `DIARY-FILE'"
   :ensure t
   :config (setq display-line-numbers-type 'relative))
 
+(use-package lsp-mssql
+  :straight t)
 
 
 (put 'scroll-left 'disabled nil)
