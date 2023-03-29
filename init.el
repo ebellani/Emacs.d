@@ -914,7 +914,8 @@ hit C-a twice:"
 
 (use-package web-mode
   :straight t
-  :mode "\\.html?\\''")
+  :mode (("\\.html?\\''" . web-mode)
+         ("\\.fsproj$" . web-mode)))
 
 (use-package hippie-exp
   :straight t
