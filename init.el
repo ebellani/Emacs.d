@@ -373,7 +373,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         org-refile-use-cache t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts t)
-  (plist-put org-format-latex-options :scale 1.0)
+  (plist-put org-format-latex-options :scale 1.2)
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
