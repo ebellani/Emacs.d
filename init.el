@@ -373,7 +373,8 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         org-refile-use-cache t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts t)
-  (plist-put org-format-latex-options :scale 1.2)
+  (plist-put org-format-latex-options :scale 1.3)
+
   (defun my/org-capture-mail ()
     "https://github.com/rougier/emacs-gtd"
     (interactive)
@@ -1626,6 +1627,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :after (slack))
 
+(use-package ox-hugo
+  :straight t)
+
 (use-package alert
   :straight t
   :commands (alert)
@@ -1802,17 +1806,14 @@ with those, storing the result in a `DIARY-FILE'"
 (use-package citeproc
   :straight '(:host github :repo "andras-simonyi/citeproc-el"))
 
-
 (use-package ob-mermaid
   :straight t)
 
 (use-package sql-indent
   :straight t)
 
-
 (use-package wiki-drill
   :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
-
 
 (use-package display-line-numbers
   :ensure t
@@ -1820,7 +1821,6 @@ with those, storing the result in a `DIARY-FILE'"
 
 (use-package lsp-mssql
   :straight t)
-
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
