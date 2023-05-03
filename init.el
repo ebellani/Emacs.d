@@ -49,6 +49,9 @@ accumulating.")
 
 (add-to-list 'load-path (my/path :emacs "lib"))
 
+;; IDK why this is needed.
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+
 ;; add the custom file inside the emacs folder
 
 (let ((custom-file-path (my/path :emacs "custom.el")))
