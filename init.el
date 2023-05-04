@@ -189,7 +189,7 @@ are equal return t."
   ;; https://www.reddit.com/r/emacs/comments/qf7o8t/orgofferlinksinentry_is_incompatible_with/
   ;; org agenda links not working.
   :config
-  (setq native-comp-deferred-compilation-deny-list '("org\\.el")))
+  (setq native-comp-jit-compilation-deny-list '("org\\.el")))
 
 (use-package diary-lib
   :config
