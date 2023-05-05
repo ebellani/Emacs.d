@@ -390,6 +390,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   ;; gnuplot. See https://emacs.stackexchange.com/q/3302
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
   (add-hook 'org-mode-hook 'org-indent-mode)
+  ;; org mode is better at this than smart parens, plus speed
+  (add-hook 'org-mode-hook  #'turn-off-smartparens-strict-mode)
+
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((dot     . t)
@@ -960,7 +963,9 @@ hit C-a twice:"
          ("<C-m> /" . vr/mc-mark)))
 
 (use-package emacs
-  :hook ((compilation-filter . ansi-color-compilation-filter)))
+  :hook ((compilation-filter . ansi-color-compilation-filter))
+  ;; :config (show-paren-mode)
+  )
 
 (use-package smartparens
   :straight t
@@ -1358,7 +1363,10 @@ hit C-a twice:"
 	 ("\\.fsx$" .  fsharp-mode))
   :config
   (setq inferior-fsharp-program "dotnet fsi --readline-")
-  (add-hook 'inferior-fsharp-mode-hook 'turn-on-comint-history))
+  (add-hook 'inferior-fsharp-mode-hook 'turn-on-comint-history)
+  (add-hook 'inferior-fsharp-mode-hook  'turn-off-smartparens-mode)
+  (add-hook 'fsharp-mode-hook  #'turn-off-smartparens-mode)
+  (add-hook 'fsharp-mode-hook  #'turn-off-smartparens-strict-mode))
 
 (use-package dotnet
   :straight t)
@@ -1550,7 +1558,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (add-hook 'fsharp-mode-hook #'lsp)
   (setq lsp-ui-doc-show-with-cursor t
         lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'top))
+        lsp-ui-doc-position 'top
+        lsp-log-io t))
 
 (use-package lsp-ui
   :straight t
