@@ -52,6 +52,21 @@ accumulating.")
 ;; IDK why this is needed.
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
+(use-package gcal-sync)
+
+(defun my/get-gcal (username diary-file)
+  "From a .authinfo file, uses `USERNAME' to get the secret URL
+password for a gcal sync and calls `gcal-sync-calendars-to-diary'
+with those, storing the result in a `DIARY-FILE'"
+  (let ((auth (car (auth-source-search :host username))))
+    (gcal-sync-calendars-to-diary
+     `((,(plist-get auth :user)
+        ,(let ((s (plist-get auth :secret)))
+           (if (functionp s)
+               (funcall s)
+             s))))
+     diary-file)))
+
 ;; add the custom file inside the emacs folder
 
 (let ((custom-file-path (my/path :emacs "custom.el")))
@@ -1709,20 +1724,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
    emms-player-mpv-environment '("PULSE_PROP_media.role=music")
    emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--force-window=no" "--vo=null")))
 
-(defun my/get-gcal (username diary-file)
-  "From a .authinfo file, uses `USERNAME' to get the secret URL
-password for a gcal sync and calls `gcal-sync-calendars-to-diary'
-with those, storing the result in a `DIARY-FILE'"
-  (let ((auth (car (auth-source-search :host username))))
-    (gcal-sync-calendars-to-diary
-     `((,(plist-get auth :user)
-        ,(let ((s (plist-get auth :secret)))
-           (if (functionp s)
-               (funcall s)
-             s))))
-     diary-file)))
-
-(use-package gcal-sync)
 
 (use-package transpose-frame
   :straight t)
