@@ -547,11 +547,11 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    ;; article-view. This bring a lot of (but not all) of the very rich Gnus
    ;; article-mode feature-set to mu4e, such as S/MIME-support,
    ;; syntax-highlighting,
-   mu4e-view-use-gnus nil
+   ;; mu4e-view-use-gnus nil
    mu4e-date-format-long "%F"
    mu4e-headers-date-format "%F"
    mu4e-headers-time-format "%T"
-   mu4e-split-view 'single-window
+   mu4e-split-view 'single-window ; 'horizontal ;  'vertical ; 'single-window ;  'horizontal
    mail-user-agent 'mu4e-user-agent
    mu4e-hide-index-messages t
    mu4e-org-contacts-file (my/path :agenda "contacts.org")
