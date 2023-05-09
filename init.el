@@ -1822,6 +1822,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package ob-mermaid
   :straight t)
 
+(use-package mermaid-mode
+  :straight t)
+
 (use-package sql-indent
   :straight t)
 
