@@ -480,6 +480,16 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
            (kar (read-char (concat prompt bmarks))))
       (mu4e-get-bookmark-query kar)))
 
+(defun my/mu4e-swap-windows ()
+  (let* ((headers-buffer (mu4e-get-headers-buffer))
+         (headers-window (get-buffer-window headers-buffer))
+         (view-buffer (mu4e-get-view-buffer))
+         (view-window (get-buffer-window view-buffer))
+         (view-window-state (window-state-get view-window))
+         (headers-window-state (window-state-get headers-window)))
+    (window-state-put view-window-state headers-window t)
+    (window-state-put headers-window-state view-window t)))
+
 (use-package mu4e
   :bind (:map
          mu4e-headers-mode-map (("C-c i" . 'my/org-capture-mail))
