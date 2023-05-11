@@ -570,6 +570,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    ;; adding the following to your configuration:
    max-specpdl-size 10000)
 
+  (add-hook 'mu4e-view-rendered-hook #'my/mu4e-swap-windows 100)
   (add-hook 'mu4e-view-mode-hook #'shrface-mode)
   (add-hook 'mu4e-message-changed-hook #'mu4e--start)
   (add-hook 'mu4e-index-updated-hook #'mu4e--start)
