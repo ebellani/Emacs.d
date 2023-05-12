@@ -1587,6 +1587,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
         lsp-ui-doc-position 'top
         lsp-log-io t))
 
+(use-package lsp-sqls
+  :after lsp-mode
+  :config
+  (setq lsp-sqls-workspace-config-path nil))
+
 (use-package lsp-ui
   :straight t
   :demand   t)
