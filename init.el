@@ -561,8 +561,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    mu4e-date-format-long "%F"
    mu4e-headers-date-format "%F"
    mu4e-headers-time-format "%T"
-   mu4e-split-view 'single-window ; 'horizontal ;  'vertical ; 'single-window ;  'horizontal
+   mu4e-split-view 'horizontal ; 'single-window ; 'horizontal ;  'vertical ; 'single-window ;  'horizontal
    mail-user-agent 'mu4e-user-agent
+   mu4e-headers-visible-lines 20
    mu4e-hide-index-messages t
    mu4e-org-contacts-file (my/path :agenda "contacts.org")
    ;; The error occurs because mu4e is binding more variables than emacs allows
@@ -570,7 +571,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    ;; adding the following to your configuration:
    max-specpdl-size 10000)
 
-  (add-hook 'mu4e-view-rendered-hook #'my/mu4e-swap-windows 100)
+  (advice-add 'org-msg-post-setup :after 'myorg/mu4e-compose-org-msg)
   (add-hook 'mu4e-view-mode-hook #'shrface-mode)
   (add-hook 'mu4e-message-changed-hook #'mu4e--start)
   (add-hook 'mu4e-index-updated-hook #'mu4e--start)
