@@ -1583,7 +1583,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :demand   t
   :config
   (add-hook 'fsharp-mode-hook #'lsp)
-  (setq lsp-ui-doc-show-with-cursor t
+  (setq lsp-ui-doc-show-with-cursor nil
+        lsp-ui-doc-use-childframe t
         lsp-ui-doc-include-signature nil
         lsp-ui-doc-position 'top
         lsp-log-io t))
