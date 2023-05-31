@@ -1409,7 +1409,8 @@ hit C-a twice:"
 (use-package org-drill
   :straight t
   :config
-  (setq org-drill-maximum-items-per-session nil))
+  (setq org-drill-maximum-items-per-session nil
+        org-drill-spaced-repetition-algorithm 'sm2))
 
 (use-package gnu-elpa-keyring-update
   :straight t
