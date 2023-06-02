@@ -561,7 +561,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    mu4e-date-format-long "%F"
    mu4e-headers-date-format "%F"
    mu4e-headers-time-format "%T"
-   mu4e-split-view 'horizontal ; 'single-window ; 'horizontal ;  'vertical ; 'single-window ;  'horizontal
+   mu4e-split-view 'single-window
    mail-user-agent 'mu4e-user-agent
    mu4e-headers-visible-lines 20
    mu4e-hide-index-messages t
