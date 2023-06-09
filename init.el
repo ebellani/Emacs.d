@@ -379,7 +379,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         ;; allows multiple agenda views to coexist
         org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
-        org-plantuml-jar-path "/opt/plantuml/plantuml"
+        org-plantuml-jar-path "/opt/"
         org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
         org-log-reschedule 'note
         org-log-into-drawer t
@@ -1158,7 +1158,7 @@ hit C-a twice:"
   :mode (("\\.plantuml$" . plantuml-mode)
          ("\\.puml$" . plantuml-mode
           ))
-  :config (setq plantuml-jar-path "/opt/plantuml/plantuml"
+  :config (setq plantuml-jar-path "/opt/plantuml.jar"
                 plantuml-default-exec-mode 'jar))
 
 (use-package docker
@@ -1852,7 +1852,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package display-line-numbers
   :ensure t
-  :config (setq display-line-numbers-type 'relative))
+  :config (setq display-line-numbers-type t))
 
 (use-package lsp-mssql
   :straight t)
