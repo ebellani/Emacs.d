@@ -379,7 +379,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         ;; allows multiple agenda views to coexist
         org-agenda-sticky nil ;; setting it to t breaks capture from agenda, for now
         org-agenda-span 'day
-        org-plantuml-jar-path "/opt/"
+        org-plantuml-jar-path "/opt/plantuml.jar"
         org-latex-pdf-process (list "latexmk -silent -f -pdf %f")
         org-log-reschedule 'note
         org-log-into-drawer t
