@@ -1847,6 +1847,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package sql-indent
   :straight t)
 
+(use-package protobuf-mode
+  :straight t)
+
+
 (use-package wiki-drill
   :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
 
