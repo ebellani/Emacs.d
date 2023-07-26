@@ -1579,35 +1579,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package emojify
   :straight t)
 
-(use-package lsp-mode
-  :straight t
-  :demand   t
-  :config
-  (add-hook 'fsharp-mode-hook #'lsp)
-  (setq lsp-ui-doc-show-with-cursor nil
-        lsp-ui-doc-use-childframe t
-        lsp-ui-doc-include-signature nil
-        lsp-ui-doc-position 'top
-        lsp-log-io t))
+(use-package eglot
+  :straight t)
 
-(use-package lsp-sqls
-  :after lsp-mode
-  :config
-  (setq lsp-sqls-workspace-config-path nil))
-
-(use-package lsp-ui
-  :straight t
-  :demand   t)
-
-(use-package lsp-java
-  :straight t
-  :after lsp
-  :config (add-hook 'java-mode-hook 'lsp))
-
-(use-package dap-mode
-  :straight t
-  :after lsp-mode
-  :config (dap-auto-configure-mode))
+(use-package eglot-fsharp
+  :straight t)
 
 (use-package dap-java
   :after dap-mode
@@ -1617,10 +1593,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-
-(use-package helm-lsp
-  :after '(lsp helm)
-  :straight t)
 
 (use-package yasnippet
   :straight t
@@ -1857,9 +1829,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package display-line-numbers
   :ensure t
   :config (setq display-line-numbers-type t))
-
-(use-package lsp-mssql
-  :straight t)
 
 (use-package sml-mode
   :straight t)
