@@ -433,6 +433,10 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 (use-package re-builder
   :config (setq reb-re-syntax 'string))
 
+(use-package smerge-mode
+  :config
+  (setq smerge-command-prefix "C-c m"))
+
 (defun set-browser! (&optional arg)
   "Makes the default browser external or internal by setting the
 `browse-url-browser-function' accordingly"
