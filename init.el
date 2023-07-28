@@ -1587,7 +1587,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package eglot-fsharp
-  :straight t)
+  :straight t
+  :config
+  (setq eglot-fsharp-server-version "0.61.1"))
 
 (use-package dap-java
   :after dap-mode
