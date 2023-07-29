@@ -1584,7 +1584,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package eglot
-  :straight t)
+  :ensure t
+  :hook ((sml-mode . eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls")))
 
 (use-package eglot-fsharp
   :straight t
