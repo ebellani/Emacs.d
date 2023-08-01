@@ -1842,6 +1842,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package sml-mode
   :straight t)
 
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
