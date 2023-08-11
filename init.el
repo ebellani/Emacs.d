@@ -1864,6 +1864,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (helm-projectile-on))
 
 
+(use-package vterm
+  :straight t
+  :ensure t)
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
