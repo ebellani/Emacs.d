@@ -1863,6 +1863,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :config
   (helm-projectile-on))
 
+(add-to-list 'sql-connection-alist
+             `(local-pg (sql-product 'postgres)
+                        (sql-user "postgres")
+                        (sql-server "localhost")
+                        (sql-database "postgres")))
 
 (use-package vterm
   :straight t
