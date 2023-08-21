@@ -1325,13 +1325,12 @@ hit C-a twice:"
                              :deadline past
                              :scheduled past
                              :order 10)
-                      (:name "Regular"
+                      (:name "Regular for today"
                              :time-grid t
                              :date today
                              :deadline  today
                              :scheduled today
-                             :order 30)
-                      (:discard (:anything t)))))))
+                             :order 30))))))
       ;; ((org-overriding-columns-format "%WSJF %ITEM %bv %tc %rr-oe %eff %ALLTAGS"))
       ))))
 
