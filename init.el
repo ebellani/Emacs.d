@@ -911,7 +911,11 @@ hit C-a twice:"
 
 (use-package magit
   :straight t
-  :bind (("C-x g" . magit-status)))
+  :bind
+  (("C-x g" . magit-status))
+  :config
+  (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1
+        magit-bury-buffer-function 'magit-restore-window-configuration))
 
 (use-package forge
   :straight t
