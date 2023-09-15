@@ -675,7 +675,8 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 (use-package sql
   :after comint
   :config
-  (add-hook 'sql-interactive-mode-hook 'turn-on-comint-history))
+  (add-hook 'sql-interactive-mode-hook 'turn-on-comint-history)
+  (setq sql-password-wallet (list "~/.authinfo.gpg")))
 
 (use-package python
   :after comint
@@ -1865,12 +1866,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :config
   (helm-projectile-on))
-
-(add-to-list 'sql-connection-alist
-             `(local-pg (sql-product 'postgres)
-                        (sql-user "postgres")
-                        (sql-server "localhost")
-                        (sql-database "postgres")))
 
 (use-package vterm
   :straight t
