@@ -1590,6 +1590,15 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package eglot
   :ensure t
   :hook ((sml-mode . eglot-ensure))
+  :bind (:map eglot-mode-map
+	      ("C-c l a" . eglot-code-actions)
+	      ("C-c l r" . eglot-rename)
+	      ("C-c l h" . eldoc)
+	      ("C-c l f" . eglot-format)
+	      ("C-c l F" . eglot-format-buffer)
+	      ("C-c l d" . xref-find-definitions-at-mouse)
+	      ;; sometimes ionide acts up
+	      ("C-c l R" . eglot-reconnect))
   :config
   (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls")))
 
