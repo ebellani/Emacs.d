@@ -1534,6 +1534,7 @@ hit C-a twice:"
   (setq shrface-href-versatile t))
 
 (defun my/eww-rename-buffer-name ()
+  "Rename the eww buffer to the page's title."
   (rename-buffer
    (if-let ((url (eww-current-url))
             (title (plist-get eww-data :title)))
@@ -1607,9 +1608,40 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :config
   (setq eglot-fsharp-server-version "0.61.1"))
 
-(use-package dap-java
-  :after dap-mode
-  :ensure nil)
+(use-package dape
+  :straight (:host github :repo "svaante/dape" ;; :files ("dist" "*.el")
+                   )
+
+  ;; To use window configuration like gud (gdb-mi)
+  ;; :init
+  ;; (setq dape-buffer-window-arrangement 'gud)
+
+  :config
+  ;; Info buffers to the right
+  ;; (setq dape-buffer-window-arrangement 'right)
+
+  ;; To not display info and/or buffers on startup
+  ;; (remove-hook 'dape-on-start-hooks 'dape-info)
+  ;; (remove-hook 'dape-on-start-hooks 'dape-repl)
+
+  ;; To display info and/or repl buffers on stopped
+  ;; (add-hook 'dape-on-stopped-hooks 'dape-info)
+  ;; (add-hook 'dape-on-stopped-hooks 'dape-repl)
+
+  ;; By default dape uses gdb keybinding prefix
+  ;; If you do not want to use any prefix, set it to nil.
+  ;; (setq dape-key-prefix "\C-x\C-a")
+
+  ;; Kill compile buffer on build success
+  ;; (add-hook 'dape-compile-compile-hooks 'kill-buffer)
+
+  ;; Save buffers on startup, useful for interpreted languages
+  ;; (add-hook 'dape-on-start-hooks
+  ;;           (defun dape--save-on-start ()
+  ;;             (save-some-buffers t t)))
+
+  ;; Projectile users
+  (setq dape-cwd-fn 'projectile-project-root))
 
 (use-package haskell-mode
   :straight t)
@@ -1633,10 +1665,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
   (setq slack-prefer-current-team t)
   (defun endless/slack-message-embed-mention ()
+    "Insert a mention at point."
     (interactive)
     (call-interactively #'slack-message-embed-mention)
     (insert " "))
   (defun my/thumbs-up ()
+    "Insert :+1: at point."
     (interactive)
     (insert ":+1:"))
   ;; from http://endlessparentheses.com/keep-your-slack-distractions-under-control-with-emacs.html
@@ -1746,6 +1780,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 ;; http://sachachua.com/notebook/emacs/small-functions.el
 (defun strip-html ()
+
   "Remove HTML tags from the current buffer,
    (this will affect the whole buffer regardless of the restrictions in effect)."
   (interactive "*")
@@ -1781,7 +1816,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :init
   (require 'persistent-soft)
   :config
-  (unicode-fonts-setup)
+  ;; (unicode-fonts-setup)
   (set-face-attribute 'default nil
                       ;; :family "Noto Mono"
                       :family "Dejavu Sans Mono"
@@ -1887,6 +1922,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :config
   (setq kubernetes-poll-frequency 10
         kubernetes-redraw-frequency 10))
+
+(use-package copilot
+  :straight (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
+  :ensure t)
 
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
