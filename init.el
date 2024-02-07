@@ -1927,6 +1927,13 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
   :ensure t)
 
+(use-package sqlformat
+  :straight t
+  :ensure t
+  :config
+  (setq sqlformat-command 'pgformatter
+        sqlformat-args '("-s2" "-g")))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
