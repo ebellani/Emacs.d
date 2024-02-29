@@ -1934,6 +1934,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (setq sqlformat-command 'pgformatter
         sqlformat-args '("-s2" "-g")))
 
+(use-package eldoc-box
+  :straight t
+  :config
+  (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t))
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
