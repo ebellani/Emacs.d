@@ -1930,9 +1930,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package sqlformat
   :straight t
   :ensure t
-  :config
-  (setq sqlformat-command 'pgformatter
-        sqlformat-args '("-s2" "-g")))
+  :custom
+  (sqlformat-command 'pgformatter)
+  (sqlformat-args '("-s2" "-g")))
 
 (use-package eldoc-box
   :straight t
