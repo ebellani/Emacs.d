@@ -1606,7 +1606,36 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package eglot-fsharp
   :straight t
   :config
-  (setq eglot-fsharp-server-version "0.61.1"))
+  :custom
+  ;; (eglot-fsharp-server-version  'latest)
+  (eglot-fsharp-server-version  "0.72.3")
+  ;; (eglot-fsharp-server-version  "0.70.0")
+  ;; (eglot-fsharp-server-version "0.61.1")
+  )
+
+(use-package lsp-mode
+  :straight t
+  :demand   t
+  :custom
+  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-use-childframe t)
+  (lsp-ui-doc-delay  1.0)
+  (lsp-ui-doc-include-signature nil)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-log-io t)
+  :config
+  ;; (add-hook 'fsharp-mode-hook #'lsp)
+  )
+
+
+(use-package lsp-ui
+  :straight t
+  :demand   t)
+
+(use-package dap-mode
+  :straight t
+  :after lsp-mode
+  :config (dap-auto-configure-mode))
 
 (use-package dape
   :straight (:host github :repo "svaante/dape" ;; :files ("dist" "*.el")
@@ -1643,8 +1672,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   ;; Projectile users
   (setq dape-cwd-fn 'projectile-project-root))
 
-(use-package haskell-mode
-  :straight t)
+;; (use-package haskell-mode
+;;   :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
@@ -1877,7 +1906,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package protobuf-mode
-  :straight t)
+  :straight t
+  :custom (c-basic-offset  2))
 
 
 (use-package wiki-drill
