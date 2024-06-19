@@ -674,9 +674,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 
 (use-package sql
   :after comint
-  :config
-  (add-hook 'sql-interactive-mode-hook 'turn-on-comint-history)
-  (setq sql-password-wallet (list "~/.authinfo.gpg")))
+  :hook (sql-interactive-mode-hook . turn-on-comint-history)
+  :custom (c-basic-offset  4)
+          (sql-password-wallet (list "~/.authinfo.gpg")))
 
 (use-package python
   :after comint
@@ -1176,7 +1176,8 @@ hit C-a twice:"
 
 (use-package docker-compose-mode
   :straight t
-  :mode "docker-compose.*\.yml\\'")
+  :mode "docker-compose.*\.yml\\'"
+ :custom docker-compose-command "docker compose")
 
 (use-package dockerfile-mode
   :straight t
@@ -1954,8 +1955,22 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
         kubernetes-redraw-frequency 10))
 
 (use-package copilot
-  :straight (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
-  :ensure t)
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :ensure t
+  :bind (:map copilot-mode-map
+              ("<tab>" . my/copilot-tab)
+              ("s-n" . copilot-next-completion)
+              ("s-p" . copilot-previous-completion)
+              ("s-w" . copilot-accept-completion-by-word)
+              ("s-l" . copilot-accept-completion-by-line))
+  :config
+  (defun my/copilot-tab ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (indent-for-tab-command)))
+
+  :hook
+  (prog-mode . copilot-mode))
 
 (use-package sqlformat
   :straight t
@@ -1969,10 +1984,24 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :config
   (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
+(use-package envrc
+  :straight t
+  :hook (after-init . envrc-global-mode))
+
+(use-package kafka-cli
+  :straight t
+  )
+
+
 (put 'scroll-left 'disabled nil)
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
+
+;; (add-hook 'sql-mode-hook 'lsp)
+;; (setq lsp-sqls-workspace-config-path nil)
+;; (setq lsp-sqls-connections
+;;     '(((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"))))
+;;     ;; '(((driver . "postgresql") (dataSourceName . "host=127.0.0.1 port=5432 user=postgres dbname=postgres sslmode=disable"))))
 
 (defun combination (k l)
   (cond
@@ -1982,3 +2011,4 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
    (t (append (mapcar #'(lambda (x) (cons (first l) x))
 		      (combination (1- k) (rest l)))
 	      (combination k (rest l))))))
+(put 'narrow-to-region 'disabled nil)
