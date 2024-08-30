@@ -139,6 +139,8 @@ with those, storing the result in a `DIARY-FILE'"
 (eval-when-compile
   (require 'use-package))
 
+(straight-use-package 'org)
+
 ;;; https://github.com/raxod502/radian/blob/develop/emacs/radian.el
 
 (defmacro use-feature (name &rest args)
@@ -235,6 +237,16 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
               (concat "\n" extra-log)
             "")))
 
+(use-package ox-gfm
+  :straight t
+  :after ox)
+
+(use-package ox-moderncv
+  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
+  :init (require 'ox-moderncv))
+
+(use-package taskjuggler-mode)
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -242,7 +254,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
          ("C-c b" . 'org-iswitchb))
   :straight t
   :preface
-  (setq org-export-backends '(moderncv md gfm beamer ascii taskjuggler html latex odt org))
+  (setq org-export-backends '(moderncv md gfm beamer ascii html latex odt org))
   :config
   (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
@@ -605,8 +617,6 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   (setq mm-automatic-display
         (remove "application/pgp-signature" mm-automatic-display)))
 
-(use-package taskjuggler-mode)
-
 (use-package windmove
   :bind
   (("C-x <left>"  . 'windmove-left)     ; move to left windnow
@@ -815,7 +825,7 @@ hit C-a twice:"
 
 (use-package files
   :config
-  (setq require-final-newline t))
+  (setq require-final-newline nil))
 
 (use-package tool-bar
   :config
@@ -885,18 +895,27 @@ hit C-a twice:"
   :straight t
   :config
   (require 'smtpmail-async)
-  (setq message-send-mail-function  #'async-smtpmail-send-it
-        ;; #'message--default-send-mail-function
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 587
-        smtpmail-debug-info t))
+  (setq ; why mail-extr-all-top-level-domains is breaking this?
+   ;; look at inject variables later
+   mail-extr-all-top-level-domains nil
+   send-mail-function 'async-smtpmail-send-it
+   message-send-mail-function 'async-smtpmail-send-it
+   async-debug t
+   ;; message-send-mail-function  #'smtpmail-send-it
+   ;; #'message--default-send-mail-function
+   smtpmail-default-smtp-server "smtp.gmail.com"
+   smtpmail-smtp-server "smtp.gmail.com"
+   smtpmail-smtp-service 587
+   undo-tree-enable-undo-in-region nil
+   smtpmail-debug-info nil
+   ))
 
 (use-package undo-tree
   :straight t
   :config
   (global-undo-tree-mode)
   (setq undo-tree-visualizer-diff t
+        undo-tree-enable-undo-in-region nil
         undo-tree-visualizer-timestamps t
         undo-tree-history-directory-alist  `(("." . ,temporary-file-directory))))
 
@@ -1045,6 +1064,8 @@ hit C-a twice:"
 
   ;; smartparens
   (require 'smartparens-config)
+
+  (add-to-list 'sp-ignore-modes-list #'org-mode)
 
   (use-feature org-agenda
     :config
@@ -1367,10 +1388,6 @@ hit C-a twice:"
   :straight t
   :after org)
 
-(use-package ox-gfm
-  :straight t
-  :after ox)
-
 (use-package perspective
   :straight t
   :custom
@@ -1490,7 +1507,9 @@ hit C-a twice:"
 
 (use-package org-contrib
   :straight t
-  :after org)
+  :after org
+  :custom
+  (org-expiry-inactive-timestamps t))
 
 (use-package org-contacts
   :after org
@@ -1582,10 +1601,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (setq nov-shr-rendering-functions '((img . nov-render-img) (title . nov-render-title)))
   (setq nov-shr-rendering-functions (append nov-shr-rendering-functions shr-external-rendering-functions)))
 
-(use-package ox-moderncv
-  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
-  :init (require 'ox-moderncv))
-
 (use-package emojify
   :straight t)
 
@@ -1598,50 +1613,49 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 	      ("C-c l h" . eldoc)
 	      ("C-c l f" . eglot-format)
 	      ("C-c l F" . eglot-format-buffer)
-	      ("C-c l d" . xref-find-definitions-at-mouse)
+	      ;; ("C-c l d" . xref-find-definitions-at-mouse)
 	      ;; sometimes ionide acts up
 	      ("C-c l R" . eglot-reconnect))
   :config
-  (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls")))
+  (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls"))
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure))
 
 (use-package eglot-fsharp
   :straight t
-  :config
+  :after eglot
   :custom
-  ;; (eglot-fsharp-server-version  'latest)
-  (eglot-fsharp-server-version  "0.72.3")
-  ;; (eglot-fsharp-server-version  "0.70.0")
-  ;; (eglot-fsharp-server-version "0.61.1")
-  )
+  (eglot-fsharp-server-version  "0.72.3"))
 
-(use-package lsp-mode
-  :straight t
-  :demand   t
-  :custom
-  (lsp-ui-doc-show-with-cursor t)
-  (lsp-ui-doc-use-childframe t)
-  (lsp-ui-doc-delay  1.0)
-  (lsp-ui-doc-include-signature nil)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-log-io t)
-  :config
-  ;; (add-hook 'fsharp-mode-hook #'lsp)
-  )
+;; (use-package lsp-mode
+;;   :straight t
+;;   :demand   t
+;;   :custom
+;;   (lsp-ui-doc-show-with-cursor t)
+;;   (lsp-ui-doc-use-childframe t)
+;;   (lsp-ui-doc-delay  1.0)
+;;   (lsp-ui-doc-include-signature nil)
+;;   (lsp-ui-doc-position 'at-point)
+;;   (lsp-log-io t)
+;;   :config
+;;   ;; (add-hook 'fsharp-mode-hook #'lsp)
+;;   )
 
 
-(use-package lsp-ui
-  :straight t
-  :demand   t)
+;; (use-package lsp-ui
+;;   :straight t
+;;   :demand   t)
 
-(use-package dap-mode
-  :straight t
-  :after lsp-mode
-  :config (dap-auto-configure-mode))
+;; (use-package dap-mode
+;;   :straight t
+;;   :after lsp-mode
+;;   :config (dap-auto-configure-mode))
 
 (use-package dape
   :straight (:host github :repo "svaante/dape" ;; :files ("dist" "*.el")
                    )
-
+  :after eglot
   ;; To use window configuration like gud (gdb-mi)
   ;; :init
   ;; (setq dape-buffer-window-arrangement 'gud)
@@ -1672,9 +1686,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
   ;; Projectile users
   (setq dape-cwd-fn 'projectile-project-root))
-
-;; (use-package haskell-mode
-;;   :straight t)
 
 (straight-use-package  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
@@ -1910,7 +1921,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :custom (c-basic-offset  2))
 
-
 (use-package wiki-drill
   :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
 
@@ -1933,9 +1943,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :diminish
   :config
   (projectile-global-mode)
-  (setq projectile-enable-caching t
-        projectile-indexing-method 'alien
-        projectile-mode-line "Projectile"))
+  :custom
+  (projectile-enable-caching t)
+  (projectile-indexing-method 'alien)
+  ;; https://github.com/bbatsov/projectile/issues/1075#issuecomment-1003794929
+  (projectile-use-git-grep t)
+  (projectile-mode-line "Projectile"))
 
 (use-package helm-projectile
   :straight t
@@ -1977,12 +1990,13 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :ensure t
   :custom
   (sqlformat-command 'pgformatter)
-  (sqlformat-args '("-s2" "-g")))
+  (sqlformat-args '("-s2" "-u0" "-U0" "-f0")))
 
 (use-package eldoc-box
   :straight t
   :config
   (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t))
+
 
 (use-package envrc
   :straight t
@@ -1992,8 +2006,38 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   )
 
+(use-package ada-mode
+  :straight t)
 
-(put 'scroll-left 'disabled nil)
+(use-package gendoxy
+  :straight t)
+
+(use-package cmake-mode
+  :straight t)
+
+;; postgres, from  postgresql 16 "editor/emacs.samples" file
+
+(c-add-style "postgresql"
+             '("bsd"
+               (c-auto-align-backslashes . nil)
+               (c-basic-offset . 4)
+               (c-offsets-alist . ((case-label . +)
+                                   (label . -)
+                                   (statement-case-open . +)))
+               (fill-column . 78)
+               (indent-tabs-mode . t)
+               (tab-width . 4)))
+
+(add-hook 'c-mode-hook
+          (defun postgresql-c-mode-hook ()
+            (when (string-match "/postgres\\(ql\\)?/" buffer-file-name)
+              (c-set-style "postgresql")
+              ;; Don't override the style we just set with the style in
+              ;; `dir-locals-file'.  Emacs 23.4.1 needs this; it is obsolete,
+              ;; albeit harmless, by Emacs 24.3.1.
+              (set (make-local-variable 'ignored-local-variables)
+                   (append '(c-file-style) ignored-local-variables)))))
+
 (put 'list-threads 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
@@ -2011,4 +2055,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
    (t (append (mapcar #'(lambda (x) (cons (first l) x))
 		      (combination (1- k) (rest l)))
 	      (combination k (rest l))))))
-(put 'narrow-to-region 'disabled nil)
+;; debug async
+;; (setq deferred:debug t
+;;       async-debug t)
+(put 'scroll-left 'disabled nil)
