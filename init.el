@@ -254,7 +254,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
          ("C-c b" . 'org-iswitchb))
   :straight t
   :preface
-  (setq org-export-backends '(moderncv md gfm beamer ascii html latex odt org))
+  (setq org-export-backends '(org moderncv md gfm beamer ascii html latex odt))
   :config
   (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
@@ -691,6 +691,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 (use-package python
   :after comint
   :config
+  (add-to-list 'Info-directory-list "/home/user/Projects/pydoc-info/python-3.12.0-docs-texinfo/")
   (add-hook 'inferior-python-mode-hook 'turn-on-comint-history))
 
 (use-package esh
@@ -893,6 +894,7 @@ hit C-a twice:"
 
 (use-package async
   :straight t
+  :defer 0
   :config
   (require 'smtpmail-async)
   (setq ; why mail-extr-all-top-level-domains is breaking this?
@@ -924,7 +926,7 @@ hit C-a twice:"
   :config
   (psession-savehist-mode 1)
   (psession-mode 1)
-  (psession-autosave-mode 1)
+  (psession-autosave-mode 0)
   (bind-key "C-x p s" 'psession-save-winconf)
   (bind-key "C-x p d" 'psession-delete-winconf)
   (bind-key "C-x p j" 'psession-restore-winconf))
@@ -1693,6 +1695,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :config (yas-global-mode))
 
+(use-package yasnippet-snippets
+  :straight t)
+
+
 (use-package flycheck
   :ensure t
   :straight t
@@ -1861,7 +1867,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (set-face-attribute 'default nil
                       ;; :family "Noto Mono"
                       :family "Dejavu Sans Mono"
-                      :height 90
+                      :height 100
                       :weight 'normal
                       :width 'normal))
 
@@ -2009,8 +2015,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package ada-mode
   :straight t)
 
-(use-package gendoxy
-  :straight t)
+;; (use-package gendoxy
+;;   :straight t)
 
 (use-package cmake-mode
   :straight t)
