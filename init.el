@@ -67,16 +67,6 @@ with those, storing the result in a `DIARY-FILE'"
              s))))
      diary-file)))
 
-;; add the custom file inside the emacs folder
-
-(let ((custom-file-path (my/path :emacs "custom.el")))
-  (if (file-readable-p custom-file-path)
-      (progn
-        (setq custom-file custom-file-path)
-        (load custom-file))
-    (warn "Custom file not found at expected path %s" custom-file-path)))
-
-
 ;;; things that I don't know how to do with use-package
 (setq system-time-locale "en_US.UTF-8")
 ;; (setq system-time-locale "pt_BR.UTF-8")
@@ -118,6 +108,8 @@ with those, storing the result in a `DIARY-FILE'"
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+(straight-use-package-mode 1)
 
 (straight-use-package 'use-package)
 
@@ -1027,7 +1019,6 @@ hit C-a twice:"
 (use-package smartparens
   :straight t
   :demand t
-  :ensure t
   :config
   ;; When in Paredit emulation mode, Smartparens binds M-( to wrap the
   ;; following s-expression in round parentheses. By analogy, we
@@ -1138,7 +1129,6 @@ hit C-a twice:"
 
 (use-package eldoc
   :straight t
-  :diminish t
   :hook ((c-mode-common
           emacs-lisp-mode
           lisp-interaction-mode
@@ -1171,7 +1161,6 @@ hit C-a twice:"
 
 (use-package elisp-slime-nav
   :straight t
-  :diminish
   :hook ((emacs-lisp-mode) . elisp-slime-nav-mode)
   :commands (elisp-slime-nav-mode
              elisp-slime-nav-find-elisp-thing-at-point))
@@ -1223,7 +1212,6 @@ hit C-a twice:"
 
 (use-package helm
   :straight t
-  :diminish
   :bind (("C-h a"   . helm-apropos)
          ("C-x b"   . helm-mini)
          ("C-x C-b" . helm-buffers-list)
@@ -1315,7 +1303,6 @@ hit C-a twice:"
 
 ;; Only for the built-in themes on Emacs 28+
 (use-package emacs
-  :ensure
   :init
   ;; Add all your customizations prior to loading the themes
   (setq modus-themes-italic-constructs t
@@ -1606,8 +1593,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package emojify
   :straight t)
 
+(use-package project
+  )
+
 (use-package eglot
-  :ensure t
+
   :hook ((sml-mode . eglot-ensure))
   :bind (:map eglot-mode-map
 	      ("C-c l a" . eglot-code-actions)
@@ -1700,7 +1690,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 
 (use-package flycheck
-  :ensure t
   :straight t
   :init (global-flycheck-mode)
   :config
@@ -1765,7 +1754,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package clojure-mode
   :straight t
-  :ensure t
   :init
   (defconst clojure--prettify-symbols-alist
     '(("fn"   . ?λ)))
@@ -1779,7 +1767,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package cider
   :straight t
-  :ensure t
   :commands (cider cider-connect cider-jack-in)
   :init
   (setq cider-auto-select-error-buffer t
@@ -1874,18 +1861,15 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 ;; Major mode for OCaml programming
 (use-package tuareg
   :straight t
-  :ensure t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
 
 ;; Major mode for editing Dune project files
 (use-package dune
-  :straight t
-  :ensure t)
+  :straight t)
 
 ;; Merlin provides advanced IDE features
 (use-package merlin
   :straight t
-  :ensure t
   :config
   (add-hook 'tuareg-mode-hook #'merlin-mode)
   (add-hook 'merlin-mode-hook #'company-mode)
@@ -1894,20 +1878,17 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package merlin-eldoc
   :straight t
-  :ensure t
   :hook ((tuareg-mode) . merlin-eldoc-setup))
 
 ;; This uses Merlin internally
 (use-package flycheck-ocaml
   :straight t
-  :ensure t
   :config
   (flycheck-ocaml-setup))
 
 ;; utop configuration
 (use-package utop
   :straight t
-  :ensure t
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode))
 
@@ -1931,7 +1912,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
 
 (use-package display-line-numbers
-  :ensure t
   :config (setq display-line-numbers-type t))
 
 (use-package sml-mode
@@ -1946,7 +1926,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :defer 5
   :bind (:map projectile-mode-map
               ("C-c p" . projectile-command-map))
-  :diminish
   :config
   (projectile-global-mode)
   :custom
@@ -1963,37 +1942,35 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package vterm
   :straight t
-  :ensure t)
+  :custom
+  (vterm-buffer-name-string "vterm %s"))
 
 (use-package kubernetes
   :straight t
-  :ensure t
   :commands (kubernetes-overview)
   :config
   (setq kubernetes-poll-frequency 10
         kubernetes-redraw-frequency 10))
 
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :ensure t
-  :bind (:map copilot-mode-map
-              ("<tab>" . my/copilot-tab)
-              ("s-n" . copilot-next-completion)
-              ("s-p" . copilot-previous-completion)
-              ("s-w" . copilot-accept-completion-by-word)
-              ("s-l" . copilot-accept-completion-by-line))
-  :config
-  (defun my/copilot-tab ()
-    (interactive)
-    (or (copilot-accept-completion)
-        (indent-for-tab-command)))
+;; (use-package copilot
+;;   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+;;   :bind (:map copilot-mode-map
+;;               ("<tab>" . my/copilot-tab)
+;;               ("s-n" . copilot-next-completion)
+;;               ("s-p" . copilot-previous-completion)
+;;               ("s-w" . copilot-accept-completion-by-word)
+;;               ("s-l" . copilot-accept-completion-by-line))
+;;   :config
+;;   (defun my/copilot-tab ()
+;;     (interactive)
+;;     (or (copilot-accept-completion)
+;;         (indent-for-tab-command)))
 
-  :hook
-  (prog-mode . copilot-mode))
+;;   :hook
+;;   (prog-mode . copilot-mode))
 
 (use-package sqlformat
   :straight t
-  :ensure t
   :custom
   (sqlformat-command 'pgformatter)
   (sqlformat-args '("-s2" "-u0" "-U0" "-f0")))
@@ -2008,12 +1985,17 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :hook (after-init . envrc-global-mode))
 
-(use-package kafka-cli
-  :straight t
-  )
 
 (use-package ada-mode
   :straight t)
+
+(use-package terraform-mode
+  :straight t
+  ;; https://alexpeits.github.io/emacs.d/#org4abbaef
+  :mode ("\\.tf\\'" . terraform-mode)
+  :config
+  (when (executable-find "terraform")
+    (terraform-format-on-save-mode +1)))
 
 ;; (use-package gendoxy
 ;;   :straight t)
@@ -2065,3 +2047,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 ;; (setq deferred:debug t
 ;;       async-debug t)
 (put 'scroll-left 'disabled nil)
+
+;; add the custom file inside the emacs folder
+
+(let ((custom-file-path (my/path :emacs "custom.el")))
+  (if (file-readable-p custom-file-path)
+      (progn
+        (setq custom-file custom-file-path)
+        (load custom-file))
+    (warn "Custom file not found at expected path %s" custom-file-path)))
