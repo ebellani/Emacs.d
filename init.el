@@ -510,6 +510,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   (advice-add 'mu4e-ask-bookmark :override #'my/mu4e-ask-bookmark)
   (setq
    mu4e-get-mail-command "mbsync -c ~/.mbsyncrc gmail"
+   mail-extr-all-top-level-domains nil
    ;; avoid auto next
    mu4e-headers-advance-after-mark t
    mu4e-headers-show-threads t
