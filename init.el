@@ -1126,7 +1126,9 @@ hit C-a twice:"
     (setf (cdr (assq key sp-message-alist)) nil))
   ;; Enable Smartparens functionality in all buffers.
   (smartparens-global-mode 1)
-  (smartparens-global-strict-mode +1))
+  (smartparens-global-strict-mode +1)
+  (remove-hook 'comint-mode-hook 'smartparens-mode)
+)
 
 (use-package eldoc
   :straight t
@@ -1781,6 +1783,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
         nrepl-popup-stacktraces nil)
   (add-hook 'cider-mode-hook 'eldoc-mode)
   (add-hook 'cider-mode-hook 'company-mode)
+  (remove-hook 'cider-mode-hook 'smartparens-mode)
   :bind (:map cider-mode-map
          ("C-c C-v C-c" . cider-send-and-evaluate-sexp)
          ("C-c C-p"     . cider-eval-print-last-sexp)))
