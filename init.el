@@ -892,7 +892,7 @@ hit C-a twice:"
   (require 'smtpmail-async)
   (setq ; why mail-extr-all-top-level-domains is breaking this?
    ;; look at inject variables later
-   omail-extr-all-top-level-domains nil
+   mail-extr-all-top-level-domains nil
    send-mail-function 'async-smtpmail-send-it
    message-send-mail-function 'async-smtpmail-send-it
    async-debug t
