@@ -1059,6 +1059,7 @@ hit C-a twice:"
   (require 'smartparens-config)
 
   (add-to-list 'sp-ignore-modes-list #'org-mode)
+  (add-to-list 'sp-ignore-modes-list #'sql-interactive-mode)
 
   (use-feature org-agenda
     :config
