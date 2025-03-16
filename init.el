@@ -890,9 +890,8 @@ hit C-a twice:"
   :defer 0
   :config
   (require 'smtpmail-async)
-  (setq ; why mail-extr-all-top-level-domains is breaking this?
-   ;; look at inject variables later
-   mail-extr-all-top-level-domains nil
+  (add-to-list 'async-inject-variables-exclude-regexps "\\`\\(mail-extr-all-top-level-domains\\)")
+  (setq
    send-mail-function 'async-smtpmail-send-it
    message-send-mail-function 'async-smtpmail-send-it
    async-debug t
@@ -1247,9 +1246,9 @@ hit C-a twice:"
         helm-imenu-fuzzy-match                 t
         helm-buffer-max-length                 50
         helm-ff-candidate-number-limit         200
-        helm-display-function                  'helm-display-buffer-in-own-frame
+        ;; helm-display-function                  'helm-display-buffer-in-own-frame
         helm-display-buffer-width              90
-        ;; helm-display-function                  'helm-default-display-buffer
+        helm-display-function                  'helm-default-display-buffer
         helm-display-buffer-reuse-frame        t
         helm-use-undecorated-frame-option      t
         helm-show-completion-display-function #'helm-show-completion-default-display-function)
