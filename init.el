@@ -239,14 +239,20 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 
 (use-package taskjuggler-mode)
 
+(use-package ox-hugo
+  :straight t
+  :ensure t   ;Auto-install the package from Melpa
+  :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
+  :after ox)
+
+
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
-  :straight t
-  :preface
-  (setq org-export-backends '(blackfriday hugo org moderncv md gfm beamer ascii html latex odt))
+  :straight (:type built-in)
+  :preface   (setq org-export-backends '(org ascii html latex moderncv odt md gfm beamer blackfriday hugo))
   :config
   (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
@@ -678,7 +684,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 (use-package sql
   :hook (sql-interactive-mode-hook . turn-on-comint-history)
   :custom (c-basic-offset  4)
-          (sql-password-wallet (list "~/.authinfo.gpg")))
+  (sql-password-wallet (list "~/.authinfo.gpg"))
+  :config
+  (add-hook 'sql-interactive-mode-hook 'turn-on-comint-history))
 
 (use-package python
   :after comint
@@ -1012,7 +1020,7 @@ hit C-a twice:"
 
 (use-package emacs
   :hook ((compilation-filter . ansi-color-compilation-filter))
-  ;; :config (show-paren-mode)
+  :config (show-paren-mode)
   )
 
 (use-package smartparens
@@ -1496,14 +1504,14 @@ hit C-a twice:"
           :full-frame t
           :candidate-number-limit 500)))
 
-(use-package org-contrib
-  :straight t
-  :after org
-  :custom
-  (org-expiry-inactive-timestamps t))
+;; (use-package org-contrib
+;;   :straight t
+;;   :after org
+;;   :custom
+;;   (org-expiry-inactive-timestamps t))
 
 (use-package org-contacts
-  :after org
+  ;; :after org
   :straight t
   :config
   (setq org-contacts-files (list  (my/path :agenda "contacts.org")))
@@ -1739,9 +1747,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :after (slack))
 
-(use-package ox-hugo
-  :straight t)
-
 (use-package alert
   :straight t
   :commands (alert)
@@ -1837,11 +1842,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
       (replace-string "&gt;" ">")
       (goto-char (point-min)))))
 
-(use-package org-inline-anim
-  :after org
-  :straight t
-  :config
-  (add-hook 'org-mode-hook #'org-inline-anim-mode))
+;; (use-package org-inline-anim
+;;   :after org
+;;   :straight t
+;;   :config
+;;   (add-hook 'org-mode-hook #'org-inline-anim-mode))
 
 (use-package persistent-soft
   :straight t
