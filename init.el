@@ -69,6 +69,8 @@ with those, storing the result in a `DIARY-FILE'"
 
 ;;; things that I don't know how to do with use-package
 (setq system-time-locale "en_US.UTF-8")
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
 ;; (setq system-time-locale "pt_BR.UTF-8")
 
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -401,6 +403,14 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         org-refile-use-cache t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts t)
+  ;; https://emacs.stackexchange.com/q/81657 acmart
+  (add-to-list 'org-latex-classes
+               '("sigconf"
+                 ;; https://conf.researchr.org/track/icse-2026/icse-2026-research-track
+                 "\\documentclass[sigconf,review,anonymous]{acmart}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (plist-put org-format-latex-options :scale 1.3)
 
   (defun my/org-capture-mail ()
@@ -439,6 +449,13 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   (defun org-set-as-habit ()
     (interactive)
     (org-set-property "STYLE" "habit")))
+
+(defun set-properties-based-on-title ()
+  (interactive)
+  (let ((property-value (org-hugo-get-heading-slug (org-element-at-point) nil)))
+    (org-set-property "EXPORT_FILE_NAME" property-value)
+    (org-set-property "CUSTOM_ID" property-value)
+    (org-set-property "EXPORT_DATE" (format-time-string "%Y-%m-%d"))))
 
 (use-package re-builder
   :config (setq reb-re-syntax 'string))
