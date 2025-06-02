@@ -231,23 +231,6 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
               (concat "\n" extra-log)
             "")))
 
-(use-package ox-gfm
-  :straight t
-  :after ox)
-
-(use-package ox-moderncv
-  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
-  :init (require 'ox-moderncv))
-
-(use-package taskjuggler-mode)
-
-(use-package ox-hugo
-  :straight t
-  :ensure t   ;Auto-install the package from Melpa
-  :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
-  :after ox)
-
-
 (use-package org
   :bind (("C-c l" . 'org-store-link)
          ("C-c c" . 'org-capture)
@@ -403,14 +386,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         org-refile-use-cache t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts t)
-  ;; https://emacs.stackexchange.com/q/81657 acmart
-  (add-to-list 'org-latex-classes
-               '("sigconf"
-                 ;; https://conf.researchr.org/track/icse-2026/icse-2026-research-track
-                 "\\documentclass[sigconf,review,anonymous]{acmart}"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
   (plist-put org-format-latex-options :scale 1.3)
 
   (defun my/org-capture-mail ()
@@ -448,7 +424,33 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
      (org    . t)))
   (defun org-set-as-habit ()
     (interactive)
-    (org-set-property "STYLE" "habit")))
+    (org-set-property "STYLE" "habit"))
+
+  ;; https://emacs.stackexchange.com/q/81657 acmart
+  (require 'ox-latex)
+  (add-to-list 'org-latex-classes
+               '("sigconf"
+                 ;; https://conf.researchr.org/track/icse-2026/icse-2026-research-track
+                 "\\documentclass[sigconf,review,anonymous]{acmart}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+(use-package ox-gfm
+  :straight t
+  :after ox)
+
+(use-package ox-moderncv
+  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
+  :init (require 'ox-moderncv))
+
+(use-package taskjuggler-mode)
+
+(use-package ox-hugo
+  :straight t
+  :ensure t   ;Auto-install the package from Melpa
+  :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
+  :after ox)
 
 (defun set-properties-based-on-title ()
   (interactive)
@@ -640,6 +642,8 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
    ("C-x <up>"    . 'windmove-up)       ; move to upper window
    ("C-x <down>"  . 'windmove-down)     ; move to downer window
    ))
+
+
 
 (use-package nxml
   :mode (("\..*proj$" . nxml-mode)))
@@ -1035,11 +1039,6 @@ hit C-a twice:"
          ("C-c %"   . vr/query-replace)
          ("<C-m> /" . vr/mc-mark)))
 
-(use-package emacs
-  :hook ((compilation-filter . ansi-color-compilation-filter))
-  :config (show-paren-mode)
-  )
-
 (use-package smartparens
   :straight t
   :demand t
@@ -1335,10 +1334,15 @@ hit C-a twice:"
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs nil
         modus-themes-region '(bg-only no-extend))
+  :hook ((compilation-filter . ansi-color-compilation-filter))
+  :bind ("<f5>" . modus-themes-toggle)
   :config
+  (show-paren-mode)
   ;; Load the theme of your choice:
   (load-theme 'modus-operandi) ; OR (load-theme 'modus-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
+  (setq split-height-threshold nil)
+  (setq split-width-threshold 0)
+  )
 
 (use-package gnuplot-mode
   :straight t)
