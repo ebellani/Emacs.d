@@ -708,7 +708,6 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 ;;; save history of some modes
 
 (use-package sql
-  :hook (sql-interactive-mode-hook . turn-on-comint-history)
   :custom (c-basic-offset  4)
   (sql-password-wallet (list "~/.authinfo.gpg"))
   :config
