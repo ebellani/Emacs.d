@@ -663,6 +663,11 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map))
 
 (use-package comint
+  :init
+  (bind-keys
+   :map comint-mode-map
+   ("C-x p" . comint-complete-input-ring)
+   ("C-x <up>" . nil))
   ;; This is based on
   ;; https://oleksandrmanzyuk.wordpress.com/2011/10/23/a-persistent-command-history-in-emacs/
   ;; The idea is to store sessions of comint based modes. For example, to enable
