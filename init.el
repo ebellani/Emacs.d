@@ -52,6 +52,13 @@ accumulating.")
 ;; IDK why this is needed.
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
+(let ((custom-file-path (my/path :emacs "custom.el")))
+  (if (file-readable-p custom-file-path)
+      (progn
+        (setq custom-file custom-file-path)
+        (load custom-file))
+    (warn "Custom file not found at expected path %s" custom-file-path)))
+
 (use-package gcal-sync)
 
 (defun my/get-gcal (username diary-file)
@@ -230,6 +237,10 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
           (if extra-log
               (concat "\n" extra-log)
             "")))
+
+(use-package ox-moderncv
+  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
+  :init (require 'ox-moderncv))
 
 (use-package org
   :bind (("C-c l" . 'org-store-link)
@@ -439,10 +450,6 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
 (use-package ox-gfm
   :straight t
   :after ox)
-
-(use-package ox-moderncv
-  :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
-  :init (require 'ox-moderncv))
 
 (use-package taskjuggler-mode)
 
@@ -1417,6 +1424,8 @@ hit C-a twice:"
   :straight t
   :custom
   (persp-mode-prefix-key (kbd "C-x x"))
+  :bind (:map persp-mode-map
+              ("C-x x x" . persp-switch-last))
   :config
   (unless (default-value 'persp-mode)
     (persp-mode +1))
@@ -2037,6 +2046,16 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package cmake-mode
   :straight t)
 
+(use-package direnv
+  :straight t
+  :config
+  (direnv-mode))
+
+(use-package tree-sitter-langs
+  :straight t
+  :ensure t
+  :after tree-sitter)
+
 ;; postgres, from  postgresql 16 "editor/emacs.samples" file
 
 (use-package ein
@@ -2087,9 +2106,5 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 ;; add the custom file inside the emacs folder
 
-(let ((custom-file-path (my/path :emacs "custom.el")))
-  (if (file-readable-p custom-file-path)
-      (progn
-        (setq custom-file custom-file-path)
-        (load custom-file))
-    (warn "Custom file not found at expected path %s" custom-file-path)))
+(put 'narrow-to-region 'disabled nil)
+
