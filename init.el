@@ -675,6 +675,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   ;; simply add turn-on-comint-history to inferior-haskell-mode-hook by adding
   ;; it to the :hook directive
   :config
+  (setq comint-input-ring-size 10000)
   (defun comint-write-history-on-exit (process event)
     (comint-write-input-ring)
     (let ((buf (process-buffer process)))
@@ -2037,6 +2038,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 ;; postgres, from  postgresql 16 "editor/emacs.samples" file
+
+(use-package ein
+  :straight t)
 
 (c-add-style "postgresql"
              '("bsd"
