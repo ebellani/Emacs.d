@@ -1421,10 +1421,11 @@ hit C-a twice:"
   :after org)
 
 (use-package perspective
-  :straight t   
+  :straight t
   :bind (:map persp-mode-map
               ("C-x x x" . persp-switch-last))
   :config
+  (persp-mode-set-prefix-key (kbd "C-x x"))
   (unless (default-value 'persp-mode)
     (persp-mode +1))
   (persp-mode-set-prefix-key (kbd "C-x x"))
@@ -1434,9 +1435,6 @@ hit C-a twice:"
 (use-package helm-org-rifle
   :straight t
   :bind (("C-c r"   . helm-org-rifle-agenda-files)))
-
-(use-package bufler
-  :straight t)
 
 (use-package which-key
   :straight t
@@ -1461,9 +1459,6 @@ hit C-a twice:"
   :straight t
   :bind (:map pyenv-mode-map
               ("C-c C-s" . nil)))
-
-(use-package orgit
-  :straight t)
 
 (use-package org-drill
   :straight t
@@ -2060,6 +2055,18 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package ein
   :straight t)
 
+(use-package aidermacs
+  :bind (("C-c a" . aidermacs-transient-menu))
+  :config
+  ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
+  (setenv "ANTHROPIC_API_KEY" "sk-...")
+  ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
+  (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
+  :custom
+  ; See the Configuration section below
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "sonnet"))
+
 (c-add-style "postgresql"
              '("bsd"
                (c-auto-align-backslashes . nil)
@@ -2106,4 +2113,3 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 ;; add the custom file inside the emacs folder
 
 (put 'narrow-to-region 'disabled nil)
-
