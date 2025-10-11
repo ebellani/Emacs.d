@@ -1421,12 +1421,11 @@ hit C-a twice:"
   :after org)
 
 (use-package perspective
-  :straight t
-  :custom
-  (persp-mode-prefix-key (kbd "C-x x"))
+  :straight t   
   :bind (:map persp-mode-map
               ("C-x x x" . persp-switch-last))
   :config
+  (persp-mode-set-prefix-key (kbd "C-x x"))
   (unless (default-value 'persp-mode)
     (persp-mode +1))
   (add-hook 'kill-emacs-hook #'persp-state-save)
