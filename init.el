@@ -1424,11 +1424,11 @@ hit C-a twice:"
   :straight t
   :bind (:map persp-mode-map
               ("C-x x x" . persp-switch-last))
+  :custom
+  (persp-mode-set-prefix-key (kbd "C-x x"))
+  :init
+  (persp-mode +1)
   :config
-  (persp-mode-set-prefix-key (kbd "C-x x"))
-  (unless (default-value 'persp-mode)
-    (persp-mode +1))
-  (persp-mode-set-prefix-key (kbd "C-x x"))
   (add-hook 'kill-emacs-hook #'persp-state-save)
   (setq persp-state-default-file "~/.emacs.d/persp.state"))
 
