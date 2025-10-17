@@ -1424,10 +1424,9 @@ hit C-a twice:"
   :straight t
   :bind (:map persp-mode-map
               ("C-x x x" . persp-switch-last))
-  :custom
-  (persp-mode-set-prefix-key (kbd "C-x x"))
   :init
   (persp-mode +1)
+  (persp-mode-set-prefix-key (kbd "C-x x"))
   :config
   (add-hook 'kill-emacs-hook #'persp-state-save)
   (setq persp-state-default-file "~/.emacs.d/persp.state"))
@@ -2056,12 +2055,13 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package aidermacs
-  :bind (("C-c a" . aidermacs-transient-menu))
+  :straight t
+  ;; :bind (("C-c a" . aidermacs-transient-menu))
   :config
   ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
-  (setenv "ANTHROPIC_API_KEY" "sk-...")
-  ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
-  (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
+  ;; (setenv "ANTHROPIC_API_KEY" "sk-...")
+  ;; ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
+  ;; (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
   :custom
   ; See the Configuration section below
   (aidermacs-default-chat-mode 'architect)
