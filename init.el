@@ -2055,9 +2055,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package aidermacs
-  :straight t
-  ;; :bind (("C-c a" . aidermacs-transient-menu))
-  :config
+  :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))  
+  :bind (("C-c m" . aidermacs-transient-menu))
+  ;; :config
   ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
   ;; (setenv "ANTHROPIC_API_KEY" "sk-...")
   ;; ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
@@ -2065,7 +2065,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :custom
   ; See the Configuration section below
   (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "sonnet"))
+  (aidermacs-default-model "sonnet")
+  )
 
 (c-add-style "postgresql"
              '("bsd"
