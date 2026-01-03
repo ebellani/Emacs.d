@@ -1941,8 +1941,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package protobuf-mode
-  :straight t
-  :custom (c-basic-offset  2))
+  :straight (protobuf-mode :type git :host github :repo "google/protobuf"
+                           :files ("editors/protobuf-mode.el"))
+  :custom (c-basic-offset 2))
 
 (use-package wiki-drill
   :straight '(:host gitlab :repo "mtekman/wiki-drill.el"))
@@ -2055,7 +2056,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t)
 
 (use-package aidermacs
-  :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))  
+  :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))
   :bind (("C-c m" . aidermacs-transient-menu))
   ;; :config
   ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
@@ -2064,9 +2065,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   ;; (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
   :custom
   ; See the Configuration section below
-  (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "sonnet")
-  )
+  (aidermacs-default-chat-mode 'architect))
 
 (c-add-style "postgresql"
              '("bsd"
