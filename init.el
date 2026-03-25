@@ -2067,6 +2067,14 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   ; See the Configuration section below
   (aidermacs-default-chat-mode 'architect))
 
+(defun show-file-name ()
+  "Show the full path file name in the minibuffer. https://stackoverflow.com/questions/3669511/the-function-to-show-current-files-full-path-in-mini-buffer"
+  (interactive)
+  (message (buffer-file-name))
+  (kill-new (file-truename buffer-file-name)))
+
+(global-set-key "\C-cz" 'show-file-name)
+
 (c-add-style "postgresql"
              '("bsd"
                (c-auto-align-backslashes . nil)
