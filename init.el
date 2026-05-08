@@ -141,7 +141,7 @@ with those, storing the result in a `DIARY-FILE'"
   (require 'use-package))
 
 (straight-use-package 'org)
-
+(straight-use-package 'project)
 ;;; https://github.com/raxod502/radian/blob/develop/emacs/radian.el
 
 (defmacro use-feature (name &rest args)
@@ -1631,12 +1631,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package emojify
   :straight t)
 
-(use-package project
-  )
-
 (use-package eglot
-
-  :hook ((sml-mode . eglot-ensure))
+  :straight t
   :bind (:map eglot-mode-map
 	      ("C-c l a" . eglot-code-actions)
 	      ("C-c l r" . eglot-rename)
@@ -1648,39 +1644,23 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 	      ("C-c l R" . eglot-reconnect))
   :config
   (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls"))
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-  (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure))
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd")))
+
+(use-package eglot-booster
+	:straight ( eglot-booster :type git :host nil :repo "https://github.com/jdtsmith/eglot-booster")
+	:after eglot
+	:config (eglot-booster-mode))
+
+(use-package typescript-mode
+  :straight t
+  :mode "\\.ts\\'"
+  :mode "\\.tsx\\'")
 
 (use-package eglot-fsharp
   :straight t
   :after eglot
   :custom
   (eglot-fsharp-server-version  "0.72.3"))
-
-;; (use-package lsp-mode
-;;   :straight t
-;;   :demand   t
-;;   :custom
-;;   (lsp-ui-doc-show-with-cursor t)
-;;   (lsp-ui-doc-use-childframe t)
-;;   (lsp-ui-doc-delay  1.0)
-;;   (lsp-ui-doc-include-signature nil)
-;;   (lsp-ui-doc-position 'at-point)
-;;   (lsp-log-io t)
-;;   :config
-;;   ;; (add-hook 'fsharp-mode-hook #'lsp)
-;;   )
-
-
-;; (use-package lsp-ui
-;;   :straight t
-;;   :demand   t)
-
-;; (use-package dap-mode
-;;   :straight t
-;;   :after lsp-mode
-;;   :config (dap-auto-configure-mode))
 
 (use-package dape
   :straight (:host github :repo "svaante/dape" ;; :files ("dist" "*.el")
@@ -1725,13 +1705,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package yasnippet-snippets
   :straight t)
-
-
-(use-package flycheck
-  :straight t
-  :init (global-flycheck-mode)
-  :config
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 (use-package slack
   :straight t
@@ -2055,17 +2028,30 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package ein
   :straight t)
 
+;; Dart mode and LSP configuration
+(use-package dart-mode
+  :straight t
+  :config
+  ;; Optional: Set up some keybindings
+  (setq dart-format-on-save t)
+  (add-to-list 'auto-mode-alist '("\\.dart\\'" . dart-mode)))
+
 (use-package aidermacs
   :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))
   :bind (("C-c m" . aidermacs-transient-menu))
   ;; :config
-  ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
+                                        ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
   ;; (setenv "ANTHROPIC_API_KEY" "sk-...")
   ;; ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
   ;; (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
   :custom
-  ; See the Configuration section below
-  (aidermacs-default-chat-mode 'architect))
+                                        ; See the Configuration section below
+  (aidermacs-default-chat-mode 'architect)
+  (add-hook 'aidermacs-comint-mode-hook 'turn-on-comint-history))
+
+(use-package eglot-java
+  :straight t
+  :hook ('java-mode-hook #'eglot-java-mode))
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer. https://stackoverflow.com/questions/3669511/the-function-to-show-current-files-full-path-in-mini-buffer"
