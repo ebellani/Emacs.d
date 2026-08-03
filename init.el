@@ -238,6 +238,21 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
               (concat "\n" extra-log)
             "")))
 
+;; (use-package ox-blackfriday
+;;   :straight t
+;;   ;; :after ox
+;;   )
+
+(use-package ox-gfm
+  :straight t
+  :after ox
+  )
+
+(use-package ox-hugo
+  :straight t
+  :after ox
+  )
+
 (use-package ox-moderncv
   :straight '(:host gitlab :repo "eduardo-bellani/org-cv")
   :init (require 'ox-moderncv))
@@ -248,7 +263,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
          ("C-c a" . 'org-agenda)
          ("C-c b" . 'org-iswitchb))
   :straight (:type built-in)
-  :preface   (setq org-export-backends '(org ascii html latex moderncv odt md gfm beamer blackfriday hugo))
+  :preface   (setq org-export-backends '(org ascii html latex moderncv odt md beamer hugo))
   :config
   (require 'oc-biblatex)
   (setq org-refile-file-path (my/path :emacs "refile.org")
@@ -418,6 +433,7 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((dot     . t)
+     (calc    . t)
      (latex   . t)
      (shell   . t)
      (python  . t)
@@ -446,10 +462,6 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
-
-(use-package ox-gfm
-  :straight t
-  :after ox)
 
 (use-package taskjuggler-mode)
 
@@ -953,15 +965,15 @@ hit C-a twice:"
         undo-tree-visualizer-timestamps t
         undo-tree-history-directory-alist  `(("." . ,temporary-file-directory))))
 
-(use-package psession
-  :straight t
-  :config
-  (psession-savehist-mode 1)
-  (psession-mode 1)
-  (psession-autosave-mode 0)
-  (bind-key "C-x p s" 'psession-save-winconf)
-  (bind-key "C-x p d" 'psession-delete-winconf)
-  (bind-key "C-x p j" 'psession-restore-winconf))
+;; (use-package psession
+;;   :straight t
+;;   :config
+;;   (psession-savehist-mode 1)
+;;   (psession-mode 1)
+;;   (psession-autosave-mode 0)
+;;   (bind-key "C-x p s" 'psession-save-winconf)
+;;   (bind-key "C-x p d" 'psession-delete-winconf)
+;;   (bind-key "C-x p j" 'psession-restore-winconf))
 
 (use-package magit
   :straight t
@@ -1265,9 +1277,10 @@ hit C-a twice:"
          ("M-I"     . helm-swoop-back-to-last-point)
          ("C-c M-i" . helm-multi-swoop)
          ("C-x M-i" . helm-multi-swoop-all))
-  :bind (:map helm-map
-              ("<tab>" . helm-execute-persistent-action)
-              ("C-z"   . helm-select-action))
+  ;; these don't play well with a multiplexed terminal
+  ;; :bind (:map helm-map
+  ;;             ("<tab>" . helm-execute-persistent-action)
+  ;;             ("C-z"   . helm-select-action))
   :config
   (setq helm-ff-transformer-show-only-basename nil
         helm-external-programs-associations '(("zip" . "unzip")
@@ -1285,6 +1298,9 @@ hit C-a twice:"
         ;; helm-display-function                  'helm-display-buffer-in-own-frame
         helm-display-buffer-width              90
         helm-display-function                  'helm-default-display-buffer
+        helm-split-window-inside-p t
+        helm-always-two-windows           nil
+        helm-move-to-line-cycle-in-source  t
         helm-display-buffer-reuse-frame        t
         helm-use-undecorated-frame-option      t
         helm-show-completion-display-function #'helm-show-completion-default-display-function)
@@ -1660,7 +1676,15 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :after eglot
   :custom
-  (eglot-fsharp-server-version  "0.72.3"))
+  (eglot-fsharp-server-version  "0.83.0"))
+
+;; (with-eval-after-load 'eglot
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '(fsharp-mode . ("/nix/store/yp1ngdaqa89xh2y1zf60mmkwkfxgdyhf-fsautocomplete-0.80.1/bin/fsautocomplete" "--adaptive-lsp-server-enabled")))
+
+;;     ;; (add-to-list 'eglot-server-programs
+;;     ;;              '(fsharp-mode . ("/home/user/.dotnet/tools/fsautocomplete" "--adaptive-lsp-server-enabled")))
+;;     )
 
 (use-package dape
   :straight (:host github :repo "svaante/dape" ;; :files ("dist" "*.el")
@@ -2045,13 +2069,33 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   ;; ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
   ;; (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
   :custom
-                                        ; See the Configuration section below
+  ; See the Configuration section below
   (aidermacs-default-chat-mode 'architect)
-  (add-hook 'aidermacs-comint-mode-hook 'turn-on-comint-history))
+  (add-hook 'aidermacs-comint-mode-hook 'turn-on-comint-history)
+  (aidermacs-backend 'comint)
+  (aidermacs-auto-accept-architect nil)
+  (aidermacs-auto-commits t)
+  )
+
 
 (use-package eglot-java
   :straight t
   :hook ('java-mode-hook #'eglot-java-mode))
+
+(straight-use-package
+ '(shell-maker :type git :host github :repo "xenodium/shell-maker"))
+
+
+(straight-use-package
+ '(acp :type git :host github :repo "xenodium/acp.el"))
+
+(use-package agent-shell
+  :straight (:host github :repo "xenodium/agent-shell")
+  :bind (("C-c a s" . agent-shell)) ; Optional: Bind to a handy shortcut
+  :after (acp shell-maker)
+  :config
+  ;; Add any additional agent-shell configurations here
+  )
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer. https://stackoverflow.com/questions/3669511/the-function-to-show-current-files-full-path-in-mini-buffer"
@@ -2107,3 +2151,5 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 ;; add the custom file inside the emacs folder
 
 (put 'narrow-to-region 'disabled nil)
+
+
