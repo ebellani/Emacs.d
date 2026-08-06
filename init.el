@@ -2082,20 +2082,17 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :hook ('java-mode-hook #'eglot-java-mode))
 
-(straight-use-package
- '(shell-maker :type git :host github :repo "xenodium/shell-maker"))
+(use-package shell-maker
+  :straight (:host github :repo "xenodium/shell-maker" :files ("*.el"))
+  :ensure t)
 
-
-(straight-use-package
- '(acp :type git :host github :repo "xenodium/acp.el"))
+(use-package acp
+  :straight (:host github :repo "xenodium/acp.el" :files ("*.el"))
+  :ensure t)
 
 (use-package agent-shell
   :straight (:host github :repo "xenodium/agent-shell")
-  :bind (("C-c a s" . agent-shell)) ; Optional: Bind to a handy shortcut
-  :after (acp shell-maker)
-  :config
-  ;; Add any additional agent-shell configurations here
-  )
+  :after (acp shell-maker))
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer. https://stackoverflow.com/questions/3669511/the-function-to-show-current-files-full-path-in-mini-buffer"
@@ -2151,5 +2148,3 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 ;; add the custom file inside the emacs folder
 
 (put 'narrow-to-region 'disabled nil)
-
-
