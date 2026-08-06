@@ -2082,6 +2082,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :hook ('java-mode-hook #'eglot-java-mode))
 
+
 (use-package shell-maker
   :straight (:host github :repo "xenodium/shell-maker" :files ("*.el"))
   :ensure t)
@@ -2093,6 +2094,11 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package agent-shell
   :straight (:host github :repo "xenodium/agent-shell")
   :after (acp shell-maker))
+
+(use-package ox-reveal
+  :straight t
+  :config
+  (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer. https://stackoverflow.com/questions/3669511/the-function-to-show-current-files-full-path-in-mini-buffer"
