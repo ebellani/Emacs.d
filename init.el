@@ -412,6 +412,9 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
         org-refile-use-cache t
         org-pretty-entities t
         org-pretty-entities-include-sub-superscripts t)
+  (remove-hook 'kill-emacs-hook #'org-persist-clear-storage-maybe)
+  (remove-hook 'kill-emacs-hook #'org-persist-write-all)
+  (remove-hook 'kill-emacs-hook #'org-persist-gc)
 
   (plist-put org-format-latex-options :scale 1.3)
 
@@ -1662,10 +1665,10 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls"))
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd")))
 
-(use-package eglot-booster
-	:straight ( eglot-booster :type git :host nil :repo "https://github.com/jdtsmith/eglot-booster")
-	:after eglot
-	:config (eglot-booster-mode))
+;; (use-package eglot-booster
+;; 	:straight ( eglot-booster :type git :host nil :repo "https://github.com/jdtsmith/eglot-booster")
+;; 	:after eglot
+;; 	:config (eglot-booster-mode))
 
 (use-package typescript-mode
   :straight t
@@ -1676,7 +1679,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight t
   :after eglot
   :custom
-  (eglot-fsharp-server-version  "0.83.0"))
+  (eglot-fsharp-server-version  "0.84.0"))
 
 ;; (with-eval-after-load 'eglot
 ;;   ;; (add-to-list 'eglot-server-programs
@@ -2093,6 +2096,7 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 
 (use-package agent-shell
   :straight (:host github :repo "xenodium/agent-shell")
+  :custom (agent-shell-session-restore-verbosity 'full)
   :after (acp shell-maker))
 
 (use-package ox-reveal
