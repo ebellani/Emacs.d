@@ -1663,7 +1663,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 	      ("C-c l R" . eglot-reconnect))
   :config
   (add-to-list 'eglot-server-programs '((sml-mode) "millet-ls"))
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd")))
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-to-list 'eglot-server-programs '(sql-mode . ("postgres-language-server" "lsp-proxy"))))
 
 ;; (use-package eglot-booster
 ;; 	:straight ( eglot-booster :type git :host nil :repo "https://github.com/jdtsmith/eglot-booster")
