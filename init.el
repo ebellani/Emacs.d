@@ -977,6 +977,22 @@ hit C-a twice:"
 ;;   (bind-key "C-x p s" 'psession-save-winconf)
 ;;   (bind-key "C-x p d" 'psession-delete-winconf)
 ;;   (bind-key "C-x p j" 'psession-restore-winconf))
+;; (defalias 'set-local (symbol-function 'setq-local))
+
+;; (setq package-install-upgrade-built-in t)
+
+(unless (fboundp 'set-local)
+  (defun set-local (sym val)
+    "Make SYM buffer-local and set it to VAL."
+    (set (make-local-variable sym) val)))
+
+(defalias 'magit--any 'cl-member-if)
+
+(unless (fboundp 'any)
+  (defalias 'any 'cl-member-if))
+
+(unless (fboundp 'all)
+  (defalias 'all 'cl-every))
 
 (use-package magit
   :straight t
@@ -1964,8 +1980,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :defer 5
   :bind (:map projectile-mode-map
               ("C-c p" . projectile-command-map))
-  :config
-  (projectile-global-mode)
+  ;; :config
+  ;; (projectile-global-mode)
   :custom
   (projectile-enable-caching t)
   (projectile-indexing-method 'alien)
