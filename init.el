@@ -59,21 +59,6 @@ accumulating.")
         (load custom-file))
     (warn "Custom file not found at expected path %s" custom-file-path)))
 
-(use-package gcal-sync)
-
-(defun my/get-gcal (username diary-file)
-  "From a .authinfo file, uses `USERNAME' to get the secret URL
-password for a gcal sync and calls `gcal-sync-calendars-to-diary'
-with those, storing the result in a `DIARY-FILE'"
-  (let ((auth (car (auth-source-search :host username))))
-    (gcal-sync-calendars-to-diary
-     `((,(plist-get auth :user)
-        ,(let ((s (plist-get auth :secret)))
-           (if (functionp s)
-               (funcall s)
-             s))))
-     diary-file)))
-
 ;;; things that I don't know how to do with use-package
 (setq system-time-locale "en_US.UTF-8")
 (set-language-environment "UTF-8")
@@ -1567,12 +1552,6 @@ hit C-a twice:"
           :full-frame t
           :candidate-number-limit 500)))
 
-;; (use-package org-contrib
-;;   :straight t
-;;   :after org
-;;   :custom
-;;   (org-expiry-inactive-timestamps t))
-
 (use-package org-contacts
   ;; :after org
   :straight t
@@ -1985,11 +1964,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   ;; :config
   ;; (projectile-global-mode)
   :custom
-  (projectile-enable-caching t)
-  (projectile-indexing-method 'alien)
-  ;; https://github.com/bbatsov/projectile/issues/1075#issuecomment-1003794929
-  (projectile-use-git-grep t)
-  (projectile-mode-line "Projectile"))
+  ((projectile-enable-caching t)
+   (projectile-indexing-method 'alien)
+   ;; https://github.com/bbatsov/projectile/issues/1075#issuecomment-1003794929
+   (projectile-use-git-grep t)
+   (projectile-mode-line "Projectile")))
+
 
 (use-package helm-projectile
   :straight t
@@ -2116,8 +2096,8 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package agent-shell
   :straight (:host github :repo "xenodium/agent-shell")
   :custom
-  (agent-shell-session-restore-verbosity 'full)
-  (agent-shell-elicitation--experimental-feature-enabled t)
+  ((agent-shell-session-restore-verbosity 'full)
+   (agent-shell-elicitation--experimental-feature-enabled t))
   :after (acp shell-maker))
 
 (use-package ox-reveal
