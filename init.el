@@ -2017,11 +2017,6 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t))
 
 
-(use-package envrc
-  :straight t
-  :hook (after-init . envrc-global-mode))
-
-
 (use-package ada-mode
   :straight t)
 
@@ -2039,10 +2034,9 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
 (use-package cmake-mode
   :straight t)
 
-(use-package direnv
+(use-package envrc
   :straight t
-  :config
-  (direnv-mode))
+  :hook (after-init . envrc-global-mode))
 
 (use-package tree-sitter-langs
   :straight t
@@ -2097,8 +2091,12 @@ https://emacs.stackexchange.com/questions/59449/how-do-i-save-raw-bytes-into-a-f
   :straight (:host github :repo "xenodium/agent-shell")
   :custom
   ((agent-shell-session-restore-verbosity 'full)
-   (agent-shell-elicitation--experimental-feature-enabled t))
+   (agent-shell-elicitation--experimental-feature-enabled t)
+   (agent-shell-preferred-agent-config 'claude-code))
   :after (acp shell-maker))
+
+(global-set-key (kbd "C-c m") #'agent-shell-anthropic-start-claude-code)
+
 
 (use-package ox-reveal
   :straight t
