@@ -7,8 +7,6 @@
 
 (require 'cl-lib)
 
-(setq lexical-binding t)
-
 (if init-file-debug
     (setq use-package-verbose t
           use-package-expand-minimally nil
@@ -396,7 +394,8 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                                      (t csl))
         org-refile-use-cache t
         org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts t)
+        org-pretty-entities-include-sub-superscripts t
+        org-agenda-inhibit-startup t)
   (remove-hook 'kill-emacs-hook #'org-persist-clear-storage-maybe)
   (remove-hook 'kill-emacs-hook #'org-persist-write-all)
   (remove-hook 'kill-emacs-hook #'org-persist-gc)
@@ -450,6 +449,30 @@ SCHEDULED: %%(org-insert-time-stamp nil nil nil nil nil \" .+%sd\")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+(setq org-archive-subtree-save-file-p nil)
+
+(defun my/org-reverse-archive-done ()
+  "Collect all DONE heading points, then archive them from bottom to top."
+  (interactive)
+  (require 'org-archive)
+  (let ((points '())
+        (inhibit-modification-hooks t)
+        (org-archive-subtree-save-file-p nil))
+    ;; Pass 1: Collect all matching points (stored in reverse order by push)
+    (org-map-entries
+     (lambda ()
+       (push (point) points))
+     "/DONE" 'file)
+
+    ;; Pass 2: Archive from the bottom of the file upward
+    (dolist (pt points)
+      (message "Will archive: %s" (org-get-heading t t t t))
+      (goto-char pt)
+      (org-archive-subtree))
+
+    (org-save-all-org-buffers)
+    (message "Archived %d DONE tasks." (length points))))
 
 (use-package taskjuggler-mode)
 
